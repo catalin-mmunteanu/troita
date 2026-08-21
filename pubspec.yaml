@@ -1,0 +1,57 @@
+name: troita
+description: Vă anunță discret când treceți pe lângă o biserică ortodoxă.
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  # 3.6 is the floor for Color.withValues(); anything older forces
+  # the deprecated withOpacity() throughout the theme.
+  sdk: ">=3.6.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Reads the same SQLite file the native background path writes. Deliberately
+  # the only data dependency: no ORM, no code generation, no second schema.
+  sqflite: ^2.3.3
+
+  # Runtime permissions. The background-location flow in particular is fiddly
+  # enough (settings-page redirect on API 30+) that hand-rolling it is a trap.
+  permission_handler: ^11.3.1
+
+  intl: ^0.20.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  # Runs the real SQL against an in-memory SQLite on the host, so the
+  # repository tests exercise production queries rather than a fake.
+  sqflite_common_ffi: ^2.3.3
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/churches/
+
+  # Uncomment once the .ttf files are in assets/fonts/ — see the README there.
+  # Until then Flutter falls back to the platform font, which is a warning
+  # rather than a build failure, so the app runs either way.
+  #
+  # fonts:
+  #   - family: Fraunces
+  #     fonts:
+  #       - asset: assets/fonts/Fraunces-VariableFont.ttf
+  #       - asset: assets/fonts/Fraunces-Bold.ttf
+  #         weight: 700
+  #   - family: Geist
+  #     fonts:
+  #       - asset: assets/fonts/Geist-Regular.ttf
+  #         weight: 400
+  #       - asset: assets/fonts/Geist-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Geist-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Geist-Bold.ttf
+  #         weight: 700

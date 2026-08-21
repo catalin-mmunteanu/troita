@@ -1,0 +1,16 @@
+<!-- Notification icons are rendered as a silhouette: only the alpha channel
+     survives, so this must be a solid white shape on transparent. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFFFF">
+    <!-- Roofed roadside cross: the troiță silhouette. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,1L4.5,5.2v1.5h15V5.2L12,1z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M10.9,8.1v2.6H8v2.2h2.9V23h2.2v-10.1H16v-2.2h-2.9V8.1z" />
+</vector>

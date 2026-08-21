@@ -1,0 +1,16 @@
+<!-- 108dp canvas, but only the central 72dp is guaranteed visible on adaptive
+     icons — everything here stays inside roughly x/y 24..92. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Roof of the troiță. -->
+    <path
+        android:fillColor="#F7F3EC"
+        android:pathData="M54,26 L24,40 v5 h60 v-5 z" />
+    <!-- Cross. -->
+    <path
+        android:fillColor="#F7F3EC"
+        android:pathData="M49,45 h10 v10 h15 v10 h-15 v27 h-10 v-27 h-15 v-10 h15 z" />
+</vector>

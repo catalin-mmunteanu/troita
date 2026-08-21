@@ -1,0 +1,95 @@
+{
+  "_README": "Major commemorations for the Romanian Orthodox calendar. `rank` drives the calendar markers and the notification style: praznic > cruce_rosie > cruce_neagra > simplu. `dezlegare` overrides the computed fast level for that day (fish|wineOil|none). Movable feasts use `movable` instead of `date`, keyed to FeastCalendar._movable. Everything here is verified=0 until checked against the Patriarchate's printed calendar.",
+  "feasts": [
+    {"movable": "pascha", "name": "Învierea Domnului (Sfintele Paști)", "short": "Sfintele Paști", "rank": "praznic", "kind": "domnesc"},
+    {"date": "12-25", "name": "Nașterea Domnului (Crăciunul)", "short": "Nașterea Domnului", "rank": "praznic", "kind": "domnesc"},
+    {"date": "01-06", "name": "Botezul Domnului (Boboteaza)", "short": "Boboteaza", "rank": "praznic", "kind": "domnesc"},
+    {"date": "02-02", "name": "Întâmpinarea Domnului", "short": "Întâmpinarea Domnului", "rank": "praznic", "kind": "domnesc"},
+    {"date": "03-25", "name": "Buna Vestire", "short": "Buna Vestire", "rank": "praznic", "kind": "maica_domnului", "dezlegare": "fish"},
+    {"movable": "palm_sunday", "name": "Intrarea Domnului în Ierusalim (Floriile)", "short": "Floriile", "rank": "praznic", "kind": "domnesc", "dezlegare": "fish"},
+    {"movable": "ascension", "name": "Înălțarea Domnului", "short": "Înălțarea Domnului", "rank": "praznic", "kind": "domnesc", "note": "Ziua Eroilor."},
+    {"movable": "pentecost", "name": "Pogorârea Sfântului Duh (Rusaliile)", "short": "Rusaliile", "rank": "praznic", "kind": "domnesc"},
+    {"date": "08-06", "name": "Schimbarea la Față a Domnului", "short": "Schimbarea la Față", "rank": "praznic", "kind": "domnesc", "dezlegare": "fish"},
+    {"date": "08-15", "name": "Adormirea Maicii Domnului", "short": "Adormirea Maicii Domnului", "rank": "praznic", "kind": "maica_domnului"},
+    {"date": "09-08", "name": "Nașterea Maicii Domnului", "short": "Nașterea Maicii Domnului", "rank": "praznic", "kind": "maica_domnului"},
+    {"date": "09-14", "name": "Înălțarea Sfintei Cruci", "short": "Înălțarea Sfintei Cruci", "rank": "praznic", "kind": "domnesc", "note": "Zi de post aspru, chiar dacă este praznic."},
+    {"date": "11-21", "name": "Intrarea în Biserică a Maicii Domnului", "short": "Intrarea în Biserică", "rank": "praznic", "kind": "maica_domnului", "dezlegare": "fish"},
+
+    {"movable": "pentecost_monday", "name": "Sfânta Treime", "short": "Sfânta Treime", "rank": "cruce_rosie", "kind": "domnesc"},
+    {"movable": "bright_friday", "name": "Izvorul Tămăduirii", "short": "Izvorul Tămăduirii", "rank": "cruce_rosie", "kind": "maica_domnului"},
+    {"movable": "thomas_sunday", "name": "Duminica Tomii", "short": "Duminica Tomii", "rank": "cruce_neagra", "kind": "domnesc"},
+    {"movable": "myrrhbearers", "name": "Duminica Mironosițelor", "short": "Mironosițele", "rank": "cruce_neagra", "kind": "sfant"},
+    {"movable": "orthodoxy_sunday", "name": "Duminica Ortodoxiei", "short": "Duminica Ortodoxiei", "rank": "cruce_neagra", "kind": "domnesc"},
+    {"movable": "all_saints", "name": "Duminica Tuturor Sfinților", "short": "Toți Sfinții", "rank": "cruce_neagra", "kind": "sfant"},
+    {"movable": "romanian_saints", "name": "Duminica Sfinților Români", "short": "Sfinții Români", "rank": "cruce_rosie", "kind": "romanesc"},
+    {"movable": "lazarus_saturday", "name": "Sâmbăta lui Lazăr", "short": "Sâmbăta lui Lazăr", "rank": "cruce_neagra", "kind": "domnesc"},
+    {"movable": "theodore_saturday", "name": "Sfântul Mucenic Teodor Tiron", "short": "Sf. Teodor Tiron", "rank": "cruce_neagra", "kind": "sfant"},
+
+    {"date": "01-01", "name": "Tăierea împrejur cea după trup a Domnului; Sfântul Ierarh Vasile cel Mare", "short": "Sf. Vasile cel Mare", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "01-02", "name": "Sfântul Ierarh Silvestru, episcopul Romei", "short": "Sf. Silvestru", "rank": "simplu", "kind": "sfant"},
+    {"date": "01-05", "name": "Ajunul Bobotezei", "short": "Ajunul Bobotezei", "rank": "cruce_neagra", "kind": "domnesc", "note": "Zi de ajunare."},
+    {"date": "01-07", "name": "Soborul Sfântului Prooroc Ioan Botezătorul", "short": "Sf. Ioan Botezătorul", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "01-12", "name": "Sfânta Muceniță Tatiana", "short": "Sf. Tatiana", "rank": "simplu", "kind": "sfant"},
+    {"date": "01-16", "name": "Închinarea cinstitului lanț al Sfântului Apostol Petru", "short": "Lanțul Sf. Petru", "rank": "simplu", "kind": "sfant"},
+    {"date": "01-17", "name": "Sfântul Cuvios Antonie cel Mare", "short": "Sf. Antonie cel Mare", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "01-18", "name": "Sfinții Ierarhi Atanasie și Chiril, arhiepiscopii Alexandriei", "short": "Sf. Atanasie și Chiril", "rank": "cruce_neagra", "kind": "sfant"},
+    {"date": "01-25", "name": "Sfântul Ierarh Grigorie Teologul", "short": "Sf. Grigorie Teologul", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "01-30", "name": "Sfinții Trei Ierarhi: Vasile cel Mare, Grigorie Teologul și Ioan Gură de Aur", "short": "Sfinții Trei Ierarhi", "rank": "cruce_rosie", "kind": "sfant"},
+
+    {"date": "02-10", "name": "Sfântul Sfințit Mucenic Haralambie", "short": "Sf. Haralambie", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "02-17", "name": "Sfântul Mare Mucenic Teodor Tiron", "short": "Sf. Teodor Tiron", "rank": "cruce_neagra", "kind": "sfant"},
+
+    {"date": "03-09", "name": "Sfinții 40 de Mucenici din Sevastia", "short": "Sfinții 40 de Mucenici", "rank": "cruce_rosie", "kind": "sfant", "dezlegare": "wineOil"},
+
+    {"date": "04-11", "name": "Sfântul Ierarh Calinic de la Cernica", "short": "Sf. Calinic de la Cernica", "rank": "cruce_rosie", "kind": "romanesc"},
+    {"date": "04-23", "name": "Sfântul Mare Mucenic Gheorghe, Purtătorul de biruință", "short": "Sf. Gheorghe", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "04-25", "name": "Sfântul Apostol și Evanghelist Marcu", "short": "Sf. Ap. Marcu", "rank": "cruce_neagra", "kind": "sfant"},
+
+    {"date": "05-02", "name": "Aducerea moaștelor Sfântului Ierarh Atanasie cel Mare", "short": "Sf. Atanasie cel Mare", "rank": "simplu", "kind": "sfant"},
+    {"date": "05-08", "name": "Sfântul Apostol și Evanghelist Ioan Teologul", "short": "Sf. Ap. Ioan Teologul", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "05-21", "name": "Sfinții Împărați Constantin și Elena", "short": "Sf. Constantin și Elena", "rank": "cruce_rosie", "kind": "sfant"},
+
+    {"date": "06-02", "name": "Sfântul Ioan cel Nou de la Suceava", "short": "Sf. Ioan cel Nou", "rank": "cruce_rosie", "kind": "romanesc"},
+    {"date": "06-24", "name": "Nașterea Sfântului Prooroc Ioan Botezătorul", "short": "Nașterea Sf. Ioan", "rank": "cruce_rosie", "kind": "sfant", "dezlegare": "fish"},
+    {"date": "06-29", "name": "Sfinții Apostoli Petru și Pavel", "short": "Sf. Ap. Petru și Pavel", "rank": "cruce_rosie", "kind": "sfant", "dezlegare": "fish"},
+    {"date": "06-30", "name": "Soborul Sfinților 12 Apostoli", "short": "Soborul Sf. Apostoli", "rank": "cruce_neagra", "kind": "sfant"},
+
+    {"date": "07-02", "name": "Sfântul Voievod Ștefan cel Mare", "short": "Sf. Ștefan cel Mare", "rank": "cruce_rosie", "kind": "romanesc"},
+    {"date": "07-20", "name": "Sfântul Prooroc Ilie Tesviteanul", "short": "Sf. Prooroc Ilie", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "07-22", "name": "Sfânta Maria Magdalena, întocmai cu apostolii", "short": "Sf. Maria Magdalena", "rank": "cruce_neagra", "kind": "sfant"},
+    {"date": "07-25", "name": "Adormirea Sfintei Ana, mama Născătoarei de Dumnezeu", "short": "Adormirea Sf. Ana", "rank": "cruce_neagra", "kind": "sfant"},
+    {"date": "07-27", "name": "Sfântul Mare Mucenic și Tămăduitor Pantelimon", "short": "Sf. Pantelimon", "rank": "cruce_rosie", "kind": "sfant"},
+
+    {"date": "08-05", "name": "Sfântul Cuvios Ioan Iacob de la Neamț", "short": "Sf. Ioan Iacob", "rank": "cruce_neagra", "kind": "romanesc"},
+    {"date": "08-16", "name": "Sfinții Martiri Brâncoveni: Constantin Vodă cu cei patru fii și sfetnicul Ianache", "short": "Sfinții Brâncoveni", "rank": "cruce_rosie", "kind": "romanesc"},
+    {"date": "08-29", "name": "Tăierea Capului Sfântului Prooroc Ioan Botezătorul", "short": "Tăierea Capului Sf. Ioan", "rank": "cruce_rosie", "kind": "sfant", "note": "Zi de post aspru."},
+
+    {"date": "09-01", "name": "Începutul anului bisericesc", "short": "Anul bisericesc nou", "rank": "cruce_neagra", "kind": "domnesc"},
+    {"date": "09-13", "name": "Sfântul Ierarh Iosif cel Nou de la Partoș", "short": "Sf. Iosif de la Partoș", "rank": "cruce_rosie", "kind": "romanesc"},
+    {"date": "09-26", "name": "Adormirea Sfântului Apostol și Evanghelist Ioan", "short": "Adormirea Sf. Ap. Ioan", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "09-27", "name": "Sfântul Ierarh Antim Ivireanul", "short": "Sf. Antim Ivireanul", "rank": "cruce_rosie", "kind": "romanesc"},
+
+    {"date": "10-01", "name": "Acoperământul Maicii Domnului; Sfântul Cuvios Iosif de la Văratec", "short": "Acoperământul Maicii Domnului", "rank": "cruce_rosie", "kind": "maica_domnului"},
+    {"date": "10-14", "name": "Sfânta Cuvioasă Parascheva de la Iași", "short": "Sf. Cuv. Parascheva", "rank": "cruce_rosie", "kind": "romanesc"},
+    {"date": "10-26", "name": "Sfântul Mare Mucenic Dimitrie, Izvorâtorul de Mir", "short": "Sf. M. Mc. Dimitrie", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "10-27", "name": "Sfântul Cuvios Dimitrie cel Nou, ocrotitorul Bucureștilor", "short": "Sf. Dimitrie cel Nou", "rank": "cruce_rosie", "kind": "romanesc"},
+
+    {"date": "11-08", "name": "Sfinții Arhangheli Mihail și Gavriil", "short": "Sf. Arhangheli Mihail și Gavriil", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "11-13", "name": "Sfântul Ierarh Ioan Gură de Aur", "short": "Sf. Ioan Gură de Aur", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "11-14", "name": "Sfântul Apostol Filip", "short": "Sf. Ap. Filip", "rank": "cruce_neagra", "kind": "sfant", "note": "Lăsatul secului pentru Postul Nașterii Domnului."},
+    {"date": "11-15", "name": "Sfântul Cuvios Paisie de la Neamț", "short": "Sf. Paisie de la Neamț", "rank": "cruce_neagra", "kind": "romanesc", "note": "Începutul Postului Nașterii Domnului."},
+    {"date": "11-16", "name": "Sfântul Apostol și Evanghelist Matei", "short": "Sf. Ap. Matei", "rank": "cruce_neagra", "kind": "sfant"},
+    {"date": "11-25", "name": "Sfânta Mare Muceniță Ecaterina", "short": "Sf. Ecaterina", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "11-30", "name": "Sfântul Apostol Andrei, cel Întâi chemat, Ocrotitorul României", "short": "Sf. Ap. Andrei", "rank": "cruce_rosie", "kind": "romanesc", "dezlegare": "fish"},
+
+    {"date": "12-04", "name": "Sfânta Mare Muceniță Varvara", "short": "Sf. Varvara", "rank": "cruce_neagra", "kind": "sfant"},
+    {"date": "12-06", "name": "Sfântul Ierarh Nicolae, arhiepiscopul Mirelor Lichiei", "short": "Sf. Ierarh Nicolae", "rank": "cruce_rosie", "kind": "sfant", "dezlegare": "fish"},
+    {"date": "12-09", "name": "Zămislirea Sfintei Fecioare Maria de către Sfânta Ana", "short": "Zămislirea Sf. Ana", "rank": "cruce_neagra", "kind": "maica_domnului"},
+    {"date": "12-12", "name": "Sfântul Ierarh Spiridon, episcopul Trimitundei", "short": "Sf. Spiridon", "rank": "cruce_rosie", "kind": "sfant"},
+    {"date": "12-15", "name": "Sfântul Sfințit Mucenic Elefterie", "short": "Sf. Elefterie", "rank": "cruce_neagra", "kind": "sfant"},
+    {"date": "12-20", "name": "Sfântul Sfințit Mucenic Ignatie Teoforul", "short": "Sf. Ignatie Teoforul", "rank": "cruce_neagra", "kind": "sfant"},
+    {"date": "12-24", "name": "Ajunul Nașterii Domnului", "short": "Ajunul Crăciunului", "rank": "cruce_neagra", "kind": "domnesc", "note": "Zi de ajunare."},
+    {"date": "12-26", "name": "Soborul Maicii Domnului", "short": "Soborul Maicii Domnului", "rank": "cruce_rosie", "kind": "maica_domnului"},
+    {"date": "12-27", "name": "Sfântul Apostol, întâiul mucenic și arhidiacon Ștefan", "short": "Sf. Arhidiacon Ștefan", "rank": "cruce_rosie", "kind": "sfant"}
+  ]
+}
