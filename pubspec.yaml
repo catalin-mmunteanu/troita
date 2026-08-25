@@ -21,6 +21,21 @@ dependencies:
   permission_handler: ^11.3.1
 
   intl: ^0.20.1
+  flutter_local_notifications: ^22.3.0
+  timezone: ^0.11.1
+  shared_preferences: ^2.5.5
+
+  # Added with `flutter pub add` rather than pinned here by hand — see the
+  # command in README. Listing a version I guessed at is how this project has
+  # broken twice already.
+  #   flutter_local_notifications   scheduling, channels
+  #   timezone                      Romania observes DST, so a fixed offset
+  #                                 would drift by an hour twice a year.
+  #                                 flutter_timezone was REMOVED — it pins
+  #                                 Kotlin 1.7.10 / AGP 7.3.0 in its own
+  #                                 buildscript and cannot compile against a
+  #                                 modern toolchain. See local_timezone.dart.
+  #   shared_preferences            notification settings
 
 dev_dependencies:
   flutter_test:
@@ -34,6 +49,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/churches/
+    # Saint images from the sinaxar scrape. Flat, with a MM-DD prefix, because
+    # Flutter does not recurse into subdirectories — one line instead of 293.
+    - assets/sinaxar/
 
   # Uncomment once the .ttf files are in assets/fonts/ — see the README there.
   # Until then Flutter falls back to the platform font, which is a warning

@@ -5,13 +5,13 @@ import android.os.Bundle
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import ro.troita.bridge.TroitaBridge
-import ro.troita.notify.Channels
 
 class MainActivity : FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Channels.ensure(this)
+        // Notification channels are created by flutter_local_notifications from
+        // Dart. There is no native Channels object any more — one owner.
         capture(intent)
     }
 

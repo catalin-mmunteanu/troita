@@ -2,22 +2,10 @@
 <resources>
     <string name="app_name">Troița</string>
 
-    <string name="channel_discreet_name">Biserici în apropiere</string>
-    <string name="channel_discreet_desc">Vibrație scurtă, fără sunet, când treceți pe lângă o biserică.</string>
-    <string name="channel_bell_name">Biserici în apropiere (cu clopot)</string>
-    <string name="channel_bell_desc">Vibrație și sunet de toacă la trecerea pe lângă o biserică.</string>
-    <string name="channel_journey_name">Mod drum</string>
-    <string name="channel_journey_desc">Notificarea permanentă cât timp Troița urmărește drumul.</string>
-
-    <string name="journey_title">Troița urmărește drumul</string>
-    <string name="journey_running">Caut biserici în apropiere…</string>
-    <string name="journey_stop">Oprește</string>
-    <plurals name="journey_found">
-        <item quantity="one">O biserică pe traseu</item>
-        <item quantity="few">%d biserici pe traseu</item>
-        <item quantity="other">%d de biserici pe traseu</item>
-    </plurals>
+    <string name="channel_feast_major_name">Sărbători mari</string>
+    <string name="channel_feast_major_desc">Praznice împărătești și sfinți cu cruce roșie.</string>
+    <string name="channel_feast_name">Pomeniri zilnice</string>
+    <string name="channel_feast_desc">Sfântul zilei, fără sunet.</string>
 
     <string name="year_prefix">din %d</string>
-    <string name="nearby_generic">Biserică în apropiere</string>
 </resources>

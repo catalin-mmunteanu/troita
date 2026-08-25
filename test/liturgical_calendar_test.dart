@@ -167,12 +167,44 @@ void main() {
     });
   });
 
+  publishedCalendarChecks();
+
   group('day summary', () {
     test('reads the way a calendar banner should', () {
       expect(LiturgicalCalendar.dayFor(DateTime(2026, 3, 7)).summary,
           'Post cu dezlegare la untdelemn și vin');
       expect(LiturgicalCalendar.dayFor(DateTime(2026, 10, 8)).summary,
           'Zi fără post');
+    });
+  });
+}
+
+// Appended after validating against a published Romanian calendar for
+// January 2026 — see tool/import_calendar_html.py, which diffs the engine
+// against transcribed HTML and currently reports 31/31 on that month.
+void publishedCalendarChecks() {
+  group('against the published calendar, January 2026', () {
+    test('glas matches on all four Sundays', () {
+      expect(LiturgicalCalendar.glasFor(DateTime(2026, 1, 4)), 5);
+      expect(LiturgicalCalendar.glasFor(DateTime(2026, 1, 11)), 6);
+      expect(LiturgicalCalendar.glasFor(DateTime(2026, 1, 18)), 7);
+      expect(LiturgicalCalendar.glasFor(DateTime(2026, 1, 25)), 8);
+    });
+
+    test('voscreasna matches on all four Sundays', () {
+      expect(LiturgicalCalendar.voscreasnaFor(DateTime(2026, 1, 4)), 8);
+      expect(LiturgicalCalendar.voscreasnaFor(DateTime(2026, 1, 11)), 9);
+      expect(LiturgicalCalendar.voscreasnaFor(DateTime(2026, 1, 18)), 10);
+      expect(LiturgicalCalendar.voscreasnaFor(DateTime(2026, 1, 25)), 11);
+    });
+
+    test('2 January is harți, not a Friday fast', () {
+      expect(levelOn(DateTime(2026, 1, 2)), FastLevel.none);
+    });
+
+    test('30 January, a cruce roșie on a Friday, allows oil and wine', () {
+      expect(levelOn(DateTime(2026, 1, 30), rank: FeastRank.cruceRosie),
+          FastLevel.wineOil);
     });
   });
 }

@@ -12,7 +12,7 @@ Future<Database> _seed() async {
       id TEXT PRIMARY KEY, name TEXT NOT NULL, kind TEXT NOT NULL,
       denomination TEXT, lat REAL NOT NULL, lon REAL NOT NULL, patron TEXT,
       feast_day TEXT, year_built INTEGER, history TEXT, photo_ref TEXT,
-      geofence_radius_m INTEGER, priority INTEGER NOT NULL DEFAULT 0,
+      priority INTEGER NOT NULL DEFAULT 0,
       address TEXT, wikidata TEXT, source TEXT NOT NULL,
       verified INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL,
       deleted INTEGER NOT NULL DEFAULT 0);

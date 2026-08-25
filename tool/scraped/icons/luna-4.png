@@ -1,0 +1,849 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+
+	<title>Predici, rugaciuni, filme, carti, conferinte ortodoxe - www.resurse-ortodoxe.ro</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+	<meta name="language" content="ro">
+	<meta name="description" content=" Resurse ortodoxe text: calendar ortodox, carti, rugaciuni, viețile sfinților, versuri colinde, poezie, evanghelii duminicale  - www.resurse-ortodoxe.ro - Predici, rugaciuni, filme, carti, conferinte ortodoxe" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<base href="https://www.resurse-ortodoxe.ro/" />
+	<link rel="stylesheet" type="text/css" href="https://www.resurse-ortodoxe.ro/templates/ro/css/style.css" />
+	<link rel="stylesheet" type="text/css" media="only screen and (max-width: 480px), only screen and (max-device-width: 480px)" href="https://www.resurse-ortodoxe.ro/templates/ro/css/small-device.css" />
+	<link rel="shortcut icon" href="https://www.resurse-ortodoxe.ro/templates/ro/favicon/favicon.ico" />
+	
+	<meta property="og:url"           content="https://www.resurse-ortodoxe.ro/" />
+	<meta property="og:type"          content="website" />
+	<meta property="og:title"         content="Resurse ortodoxe" />
+	<meta property="og:description"   content="Cuprinde o colectie bogata de predici ale duhovnicilor romani, rugaciuni, slujbe, carti, muzica bisericesca." />
+	<meta property="og:image"         content="https://www.resurse-ortodoxe.ro/templates/ro/img/RO_logo.gif" />
+
+</head>
+
+<body>
+
+
+<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-5FSFLX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5FSFLX');</script>
+<!-- End Google Tag Manager -->
+
+<div class="page">
+
+	<div class="content">
+		<div class="box">	
+			<div class="logo_title" style="text-align: center">
+				<h1>www.resurse-ortodoxe.ro - Predici, rugăciuni, filme, carți, conferințe ortodoxe</h1> 
+			</div>								
+		</div>	
+	</div>	
+	
+
+<div class="left-control">
+    <div class="toggle-btn" onclick="toggleLeft()">
+        <div></div><div></div><div></div>
+    </div>
+</div>
+
+<div class="content">
+	<div class="left"  id="leftMenu">
+		<div class="box-content">
+<center>
+	<img src="https://www.resurse-ortodoxe.ro/templates/ro/img/Maica-Domnului.jpg" max-width="100%" alt="Maica Domnului"/>
+</center>
+</div>
+
+<div class="box">
+	<div class="box-caption">Categorii principale</div>
+	<div class="box-content">
+		<div class="links">
+
+			<a href="https://www.resurse-ortodoxe.ro/">Acasă</a> <br/>	
+			<a href="https://www.resurse-ortodoxe.ro/categoria_text/">Text</a> 
+			<ul>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_calendar-ortodox/">Calendar ortodox</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_cantari-si-pricesne/">Cântări și pricesne</a> <br/>		
+			<a href="https://www.resurse-ortodoxe.ro/categoria_epub/">Cărți epub</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/epub-ru-ro/" target="_blank">Cărți epub rusă</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_carti-ortodoxe-online/">Cărți online</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_carti-ortodoxe/">Cărți pdf</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_evanghelii-duminicale/">Evanghelii duminicale</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_articole/">Articole</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_rugaciuni/">Rugăciuni</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_slujbe-si-randuieli/">Slujbe și rânduieli</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_versuri-colinde/">Versuri colinde</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_vietile-sfintilor/">Viețile Sfinților</a> <br/>
+			</ul>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_audio/">Audio</a> <br/>
+			<ul>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_predici-audio/">Predici</a>  <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_parinti-duhovnicesti/">Părinți duhovnicești</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_rugaciuni-audio/">Rugăciuni</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_cantari-bisericesti-audio/">Cântări bisericești</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_slujbe-audio/">Slujbe</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_carti-audio/">Cărți</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_colinde/">Colinde</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_arhiva-emisiuni-radio/">Arhivă emisiuni radio</a> <br/>
+			</ul>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_foto/">Foto</a>  <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_video/">Video</a> 
+			<ul>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_parinti/">Părinți</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_cantari-bisericesti/">Cântări bisericești</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_documentare/">Documentare</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_arhiva-emisiuni-tv/">Arhivă emisiuni TV</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_slujbe/">Slujbe</a> <br/>
+			</ul>
+			<a href="https://www.resurse-ortodoxe.ro/categoria_software/">Software</a> <br/>
+			<a href="https://www.resurse-ortodoxe.ro/search.php">Căutare avansată</a>
+		</div>
+	</div>
+
+
+</div>
+
+<div class="box">
+	<div class="box-caption">Promovare</div>
+	<div class="box-content">
+	<div class="links">
+		<a href="https://www.maicadomnului.ro/calendar-ortodox-stil-vechi/">Calendar pe stil vechi - Republica Moldova</a> 
+	</div>
+	</div>
+</div>
+
+<div class="box">
+<div class="box-caption">Ne găsiți pe:</div>
+	<div class="box-content">
+		<div class="links">
+<b>E-mail:</b> <br/> webortodox[AT]yahoo.com (inlocuiti [AT] cu @)<br/>
+<b>Youtube:</b> <a href="https://www.youtube.com/@resurse-ortodoxe">youtube.com/@resurse-ortodoxe</a>
+		</div>
+	</div>
+</div>
+
+
+
+	</div>
+	<div class="middle">
+		<div class="box">	
+<div class="box-content"><h2>Resurse-Ortodoxe.ro - Bibliotecă online de materiale ortodoxe audio, video, text. Cuprinde o colecție bogată de predici ale duhovnicilor români, rugăciuni, slujbe, cărți, muzică bisericescă.</h2>	
+</div>
+</div>
+
+<div class="box">
+	<div class="box-caption">Căutare</div>
+	<div class="box-content">
+		<form action="https://www.resurse-ortodoxe.ro/search.php" method="get">
+<p><div class="links">1. <a href="https://www.resurse-ortodoxe.ro/search.php">Căutare avansată</a></p></div>
+<p>2. Căutare rapidă - cuvânt:
+			<input type="text" name="what" id="what" size="25" value="" />
+			<input type="submit" value="Caută"/>					
+		</p>
+		</form>
+	</div>
+</div>
+
+<div class="box">
+	<div class="box-caption">Recomandare</div>
+	<div class="box-content">
+	<p>Vă invităm să vizionați un scurt documentar video despre Icoana Maicii Domnului aflată în Catedrala Mitropolitană din Iași.</p>
+	<center>
+<iframe width="500" height="315" src="https://www.youtube.com/embed/vbiqR7nC-Jg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+	</center>	
+	</div>
+</div>
+
+	
+<div class="box">		
+<div class="box-caption">Astăzi vă propunem să lecturați:</div>		
+<div class="box-content">			
+<div class="links">			
+ Text:<br/>
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/rugaciunea-de-luni_text">Rugaciunea de Luni</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/sfantul-sfintitul-mucenic-evtihie-ucenicul-sfantului-apostol-ioan-si-al-sfantului-apostol-pavel_text">Sfîntul Sfinitul Mucenic Evtihie, ucenicul Sfîntului Apostol Ioan şi al Sfîntului Apostol Pavel</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/sfanta-mucenita-sira-fecioara-ruda-cu-sfanta-maria-golinduhia_text">Sfanta Muceniţă Sira fecioara, rudă cu Sfînta Maria Golinduhia</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+			
+ Audio:<br/>
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/rugaciunea-de-luni_audio">Rugaciunea de luni</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/acatistul-sfintilor-mai-marilor-voievozi-mihail-si-gavriil_audio">Acatistul Sfintilor mai-marilor Voievozi Mihail si Gavriil RT</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/sinaxar-audio-24-august_audio">Sinaxar audio 24 august</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+</div>
+</div>
+</div>
+
+<div class="box">
+<div class="box-caption">Sugestii pentru Duminica următoare</div>
+<div class="box-content">
+<div class="links">
+ Text:<br/>
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/predica-parintelui-cleopa-la-duminica-a-xiii-a-dupa-rusalii_text">Predica Parintelui Cleopa la Duminica a XIII-a dupa Rusalii</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+ Audio:<br/>
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/21-pr-teofil-paraian-duminica-13-dupa-rusalii_audio">21 Pr Teofil Paraian - Duminica 13 dupa Rusalii</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/cuvant-la-duminica-a-xiii-a-dupa-rusalii-pilda-lucratorilor-celor-rai-arhim-melchisedec-2-septembrie-2012_audio">Cuvant la Duminica a XIII-a dupa Rusalii (Pilda lucratorilor celor rai) (Arhim. Melchisedec, 2 septembrie 2012)</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/11-talcuirea-evangheliei-pr-viorel-ion-vacariu-02-09-2012-duminica-a-xiii-a-dupa-rusalii_audio">11. Talcuirea Evangheliei - Pr. Viorel-Ion Vacariu - 02.09.2012 - Duminica a XIII-a dupa Rusalii</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/pr-ioanichie-balan-duminica-a-xiii-a-dupa-rusalii-1998_audio">Pr Ioanichie Balan - Duminica a XIII-a dupa Rusalii 1998</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/pf-daniel-duminica-13-dupa-rusalii-pilda-lucratorilor-rai-03-09-2017_audio">PF Daniel - Duminica 13 dupa Rusalii - Pilda lucratorilor rai - 03 09 2017</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+ Video:<br/>
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/ips-bartolomeu-anania-lucratorii-cei-rai_video">IPS Bartolomeu Anania - lucratorii cei rai</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+</div>
+</div>
+</div>
+
+<div class="box">
+<div class="box-caption">Sugestii pentru urmatoarea sărbatoare</div>
+<div class="box-content">
+<div class="links">
+ Text:<br/>
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/predica-la-sfantul-ioan-botezatorul_text">Predica la Sfantul Ioan Botezatorul - Parintele Sofian BOGHIU</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/taierea-capului-sfantului-prooroc-ioan-botezatorul_text">Taierea capului Sfantului Prooroc Ioan Botezatorul</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/rugaciune-catre-sfantul-ioan-botezatorul-la-praznicul-taierii-capului_text">Rugaciune catre Sfantul Ioan Botezatorul la praznicul Taierii Capului</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/sa-laudam-astazi-pe-cel-mai-mare-postitor-si-rugator-dintre-oameni-pe-proorocul-cel-minunat-pe-sfantul-ioan-botezatorul_text">Sa laudam astazi pe cel mai mare postitor si rugator dintre oameni, pe Proorocul cel minunat, pe Sfantul Ioan Botezatorul</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+ Audio:<br/>
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/acatistul-sfantului-ioan-botezatorul_audio">Acatistul Sfantului Ioan Botezatorul RT</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/sinaxar-audio-29-august_audio">Sinaxar audio 29 august</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/predica-la-praznicul-taierii-capului-sfantului-ioan-botezatorul-arhim-melchisedec-29-august-2011_audio">Predica la praznicul Taierii Capului Sfantului Ioan Botezatorul (Arhim. Melchisedec, 29 august 2011)</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/priveghere-la-praznicul-taierii-capului-sfantului-ioan-botezatorul-28-august-2013_audio">Priveghere la praznicul taierii capului Sfantului Ioan Botezatorul (28 august 2013)</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/sfanta-liturghie-la-praznicul-taierii-capului-sfantului-ioan-botezatorul-29-august-2013_audio">Sfanta Liturghie la praznicul taierii capului Sfantului Ioan Botezatorul (29 august 2013)</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/pr-amfilohie-branza-taierea-capului-sf-ioan-botezatorul-29-08-03-1_audio">Pr Amfilohie Branza - Taierea capului Sf Ioan Botezatorul 29.08.03 - 1</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/pr-gheorghe-calciu-dumitreasa-1999-aug-29-taierea-capului-sf-ioan_audio">Pr Gheorghe Calciu Dumitreasa - 1999 AUG 29 TAIEREA CAPULUI SF IOAN</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/ips-teodosie-predica-la-taierea-capului-sf-ioan-botezatorul_audio">IPS Teodosie - Predica la Taierea Capului Sf Ioan Botezatorul</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/pf-daniel-taierea-capului-sfantului-ioan-botezatorul-29-08-2005_audio">PF Daniel - Taierea capului Sfantului Ioan Botezatorul - 29-08-2005</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+ Video:<br/>
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/troparul-taierii-capului-sfantului-prooroc-ioan-botezatorul-glas-2-catedrala-patriarhala_video">Troparul Taierii Capului Sfantului Prooroc Ioan Botezatorul, glas 2 - Catedrala Patriarhala</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/ips-bartolomeu-anania-enigma-teologilor-sfantul-ioan-botezatorul_video">IPS Bartolomeu Anania - Enigma teologilor - Sfantul Ioan Botezatorul</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/ips-andrei-andreicut-predica-la-taierea-capului-sf-ioan-botezatorul_video">IPS Andrei Andreicut - Predica la Taierea Capului Sf Ioan Botezatorul</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+</div>
+</div>
+</div>
+
+<div class="box">
+<div class="box-caption">Ultimele articole (text)</div>
+<div class="box-content">
+<div class="links">
+
+	<div class="link_display_in_category">
+		<div class="box-image-browse-category">
+			<a href="https://www.resurse-ortodoxe.ro/text/paraclisul-preasfintei-nascatoare-de-dumnezeu-pentru-uzul-mirenilor" class="title" >
+
+			<img src="upload/files/0/photo/31904.jpg" alt="" width="111" align="left" />
+			</a>
+		</div>
+		<br/>
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/paraclisul-preasfintei-nascatoare-de-dumnezeu-pentru-uzul-mirenilor_text">Paraclisul Preasfintei Născătoare de Dumnezeu (pentru uzul mirenilor)</a>
+			<br/>
+		</div>
+
+		<p style="text-align: center;"><em>Slavă Ție Dumnezeul nostru, Slavă Ție!</em> (<em>de trei ori</em>)</p>
+<p style="text-align: justify;">Împărate Ceresc, Mângâietorule, Duhul adevărului, Care ..... </p>
+		<!--
+						
+		<br/>
+		Added: aug 20, 2026
+		-->
+	</div>
+
+
+	<div class="link_display_in_category">
+		<div class="box-image-browse-category">
+			<a href="https://www.resurse-ortodoxe.ro/text/adam-doarme-somnul-pacatului" class="title" >
+
+			<img src="upload/files/0/photo/31903.jpg" alt="" width="111" align="left" />
+			</a>
+		</div>
+		<br/>
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/adam-doarme-somnul-pacatului_text">Adam doarme somnul păcatului</a>
+			<br/>
+		</div>
+
+		<p>Înainte ca Eva să poată vorbi cu șarpele, ea a trebuit să se despartă de Adam. Această despărțire s-a produs la nivel de gînd. Eva era singură atunci cînd șarpele a abordat-o. Singurătatea ei ..... </p>
+		<!--
+						
+		<br/>
+		Added: aug  9, 2026
+		-->
+	</div>
+
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-octombrie-2027_text">Calendar ortodox - Octombrie 2027</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-decembrie-2028_text">Calendar ortodox - Decembrie 2028</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-noiembrie-2028_text">Calendar ortodox - Noiembrie 2028</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+</div>
+</div>
+</div>
+
+<div class="box" style="border: none;">
+<div class="links"></div>
+</div>
+
+
+<div class="box">
+<div class="box-caption">Recomandări audio</div>
+<div class="box-content">
+<div class="links">
+<a href="https://www.resurse-ortodoxe.ro/categoria_pf-daniel/">Predici PF Daniel</a> 
+<a href="https://www.resurse-ortodoxe.ro/categoria_pr-galeriu/">Predici Pr Galeriu</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_pr-dumitru-staniloae/">Predici Pr Dumitru Stăniloae</a> 
+<a href="https://www.resurse-ortodoxe.ro/categoria_ips-bartolomeu-anania-audio/">Predici IPS Bartolomeu Anania</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_cantari-bisericesti-audio/">Cântări bisericești</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_catehism-ortodox/">Catehism ortodox</a>
+</div>
+</div>
+</div>
+<div class="box">
+<div class="box-caption">Recomandări video</div>
+<div class="box-content"><div class="links">
+<a href="https://www.resurse-ortodoxe.ro/categoria_ips-bartolomeu-anania/">IPS Bartolomeu Anania</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_parintele-arsenie-papacioc/">Pr Arsenie Papacioc</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_parintele-ilie-cleopa-video/">Pr Ilie Cleopa</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_parintele-teofil-paraian/">Pr Teofil Pârâian</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_tropare/">Tropare</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_documentare/">Documentare</a>
+</div>
+</div>
+</div>
+
+<div class="box">
+<div class="box-caption">Recomandări text</div>
+<div class="box-content">
+<div class="links">
+<a href="https://www.resurse-ortodoxe.ro/categoria_rugaciuni/">Rugăciuni</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_acatiste/">Acatiste</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_randuiala-spovedaniei/">Rânduiala spovedaniei</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_rugaciuni-la-toata-vremea-si-trebuinta/">Rugăciuni la toată vremea și trebuința</a>
+<a href="https://www.resurse-ortodoxe.ro/categoria_carti-ortodoxe-online/">Cărți ortodoxe online</a>
+</div>
+</div>
+</div>
+
+
+<div class="box">
+<div class="box-caption">Alte recomandări (text)</div>
+<div class="box-content">
+<div class="links">
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/cum-ajungem-la-comuniunea-cu-dumnezeu_text">Cum ajungem la comuniunea cu Dumnezeu</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/sa-ne-pastram-fecioria-sufletului_text">Sa ne pastram fecioria sufletului</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/filosofia-lacrimilor_text">Filosofia lacrimilor </a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/cine-mai-poate-ajunge-sfant-in-lumea-de-azi_text">Cine mai poate ajunge sfant in lumea de azi?</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/siguranta-prea-mare-in-parerile-noastre_text">Siguranta prea mare in parerile noastre</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/sunt-felurite-chipuri-de-a-l-iubi-pe-dumnezeu_text">Sunt felurite chipuri de a-L iubi pe Dumnezeu</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/frica-lui-dumnezeu-naste-in-noi-o-alta-frica-de-pacat_text">Frica lui Dumnezeu naste in noi o alta frica de pacat</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/fara-smerenie-nu-ne-putem-mantui_text">Fara smerenie nu ne putem mantui</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/lumina-sfantului-duh_text">Lumina Sfantului Duh</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/quot-fiul-omului-n-a-venit-ca-sa-piarda-sufletele-oamenilor-ci-ca-sa-le-mantuiasca-quot_text">&quot;Fiul Omului n-a venit ca sa piarda sufletele oamenilor, ci ca sa le mantuiasca.&quot;</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/canon-de-rugaciune-catre-sfanta-mucenita-vasa-cu-cei-trei-fii-ai-ei_text">Canon de rugaciune catre Sfanta Mucenita Vasa cu cei trei fii ai ei</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+
+			
+	<div class="link_display_in_category">
+		<div class="title">
+				<a href="https://www.resurse-ortodoxe.ro/condacul-sfintei-mucenite-agripina_text">Condacul Sfintei Mucenite Agripina</a>
+		</div>
+				<br/>
+						
+
+	</div>	
+</div>
+</div>
+</div>
+
+					
+	</div>
+	<div class="right" id="rightMenu">
+		<div class="box-content">
+<center>
+	<img src="https://www.resurse-ortodoxe.ro/templates/ro/img/Iisus-Hristos.jpg" alt="Iisus-Hristos"/>
+</center>
+</div>
+
+<div class="box">
+<div class="box-caption">Sfinții zilei</div>
+<div class="box-content">
+	<div class="links">
+		<center>
+		<!--/Start calendarul ortodox al zilei: https://www.resurse-ortodoxe.ro/ /-->
+		<script type="text/javascript">
+		<!--
+
+		var Latime="170";	//latimea tabelului
+		var Titlu_tabel="Calendarul ortodox al zilei" //superior 
+		var Culoare_tabel="#f9fbe0";	// chenar
+		var Culoare_fereastra_principala="#f9fbe0"; //fundalul la fereastra cu stiri
+		var Culoare_font_tabel="#650000";	// culoare font titlu
+		var Culoare_font_principal="#650000";	// culoare font stiri
+		var Dimensiune_font_tabel="11px"; //dimensiune font titlu
+		var Dimensiune_font_principal="12px"; // dimensiune font stiri
+
+		//-->
+		</script>
+		<script language=Javascript src="https://www.resurse-ortodoxe.ro/calendarul-zilei/calendar.js" type="text/javascript"></script>
+		<noscript><p>Calendarul ortodox al zilei </p></noscript>
+		<!--/End calendarul ortodox al zilei: https://www.resurse-ortodoxe.ro/ -->
+		</center>
+
+	</div>
+
+</div>
+</div>
+
+<div class="box">
+<div class="box-caption">Calendar</div>
+	<div class="box-content">
+		<div class="links">            
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-ianuarie-2026_text">Ianuarie 2026</a></br>
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-februarie-2026_text">Februarie 2026</a></br>
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-martie-2026_text">Martie 2026</a></br>
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-aprilie-2026_text">Aprilie 2026</a></br>
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-mai-2026_text">Mai 2026</a></br>
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-iunie-2026_text">Iunie 2026</a></br>        
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-iulie-2026_text">Iulie 2026</a></br>        
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-august-2026_text">August 2026</a></br>        
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-septembrie-2026_text">Septembrie 2026</a></br>        
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-octombrie-2026_text">Octombrie 2026</a></br>        
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-noiembrie-2026_text">Noiembrie 2026</a></br>        
+		<a href="https://www.resurse-ortodoxe.ro/calendar-ortodox-decembrie-2026_text">Decembrie 2026</a></br>    
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+<div class="partners">
+	<b>Recomandări:</b> <br>
+			<a href="https://www.noutati-ortodoxe.ro">noutati-ortodoxe.ro</a> - Știri și informații din viața bisericii ortodoxe, evenimente religioase, conferințe, apariții editoriale.<br> 
+			<a href="http://www.maicadomnului.ro">maicadomnului.ro</a> - Preacinstire pentru Maica Domnului - Prea Curata Fecioara Maria.<br> 
+
+</div>
+		
+	</div>
+
+</div>					
+					
+<div class="right">
+</div>
+    		
+
+<script src="https://www.resurse-ortodoxe.ro/templates/ro/javascript/script_menu.js"></script>
+
+
+<br>
+	
+	
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-73320920-1', 'auto');
+	  ga('send', 'pageview');
+
+	</script>
+
+
+	<!-- Histats.com  START  (aync)-->
+	<script type="text/javascript">var _Hasync= _Hasync|| [];
+	_Hasync.push(['Histats.start', '1,4550730,4,435,112,75,00011110']);
+	_Hasync.push(['Histats.fasi', '1']);
+	_Hasync.push(['Histats.track_hits', '']);
+	(function() {
+	var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+	hs.src = ('//s10.histats.com/js15_as.js');
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+	})();</script>
+	<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?4550730&101" alt="html hit counter" border="0"></a></noscript>
+	<!-- Histats.com  END  -->
+
+	
+	
+</body>
+</html>

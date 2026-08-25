@@ -9,11 +9,10 @@ import 'package:sqflite/sqflite.dart';
 ///  * Later: [RemoteSync] — `GET /churches?bbox=…&since=…` and upsert into the
 ///    same tables.
 ///
-/// The database stays the runtime source of truth in both cases. This matters
-/// more than it looks: the geofencing path runs in a dead process with no
-/// network guarantee, so it must never depend on an API call. The backend is a
-/// sync source, not a query path. Lock that in now and the migration is purely
-/// additive.
+/// The database stays the runtime source of truth in both cases: the backend is
+/// a sync source, not a query path. Every screen reads local SQLite, so the app
+/// works with no signal — which for a map of rural monasteries is the normal
+/// case, not the edge case.
 abstract interface class ChurchSyncService {
   /// Returns the number of rows written. [since] is ignored by implementations
   /// that have no notion of incremental updates.
@@ -57,9 +56,9 @@ class RemoteSync implements ChurchSyncService {
 
     final List<Map<String, Object?>> rows = await fetchJson(uri);
 
-    // Upsert on the stable id. Soft deletes arrive as rows with deleted = 1 so
-    // a removed church disappears from the geofence window on the next rebuild
-    // without needing a separate deletion feed.
+    // Upsert on the stable id. Soft deletes arrive as rows with deleted = 1,
+    // so a demolished church disappears from the map without needing a separate
+    // deletion feed.
     final Batch batch = db.batch();
     for (final Map<String, Object?> row in rows) {
       batch.insert(

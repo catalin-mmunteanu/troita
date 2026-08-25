@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_scope.dart';
-import '../history/history_page.dart';
-import '../nearby/nearby_page.dart';
-import '../settings/settings_page.dart';
-import 'journey_page.dart';
+import '../../app/app_state.dart';
+import '../../app/troita_icons.dart';
+import '../calendar/calendar_page.dart';
+import '../fasting/fasting_page.dart';
+import '../map/map_page.dart';
+import '../profile/profile_page.dart';
 
+/// Four tabs, matching `bottom-nav` (2:239): Calendar · Posturi · Hartă · Profil.
+///
+/// Hartă is a placeholder while the map feature is being redefined.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -30,55 +35,50 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Permissions and battery settings can change while we're backgrounded —
-    // the user may have just come back from the Settings app. Re-read rather
-    // than trusting cached state.
+    // Permissions and battery settings can change while backgrounded — the user
+    // may be returning from the Settings app.
     if (state == AppLifecycleState.resumed) {
-      AppScope.of(context).refreshStatus();
+      final AppState app = AppScope.of(context);
+      app.refreshStatus();
+      // Cheap, and it is what stops the 60-day window from silently expiring.
+      app.rescheduleNotifications();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          switch (_tab) {
-            0 => 'Drum',
-            1 => 'În apropiere',
-            _ => 'Istoric',
-          },
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const SettingsPage()),
-            ),
-          ),
-        ],
-      ),
       body: IndexedStack(
         index: _tab,
-        children: const <Widget>[JourneyPage(), NearbyPage(), HistoryPage()],
+        children: const <Widget>[
+          CalendarPage(),
+          FastingPage(),
+          MapPage(),
+          ProfilePage(),
+        ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
         onDestinationSelected: (int i) => setState(() => _tab = i),
         destinations: const <NavigationDestination>[
           NavigationDestination(
-            icon: Icon(Icons.navigation_outlined),
-            selectedIcon: Icon(Icons.navigation),
-            label: 'Drum',
+            icon: Icon(TroitaIcons.calendar),
+            selectedIcon: Icon(TroitaIcons.calendarFilled),
+            label: 'Calendar',
           ),
           NavigationDestination(
-            icon: Icon(Icons.church_outlined),
-            selectedIcon: Icon(Icons.church),
-            label: 'În apropiere',
+            icon: Icon(TroitaIcons.fasting),
+            label: 'Posturi',
           ),
           NavigationDestination(
-            icon: Icon(Icons.history),
-            label: 'Istoric',
+            icon: Icon(TroitaIcons.map),
+            selectedIcon: Icon(TroitaIcons.mapFilled),
+            label: 'Harta',
+          ),
+          NavigationDestination(
+            icon: Icon(TroitaIcons.profile),
+            selectedIcon: Icon(TroitaIcons.profileFilled),
+            label: 'Profil',
           ),
         ],
       ),

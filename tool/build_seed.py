@@ -13,9 +13,12 @@ COPY into PostGIS. The row shape is identical, so nothing downstream changes.
 from __future__ import annotations
 
 import argparse
+import glob
 import json
 import math
 import os
+import re
+import shutil
 import sqlite3
 import sys
 import time
@@ -49,16 +52,6 @@ QUERY = """
 );
 out center tags;
 """
-
-# Default geofence radius by kind, in metres. Tuned so that a pedestrian always
-# gets an ENTER and a driver usually does; see README for the speed math.
-RADIUS_BY_KIND = {
-    "cathedral": 400,
-    "monastery": 400,
-    "church": 350,
-    "chapel": 250,
-    "wayside_cross": 200,
-}
 
 KEEP_DENOMINATIONS = {
     "romanian_orthodox", "orthodox", "eastern_orthodox",
@@ -160,7 +153,6 @@ def normalise(el: dict, keep_all_denominations: bool) -> dict | None:
         "year_built": year,
         "history": None,
         "photo_ref": None,
-        "geofence_radius_m": None,
         "priority": 0,
         "address": addr,
         "wikidata": tags.get("wikidata"),
@@ -235,7 +227,7 @@ def merge_curated(rows: list[dict], curated: dict) -> list[dict]:
             slug = hram._fold(entry["name"]).replace(" ", "-")
             new = {
                 "id": f"troita:{slug}", "history": None, "photo_ref": None,
-                "geofence_radius_m": None, "priority": 0, "address": None,
+                "priority": 0, "address": None,
                 "wikidata": None, "denomination": "romanian_orthodox",
                 "patron": None, "feast_day": None, "year_built": None,
                 "kind": "church", "source": "manual", "verified": 0,
@@ -249,8 +241,6 @@ def merge_curated(rows: list[dict], curated: dict) -> list[dict]:
 
 def apply_defaults(rows: list[dict]) -> list[dict]:
     for r in rows:
-        if not r.get("geofence_radius_m"):
-            r["geofence_radius_m"] = RADIUS_BY_KIND.get(r["kind"], 350)
         if not r.get("photo_ref"):
             slug = hram._fold(r["name"]).replace(" ", "-")[:48]
             r["photo_ref"] = f"asset://churches/{slug}.jpg"
@@ -269,7 +259,7 @@ def apply_defaults(rows: list[dict]) -> list[dict]:
 
 COLUMNS = [
     "id", "name", "kind", "denomination", "lat", "lon", "patron", "feast_day",
-    "year_built", "history", "photo_ref", "geofence_radius_m", "priority",
+    "year_built", "history", "photo_ref", "priority",
     "address", "wikidata", "source", "verified", "updated_at", "deleted",
 ]
 
@@ -279,7 +269,7 @@ FEAST_COLUMNS = [
 ]
 
 
-def load_feasts() -> list[tuple]:
+def load_feasts(published: dict[str, dict] | None = None) -> list[tuple]:
     """Curated commemorations. Fixed feasts key off MM-DD, movable ones off the
     same keys FeastCalendar resolves against Pascha."""
     path = os.path.join(HERE, "feasts.json")
@@ -287,18 +277,198 @@ def load_feasts() -> list[tuple]:
         return []
     entries = json.load(open(path, encoding="utf-8"))["feasts"]
     rows = []
+    covered: set[str] = set()
     for e in entries:
         movable = e.get("movable")
         month_day = e.get("date")
         if not movable and not month_day:
             raise SystemExit(f"feast needs `date` or `movable`: {e.get('name')}")
         ident = f"feast:mov:{movable}" if movable else f"feast:{month_day}"
+        if month_day:
+            covered.add(month_day)
         rows.append((
             ident, month_day, movable, e["name"], e.get("short"),
             e.get("rank", "simplu"), e.get("kind"), e.get("note"),
             e.get("dezlegare"), "manual", int(e.get("verified", 0)),
         ))
+
+    # Days transcribed from a published calendar via import_calendar_html.py.
+    # These are trustworthy — name and rank come from the source, so they are
+    # marked verified and win over the hand-written fallback below.
+    imported: dict[str, dict] = {}
+    for path in sorted(glob.glob(os.path.join(HERE, "imported", "*.json"))):
+        payload = json.load(open(path, encoding="utf-8"))
+        for entry in payload.get("days", []):
+            imported[entry["month_day"]] = entry
+
+    # Published data beats hand-written data on name and rank — those are the
+    # fields the source is authoritative for. Curated rows keep the things the
+    # source does not express: the dezlegare override, the short name we chose
+    # for the grid, and the `kind` used for styling Romanian saints.
+    by_day = {r[1]: i for i, r in enumerate(rows) if r[1]}
+
+    for month_day, entry in sorted(imported.items()):
+        rank = entry.get("rank", "simplu")
+        name = entry["name"]
+        kind = "romanesc" if entry.get("romanian") else None
+        note = "; ".join(entry.get("notes", [])) or None
+        dezlegare = entry.get("fast") if entry.get("fast") in (
+            "fish", "wineOil", "none") else None
+
+        existing = by_day.get(month_day)
+        if existing is not None:
+            old_row = rows[existing]
+            rows[existing] = (
+                old_row[0], month_day, None,
+                name,                         # published name wins
+                old_row[4] or _short(name),   # keep our short label
+                rank,                         # published rank wins
+                old_row[6] or kind,
+                old_row[7] or note,
+                old_row[8] or dezlegare,      # keep our dezlegare override
+                "calendar-ro", 1,
+            )
+            continue
+
+        covered.add(month_day)
+        rows.append((
+            f"feast:{month_day}", month_day, None, name, _short(name),
+            rank, kind, note, dezlegare, "calendar-ro", 1,
+        ))
+
+    # The scraped calendar is authoritative for name and rank — it is a
+    # published source and the menologion is my best recollection. Applied last
+    # so it wins over both the curated file and the fallback.
+    for month_day, entry in sorted((published or {}).items()):
+        idx = next((i for i, r in enumerate(rows) if r[1] == month_day), None)
+        name = entry.get("name") or ""
+        if not name:
+            continue
+        if idx is None:
+            covered.add(month_day)
+            rows.append((
+                f"feast:{month_day}", month_day, None, name, _short(name),
+                entry.get("rank", "simplu"), None,
+                "; ".join(entry.get("notes", [])) or None, None, "scraped", 1,
+            ))
+        else:
+            old_row = rows[idx]
+            rows[idx] = (
+                old_row[0], month_day, None, name, _short(name),
+                entry.get("rank", "simplu"), old_row[6],
+                old_row[7] or ("; ".join(entry.get("notes", [])) or None),
+                old_row[8], "scraped", 1,
+            )
+
+    # Everything still uncovered falls back to the hand-written menologion. An
+    # Orthodox calendar has an entry for all 365 days — a blank day is a
+    # missing row, not an ordinary one.
+    from menologion import MENOLOGION
+    for month_day, name in sorted(MENOLOGION.items()):
+        if month_day in covered:
+            continue
+        rows.append((
+            f"feast:{month_day}", month_day, None, name, _short(name),
+            "simplu", None, None, None, "menologion", 0,
+        ))
     return rows
+
+
+def _short(name: str) -> str:
+    """First commemoration only, for the places that show a single line."""
+    head = name.split(";")[0].strip()
+    return head if len(head) <= 42 else head[:39].rstrip(" ,") + "…"
+
+
+SINAXAR_COLUMNS = ["month_day", "text", "sections", "images", "source_url", "attribution"]
+OVERRIDE_COLUMNS = [
+    "year", "month_day", "fast_level", "notes", "glas", "voscreasna",
+    "sunday_title", "sunday_subtitle", "apostol", "evanghelie",
+]
+
+
+def install_images() -> dict[str, list[str]]:
+    """Copy scraped saint images into assets/ and return the flattened names.
+
+    Flattened deliberately. Flutter's `assets:` declarations do not recurse, so
+    293 per-day folders would mean 293 lines in pubspec.yaml — one directory and
+    a `MM-DD__` prefix means one line and no maintenance.
+    """
+    src_root = os.path.join(HERE, "scraped", "images")
+    if not os.path.isdir(src_root):
+        return {}
+
+    dest = os.path.join(HERE, "..", "assets", "sinaxar")
+    os.makedirs(dest, exist_ok=True)
+
+    installed: dict[str, list[str]] = {}
+    copied = skipped = 0
+    for day in sorted(os.listdir(src_root)):
+        day_dir = os.path.join(src_root, day)
+        if not os.path.isdir(day_dir):
+            continue
+        names = []
+        for name in sorted(os.listdir(day_dir)):
+            flat = f"{day}__{name}"
+            target = os.path.join(dest, flat)
+            source = os.path.join(day_dir, name)
+            if not os.path.exists(target) or \
+                    os.path.getsize(target) != os.path.getsize(source):
+                shutil.copy2(source, target)
+                copied += 1
+            else:
+                skipped += 1
+            names.append(flat)
+        if names:
+            installed[day] = names
+
+    total = sum(os.path.getsize(os.path.join(dest, f)) for f in os.listdir(dest))
+    print(f"  images: {copied} copied, {skipped} already current, "
+          f"{total / 1024 / 1024:.1f} MiB in assets/sinaxar/")
+    return installed
+
+
+def load_scraped() -> tuple[list[tuple], list[tuple], dict[str, dict]]:
+    """Read tool/scraped/ if the scraper has been run.
+
+    Returns (sinaxar rows, day_override rows, per-day published facts). The
+    third is used to overwrite feast names and ranks, because the published
+    calendar is authoritative and the hand-written menologion is not.
+    """
+    scraped = os.path.join(HERE, "scraped")
+    if not os.path.isdir(scraped):
+        return [], [], {}
+
+    # --- sinaxar text ---------------------------------------------------
+    sinaxar_rows: list[tuple] = []
+    sinaxar_path = os.path.join(scraped, "sinaxar.json")
+    images_map = install_images()
+
+    if os.path.exists(sinaxar_path):
+        for key, entry in sorted(json.load(open(sinaxar_path, encoding="utf-8")).items()):
+            sinaxar_rows.append((
+                key,
+                entry.get("text", ""),
+                json.dumps(entry.get("sections", []), ensure_ascii=False),
+                json.dumps(images_map.get(key, []), ensure_ascii=False),
+                entry.get("url"),
+                entry.get("attribution", "calendar-ortodox.ro"),
+            ))
+
+    # --- month pages: dezlegări, ranks, pericopes ------------------------
+    override_rows: list[tuple] = []
+    published: dict[str, dict] = {}
+    for path in sorted(glob.glob(os.path.join(scraped, "month-*.json"))):
+        year = int(re.search(r"month-(\d{4})-", path).group(1))
+        payload = json.load(open(path, encoding="utf-8"))
+        for d in payload.get("days", []):
+            published[d["month_day"]] = d
+            override_rows.append((
+                year, d["month_day"], d.get("fast"),
+                "; ".join(d.get("notes", [])) or None,
+                None, None, None, None, None, None,
+            ))
+    return sinaxar_rows, override_rows, published
 
 
 def write_sqlite(rows: list[dict], out: str, bbox, area: str) -> None:
@@ -312,7 +482,9 @@ def write_sqlite(rows: list[dict], out: str, bbox, area: str) -> None:
         f"VALUES ({','.join('?' * len(COLUMNS))})",
         [tuple(r.get(c) for c in COLUMNS) for r in rows],
     )
-    feasts = load_feasts()
+    sinaxar_rows, override_rows, published = load_scraped()
+
+    feasts = load_feasts(published)
     if feasts:
         db.executemany(
             f"INSERT OR REPLACE INTO feasts ({','.join(FEAST_COLUMNS)}) "
@@ -320,14 +492,29 @@ def write_sqlite(rows: list[dict], out: str, bbox, area: str) -> None:
             feasts,
         )
 
+    if sinaxar_rows:
+        db.executemany(
+            f"INSERT OR REPLACE INTO sinaxar ({','.join(SINAXAR_COLUMNS)}) "
+            f"VALUES ({','.join('?' * len(SINAXAR_COLUMNS))})",
+            sinaxar_rows,
+        )
+    if override_rows:
+        db.executemany(
+            f"INSERT OR REPLACE INTO day_overrides ({','.join(OVERRIDE_COLUMNS)}) "
+            f"VALUES ({','.join('?' * len(OVERRIDE_COLUMNS))})",
+            override_rows,
+        )
+
     meta = {
-        "schema_version": "2",
+        "schema_version": "3",
         "seed_version": datetime.now(timezone.utc).strftime("%Y%m%d%H%M"),
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "area": area,
         "bbox": ",".join(str(x) for x in bbox),
         "count": str(len(rows)),
         "feast_count": str(len(feasts)),
+        "sinaxar_count": str(len(sinaxar_rows)),
+        "override_count": str(len(override_rows)),
         "attribution": "© OpenStreetMap contributors, ODbL 1.0",
     }
     db.executemany("INSERT OR REPLACE INTO meta (key,value) VALUES (?,?)", list(meta.items()))
@@ -342,8 +529,15 @@ def write_sqlite(rows: list[dict], out: str, bbox, area: str) -> None:
               "w", encoding="utf-8") as fh:
         fh.write(meta["seed_version"] + "\n")
 
-    print(f"wrote {len(rows)} churches + {len(feasts)} feasts -> {out} "
-          f"({os.path.getsize(out) / 1024:.0f} KiB)")
+    print(f"wrote -> {out} ({os.path.getsize(out) / 1024:.0f} KiB)")
+    for label, count in (
+        ("churches", len(rows)),
+        ("feasts", len(feasts)),
+        ("sinaxar days", len(sinaxar_rows)),
+        ("day overrides", len(override_rows)),
+    ):
+        flag = "   <-- EMPTY" if count == 0 else ""
+        print(f"    {label:<16} {count}{flag}")
 
 
 def main() -> None:

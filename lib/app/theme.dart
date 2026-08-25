@@ -36,6 +36,27 @@ abstract final class TroitaColors {
   static const Color muted = Color(0xFF6B5E4F);
 
   static const Color onBurgundy = Color(0xFFFFFFFF);
+
+  // ---------------------------------------------------------------- calendar
+  //
+  // Romanian printed calendars use a colour convention people have read their
+  // whole lives, and it is not decorative — the rank names *are* the colours.
+  // "Cruce roșie" and "cruce neagră" mean red cross and black cross. Rendering
+  // both in the brand burgundy destroys the only distinction between them.
+  //
+  // So the calendar keeps its own semantic palette, separate from the brand
+  // chrome: red for feasts and Sundays, black for ordinary days.
+
+  /// Feasts with a red cross, and every Sunday. The red of a printed calendar —
+  /// deeper and less orange than a UI alert red.
+  static const Color feastRed = Color(0xFFC1272D);
+
+  /// Feasts with a black cross, and ordinary weekday numerals.
+  static const Color calendarInk = Color(0xFF1B1B1B);
+
+  /// Romanian saints. The source markup singles them out with `class="rom"`,
+  /// and printed calendars usually set them apart too.
+  static const Color romanianSaint = Color(0xFF8C2F2A);
 }
 
 abstract final class TroitaRadius {
@@ -74,11 +95,61 @@ abstract final class TroitaSpacing {
 /// warning rather than failing, so the app runs today and upgrades the moment
 /// the files are dropped in.
 abstract final class TroitaFonts {
-  /// Headings. Variable font, drawn in Figma with SOFT 0 / WONK 1.
+  /// Headings, and the calendar itself. Variable font, drawn in Figma with
+  /// SOFT 0 / WONK 1.
   static const String display = 'Fraunces';
 
-  /// Everything else.
+  /// UI chrome — buttons, labels, settings, anything that reads as software.
   static const String text = 'Geist';
+
+  /// Generic serif, resolved by the platform (Noto Serif on Android).
+  ///
+  /// This is what makes the serif calendar visible *today*, before anyone
+  /// downloads Fraunces: the family falls through to the platform serif rather
+  /// than to the default sans, and upgrades silently once the .ttf lands.
+  static const List<String> serifFallback = <String>['serif', 'Georgia'];
+}
+
+/// Type for the calendar grid and the commemorations.
+///
+/// Romanian church calendars are set in serif, and that is most of what makes
+/// one *look* like a church calendar rather than an app screen. The chrome
+/// around it stays sans — the distinction is deliberate, not an inconsistency.
+abstract final class TroitaCalendarText {
+  /// Day numerals in the month grid.
+  static const TextStyle numeral = TextStyle(
+    fontFamily: TroitaFonts.display,
+    fontFamilyFallback: TroitaFonts.serifFallback,
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
+    height: 1.0,
+  );
+
+  /// Lu / Ma / Mi column headers.
+  static const TextStyle weekday = TextStyle(
+    fontFamily: TroitaFonts.display,
+    fontFamilyFallback: TroitaFonts.serifFallback,
+    fontSize: 12,
+    fontWeight: FontWeight.w700,
+  );
+
+  /// Saint and feast names.
+  static const TextStyle commemoration = TextStyle(
+    fontFamily: TroitaFonts.display,
+    fontFamilyFallback: TroitaFonts.serifFallback,
+    fontSize: 14.5,
+    height: 1.4,
+    color: TroitaColors.calendarInk,
+  );
+
+  /// The date on a feast card badge.
+  static const TextStyle badgeDay = TextStyle(
+    fontFamily: TroitaFonts.display,
+    fontFamilyFallback: TroitaFonts.serifFallback,
+    fontSize: 17,
+    fontWeight: FontWeight.w700,
+    height: 1.0,
+  );
 }
 
 /// Semantic colour for a day's fasting state — the calendar dots, the banner,
@@ -92,15 +163,48 @@ Color fastLevelColor(FastLevel level) => switch (level) {
       FastLevel.strict => TroitaColors.burgundy,
     };
 
-/// Rank drives both the calendar marker and the notification style, so the two
-/// stay visually consistent — a Praznic Împărătesc looks the same wherever the
-/// user meets it.
+/// Icon for a day's fasting state.
+///
+/// Paired with a written label everywhere it appears. An icon alone is not
+/// enough for the audience this app is for — the published calendars use a
+/// small fish glyph, but they also spell out "Dezlegare la pește" next to it,
+/// and so should we.
+IconData fastLevelIcon(FastLevel level) => switch (level) {
+      FastLevel.none => Icons.restaurant_outlined,
+      FastLevel.dairy => Icons.egg_outlined,
+      FastLevel.fish => Icons.set_meal_outlined,
+      FastLevel.wineOil => Icons.wine_bar_outlined,
+      FastLevel.fast => Icons.spa_outlined,
+      FastLevel.strict => Icons.do_not_disturb_alt_outlined,
+    };
+
+/// Rank drives the calendar marker and the notification style, so the two stay
+/// consistent — a Praznic Împărătesc looks the same wherever the user meets it.
+///
+/// Red and black here are the convention, not a choice: a red cross and a black
+/// cross are what the two ranks are called.
 Color feastRankColor(FeastRank rank) => switch (rank) {
-      FeastRank.praznic => TroitaColors.burgundy,
-      FeastRank.cruceRosie => TroitaColors.burgundy,
-      FeastRank.cruceNeagra => TroitaColors.ink,
+      FeastRank.praznic => TroitaColors.feastRed,
+      FeastRank.cruceRosie => TroitaColors.feastRed,
+      FeastRank.cruceNeagra => TroitaColors.calendarInk,
       FeastRank.simplu => TroitaColors.muted,
     };
+
+/// The colour a day's numeral takes in the month grid.
+///
+/// Sundays are red even when nothing is commemorated — that is how a printed
+/// calendar reads, and it is the fastest way to find your place in the month.
+Color calendarDayColor({
+  required FeastRank rank,
+  required bool isSunday,
+  required bool inMonth,
+}) {
+  if (!inMonth) return TroitaColors.muted;
+  if (rank == FeastRank.praznic || rank == FeastRank.cruceRosie || isSunday) {
+    return TroitaColors.feastRed;
+  }
+  return TroitaColors.calendarInk;
+}
 
 class TroitaTheme {
   const TroitaTheme._();
@@ -141,6 +245,7 @@ class TroitaTheme {
         centerTitle: false,
         titleTextStyle: TextStyle(
           fontFamily: TroitaFonts.display,
+          fontFamilyFallback: TroitaFonts.serifFallback,
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: TroitaColors.burgundy,
@@ -151,6 +256,7 @@ class TroitaTheme {
         // Fraunces — screen titles, "Noiembrie 2026".
         headlineMedium: TextStyle(
           fontFamily: TroitaFonts.display,
+          fontFamilyFallback: TroitaFonts.serifFallback,
           fontSize: 20,
           fontWeight: FontWeight.w700,
           height: 1.25,
@@ -159,6 +265,7 @@ class TroitaTheme {
         // Fraunces — section headers, "Sărbători următoare".
         titleLarge: TextStyle(
           fontFamily: TroitaFonts.display,
+          fontFamilyFallback: TroitaFonts.serifFallback,
           fontSize: 16,
           fontWeight: FontWeight.w700,
           color: TroitaColors.ink,

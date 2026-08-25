@@ -1,0 +1,436 @@
+{
+  "days": [
+    {
+      "month_day": "10-01",
+      "weekday": "J",
+      "row_class": "sarbatoare",
+      "name": "Acoperământul Maicii Domnului; Sf. Ap. Anania; Sf. Cuv. Roman Melodul; †) Sf. Cuv. Chiriac și Iosif de la Bisericani",
+      "rank": "praznic",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "†) Sf. Cuv. Chiriac și Iosif de la Bisericani"
+      ],
+      "icons": []
+    },
+    {
+      "month_day": "10-02",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Sf. Sfințit Mc. Ciprian; Sf. Mc. Iustina fecioara",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-03",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. Sfințit Mc. Dionisie Areopagitul; Sf. Mc. Teoctist",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-04",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Pr. Mărt. Dumitru Stăniloae; Sf. Sfințit Mc. Ierotei, ep. Atenei",
+      "rank": "cruce_rosie",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "†) Sf. Pr. Mărt. Dumitru Stăniloae"
+      ],
+      "icons": [
+        "luna-1.png"
+      ]
+    },
+    {
+      "month_day": "10-05",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. Mc. Haritina; †) Sf. Cuv. Misail și Daniil de la Mănăstirea Turnu",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "†) Sf. Cuv. Misail și Daniil de la Mănăstirea Turnu"
+      ],
+      "icons": []
+    },
+    {
+      "month_day": "10-06",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Ap. Toma; Sf. Mc. Erotiida",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-07",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. M. Mc. Serghie și Vah; Sf. Mc. Iulian pr., Chesarie diac. și Polihronie",
+      "rank": "cruce_neagra",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-08",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Pelaghia și Taisia",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-09",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Sf. Ap. Iacov al lui Alfeu; Sf. Cuv. Atanasia, Andronic și Anastasia",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-10",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. Mc. Evlampie și sora sa, Evlampia; Sf. Cuv. Vasian și Teofil Mărt.",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-11",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Ap. Filip, unul din cei 7 diac.; Sf. Ier. Teofan Mărt., ep. Niceei",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "luna-2.png"
+      ]
+    },
+    {
+      "month_day": "10-12",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. Mc. Prov, Tarah și Andronic; Sf. Ier. Cosma, ep. Maiumei",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "luna-2.png"
+      ]
+    },
+    {
+      "month_day": "10-13",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Aducerea moaștelor Sf. Ap. Andrei la Iași; Sf. Mc. Carp, Papil, Agatodor, Agatonica și Florentie",
+      "rank": "cruce_neagra",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "† Aducerea moaștelor Sf. Ap. Andrei la Iași"
+      ],
+      "icons": []
+    },
+    {
+      "month_day": "10-14",
+      "weekday": "M",
+      "row_class": "sarbatoare",
+      "name": "Sf. Cuv. Parascheva de la Iași; Sf. Mc. Nazarie, Ghervasie, Protasie și Chelsie",
+      "rank": "cruce_rosie",
+      "fast": "wineOil",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-15",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. Magdalena de la Mălainița; Sf. Mc. Luchian, pr. din Antiohia",
+      "rank": "cruce_neagra",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "† Sf. Magdalena de la Mălainița"
+      ],
+      "icons": []
+    },
+    {
+      "month_day": "10-16",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Sf. Mc. Longhin Sutașul",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-17",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. Prooroc Oseea; Sf. Cuv. Mc. Andrei Criteanul",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-18",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Ap. și Ev. Luca; Sf. Mc. Marin cel Bătrân",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-19",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. Prooroc Ioil; Sf. Mc. Uar; Sf. Cleopatra; Sf. Cuv. Ioan de la Rila;",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "luna-3.png"
+      ]
+    },
+    {
+      "month_day": "10-20",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. M. Mc. Artemie; Sf. Gherasim din Chefalonia",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-21",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Mărt. Visarion și Sofronie; Sf. Mc. Oprea; Sf. Pr. Mărt. Ioan din Galeș și Moise Măcinic din Sibiel; Sf. Cuv. Ilarion cel Mare",
+      "rank": "cruce_rosie",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [
+        "†) Sf. Cuv. Mărt. Visarion și Sofronie",
+        "Sf. Mc. Oprea",
+        "Sf. Pr. Mărt. Ioan din Galeș și Moise Măcinic din Sibiel"
+      ],
+      "icons": []
+    },
+    {
+      "month_day": "10-22",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. Ier. Averchie, ep. Ierapolei; Sf. 7 tineri din Efes;",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-23",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Sf. Ap. Iacob, ruda Domnului, întâiul ep. al Ierusalimului; †) Sf. Pr. Mc. Constantin Sârbu; Sf. Cuv. Macarie Romanul",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [
+        "†) Sf. Pr. Mc. Constantin Sârbu"
+      ],
+      "icons": []
+    },
+    {
+      "month_day": "10-24",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. M. Mc. Areta; Sf. Mc. Marcu, Sotirih și Valentin",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-25",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Mc. Marcian și Martirie; Sf. Tavita",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-26",
+      "weekday": "L",
+      "row_class": "sarbatoare",
+      "name": "Sf. M. Mc. Dimitrie, Izvorâtorul de mir",
+      "rank": "cruce_rosie",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "luna-0.png"
+      ]
+    },
+    {
+      "month_day": "10-27",
+      "weekday": "M",
+      "row_class": "sarbatoare",
+      "name": "Sf. Cuv. Dimitrie cel Nou, Ocrotitorul Bucureștilor, ale cărui moaște se află în Catedrala Patriarhală; Sf. Mc. Nestor",
+      "rank": "cruce_rosie",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-28",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Ier. Iachint, mitr. Țării Românești; †) Sf. Cuv. Teofana Basarab; Sf. Mc. Terentie, soția sa Neonila și cei 7 fii ai lor: Nita, Sarvil, Ierax, Teodul, Fota, Vilie si Evnichi; Sf. Ier. Firmilian, ep. Cezareei Capadociei;",
+      "rank": "cruce_neagra",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [
+        "† Sf. Ier. Iachint, mitr. Țării Românești",
+        "†) Sf. Cuv. Teofana Basarab"
+      ],
+      "icons": []
+    },
+    {
+      "month_day": "10-29",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. M. Mc. Anastasia Romana; Sf. Cuv. Avramie și Maria, nepoata sa",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-30",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Sf. Sfințit Mc. Zenovie, ep. Ciliciei și sora sa, Zenovia; Sf. Ap. Cleopa",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "10-31",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. Ap. Apelie, Stahie, Amplie, Urban, Aristobul și Narcis; Sf. Mc. Epimah",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [
+        "\"copyBtn\"",
+        "window.location.href",
+        "'text'",
+        "'text'",
+        "'togglePdf'",
+        "'pdfContainer'",
+        "'pdfIframe'",
+        "/\\.pdf$/i",
+        "\"http://\"",
+        "pdfUrl",
+        "!isOpen",
+        "inlocuiti [AT] cu @",
+        "i,s,o,g,r,a,m",
+        "i[r].q=i[r].q||[]",
+        "arguments",
+        "a,m",
+        "window,document,'script','//www.google-analytics.com/analytics.js','ga'",
+        "'create', 'UA-73320920-1', 'auto'",
+        "'send', 'pageview'",
+        "['Histats.start', '1,4550730,4,435,112,75,00011110']",
+        "['Histats.fasi', '1']",
+        "['Histats.track_hits', '']",
+        "'script'",
+        "'//s10.histats.com/js15_as.js'",
+        "'head'",
+        "'body'",
+        "hs"
+      ],
+      "romanian": [],
+      "icons": []
+    }
+  ],
+  "sundays": [
+    {
+      "title": "Duminica a XIX-a după Rusalii",
+      "subtitle": "Predica de pe munte - Iubirea vrăjmașilor",
+      "apostol": "II Corinteni XI, 31-33",
+      "evanghelie": "Luca VI, 31-36",
+      "glas": 1,
+      "voscreasna": 7
+    },
+    {
+      "title": "Duminica a XXI-a după Rusalii",
+      "subtitle": "a Sf. Părinţi de la Sinodul al VII-lea Ecumenic; Rugăciunea lui Iisus",
+      "apostol": "Galateni I, 11-19",
+      "evanghelie": "Luca VII, 11-16",
+      "glas": 2,
+      "voscreasna": 8
+    },
+    {
+      "title": "Duminica a XX-a după Rusalii",
+      "subtitle": "Invierea fiului vaduvei din Nain",
+      "apostol": "Galateni I, 11-19",
+      "evanghelie": "Luca VII, 11-16",
+      "glas": 3,
+      "voscreasna": 9
+    },
+    {
+      "title": "Duminica a XXIII-a după Rusalii",
+      "subtitle": "Vindecarea demonizatului din ținutul Gherghesenilor",
+      "apostol": "Efeseni II, 4-10",
+      "evanghelie": "Luca VIII, 26-39",
+      "glas": 4,
+      "voscreasna": 10
+    }
+  ]
+}

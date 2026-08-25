@@ -16,7 +16,6 @@ class Church {
     this.yearBuilt,
     this.history,
     this.photoRef,
-    this.geofenceRadiusM,
     this.priority = 0,
     this.address,
     this.distanceM,
@@ -35,7 +34,6 @@ class Church {
   final int? yearBuilt;
   final String? history;
   final String? photoRef;
-  final int? geofenceRadiusM;
   final int priority;
   final String? address;
 
@@ -56,7 +54,6 @@ class Church {
         yearBuilt: (row['year_built'] as num?)?.toInt(),
         history: row['history'] as String?,
         photoRef: row['photo_ref'] as String?,
-        geofenceRadiusM: (row['geofence_radius_m'] as num?)?.toInt(),
         priority: (row['priority'] as num?)?.toInt() ?? 0,
         address: row['address'] as String?,
         distanceM: (row['distance_m'] as num?)?.toDouble(),
@@ -74,7 +71,6 @@ class Church {
         yearBuilt: yearBuilt,
         history: history,
         photoRef: photoRef,
-        geofenceRadiusM: geofenceRadiusM,
         priority: priority,
         address: address,
         distanceM: distanceM ?? this.distanceM,

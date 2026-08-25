@@ -61,6 +61,7 @@ ios/Flutter/ephemeral/
 # -------------------------------------------------------------- Seed pipeline
 # The Overpass response cache — can be tens of megabytes and is reproducible.
 tool/.overpass-cache.json
+tool/.scrape-cache/
 
 # SQLite side-car files. These appear next to the seed database when a build is
 # interrupted and must never be shipped inside the APK; a stray file under

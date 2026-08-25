@@ -21,7 +21,7 @@ class LocalChurchRepository implements ChurchRepository {
 
   static const String _cols =
       'id, name, kind, denomination, lat, lon, patron, feast_day, year_built, '
-      'history, photo_ref, geofence_radius_m, priority, address';
+      'history, photo_ref, priority, address';
 
   @override
   Future<List<Church>> nearby({

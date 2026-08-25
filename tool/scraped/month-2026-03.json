@@ -1,0 +1,442 @@
+{
+  "days": [
+    {
+      "month_day": "03-01",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Cuv. Mc. Evdochia; Sf. Cuv. Domnina",
+      "rank": "simplu",
+      "fast": "wineOil",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-02",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. Sfințit Mc. Teodot, ep. Chiriniei; Sf. Mc. Isihie",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-03",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Mc. Eutropie, Cleonic și Vasilisc",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-04",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Gherasim de la Iordan; Sf. Mc. Pavel și sora sa, Iuliana",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "luna-0.png"
+      ]
+    },
+    {
+      "month_day": "03-05",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. Mc. Conon din Isauria și Conon Grădinarul; Sf. Cuv. Marcu Pustnicul",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-06",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Sf. 42 de Mc. din Amoreea; Aflarea Sfintei Cruci",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-07",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. Sfințiți Mc. Vasilevs, Evghenie, Capiton, Eterie, Agatodor și Elpidie, ep. din Herson; † Sf. Sfințit Mc. Efrem, ep. Tomisului",
+      "rank": "simplu",
+      "fast": "wineOil",
+      "notes": [
+        "Sâmbăta a II-a din Post - Pomenirea morților"
+      ],
+      "romanian": [
+        "† Sf. Sfințit Mc. Efrem, ep. Tomisului"
+      ],
+      "icons": []
+    },
+    {
+      "month_day": "03-08",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Pr. Mc. Liviu-Galaction de la Cluj; Sf. Ier. Mărt. Teofilact, ep. Nicomidiei",
+      "rank": "cruce_rosie",
+      "fast": "wineOil",
+      "notes": [],
+      "romanian": [
+        "†) Sf. Pr. Mc. Liviu-Galaction de la Cluj"
+      ],
+      "icons": []
+    },
+    {
+      "month_day": "03-09",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. 40 de Mc. din Sevastia (Post)",
+      "rank": "cruce_neagra",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-10",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Mc. Codrat, Ciprian, Dionisie și cei împreună cu ei",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-11",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Ier. Sofronie, patr. Ierusalimului",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "luna-1.png"
+      ]
+    },
+    {
+      "month_day": "03-12",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Teofan Mărt. Sf. Ier. Grigorie Dialogul, ep. Romei; Sf. Cuv. Simeon Noul Teolog",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-13",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Aducerea moaștelor Sf. Ier. Nichifor, patr. Constantinopolului",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-14",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Benedict de Nursia; Sf. Sfințit Mc. Alexandru, pr. din Pidna",
+      "rank": "simplu",
+      "fast": "wineOil",
+      "notes": [
+        "Sâmbăta a III-a din Post - Pomenirea morților"
+      ],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-15",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Mc. Agapie și Plisie, Timolau",
+      "rank": "simplu",
+      "fast": "wineOil",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-16",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. Mc. Sabin Egipteanul; Sf. Cuv. Hristodul din Patmos",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-17",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Alexie, omul lui Dumnezeu",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-18",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Ier. Chiril, arhiep. Ierusalimului",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-19",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. Mc. Hrisant și Daria, Claudiu și Ilaria; Sf. Mc. Marian diac.",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "luna-2.png"
+      ]
+    },
+    {
+      "month_day": "03-20",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Mc. uciși în M. Sf. Sava cel Sfințit",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-21",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. Ier. Iacob Mărt.; Sf. Cuv. Serapion;",
+      "rank": "simplu",
+      "fast": "wineOil",
+      "notes": [
+        "Sâmbăta a IV-a din Post - Pomenirea morților"
+      ],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-22",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Sfințit Mc. Vasile, pr. din Ancira; Sf. Mc. Drosida, fiica împ. Traian",
+      "rank": "simplu",
+      "fast": "wineOil",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-23",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Mc. Nicon și cei 199 ucenici ai lui",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-24",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Înainte-prăznuirea Bunei Vestiri; Sf. Ier. Artemon, ep. Seleuciei",
+      "rank": "simplu",
+      "fast": "wineOil",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-25",
+      "weekday": "M",
+      "row_class": "sarbatoare",
+      "name": "Buna Vestire (Blagoveștenia)",
+      "rank": "praznic",
+      "fast": "fish",
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-4.png"
+      ]
+    },
+    {
+      "month_day": "03-26",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Odovania Praznicului Bunei Vestiri; Soborul Sf. Arh. Gavriil; Sf. Mc. Montanus, pr. și soția sa, Maxima; Sf. 26 de Mc. din Goția/Dacia",
+      "rank": "simplu",
+      "fast": "wineOil",
+      "notes": [],
+      "romanian": [
+        "Sf. Mc. Montanus, pr. și soția sa, Maxima",
+        "Sf. 26 de Mc. din Goția/Dacia"
+      ],
+      "icons": [
+        "luna-3.png"
+      ]
+    },
+    {
+      "month_day": "03-27",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Sf. Mc. Matrona din Tesalonic; Sf. Mc. Filit și Lidia, soția sa, cu cei 4 fii ai lor",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [
+        "Denia Acatistului Bunei Vestiri"
+      ],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-28",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Ilarion cel Nou, eg. Pelechitului; Sf. Cuv. Ștefan, făcătorul de minuni",
+      "rank": "simplu",
+      "fast": "wineOil",
+      "notes": [
+        "Sâmbăta a V-a din Post - Pomenirea morților"
+      ],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-29",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Sfințiți Mc. Marcu, ep. Aretuselor și Chiril diac.; Sf. Mc. Iona și Varahisie; Sf. Ier. Diadoh, ep. Foticeei;",
+      "rank": "simplu",
+      "fast": "wineOil",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-30",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Ioan Scărarul; Sf. Cuv. Euvula, mama Sf. Pantelimon",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [],
+      "romanian": [],
+      "icons": []
+    },
+    {
+      "month_day": "03-31",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Sfințit Mc. Ipatie, ep. Gangrei; Sf. Mc. Veniamin, diac.",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [
+        "\"copyBtn\"",
+        "window.location.href",
+        "'text'",
+        "'text'",
+        "'togglePdf'",
+        "'pdfContainer'",
+        "'pdfIframe'",
+        "/\\.pdf$/i",
+        "\"http://\"",
+        "pdfUrl",
+        "!isOpen",
+        "inlocuiti [AT] cu @",
+        "i,s,o,g,r,a,m",
+        "i[r].q=i[r].q||[]",
+        "arguments",
+        "a,m",
+        "window,document,'script','//www.google-analytics.com/analytics.js','ga'",
+        "'create', 'UA-73320920-1', 'auto'",
+        "'send', 'pageview'",
+        "['Histats.start', '1,4550730,4,435,112,75,00011110']",
+        "['Histats.fasi', '1']",
+        "['Histats.track_hits', '']",
+        "'script'",
+        "'//s10.histats.com/js15_as.js'",
+        "'head'",
+        "'body'",
+        "hs"
+      ],
+      "romanian": [],
+      "icons": []
+    }
+  ],
+  "sundays": [
+    {
+      "title": "Duminica I din Post",
+      "subtitle": "a Ortodoxiei; Chemarea lui Filip și a lui Natanael",
+      "apostol": "Evrei XI, 24-26",
+      "evanghelie": "Ioan I, 43-51",
+      "glas": 5,
+      "voscreasna": 5
+    },
+    {
+      "title": "Duminica a II-a din Post",
+      "subtitle": "a Sf. Ier. Grigorie Palama; Vindecarea slăbănogului din Capernaum",
+      "apostol": "Evrei I, 10-14",
+      "evanghelie": "Marcu II, 1-12",
+      "glas": 6,
+      "voscreasna": 6
+    },
+    {
+      "title": "Duminica a III-a din Post",
+      "subtitle": "a Sf. Cruci; Luarea crucii și urmarea lui Hristos",
+      "apostol": "Evrei IV, 14-16",
+      "evanghelie": "Marcu VIII, 34-38",
+      "glas": 7,
+      "voscreasna": 7
+    },
+    {
+      "title": "Duminica a IV-a din Post",
+      "subtitle": "a Sf. Cuv. Ioan Scărarul; Vindecarea fiului lunatic; Predica de pe munte - Fericirile",
+      "apostol": "Evrei VI, 13-20",
+      "evanghelie": "Marcu IX, 17-32",
+      "glas": 8,
+      "voscreasna": 8
+    },
+    {
+      "title": "Duminica a V-a din Post",
+      "subtitle": "a Sf. Cuv. Maria Egipteanca; Prevestirea Patimilor; Cererea fiilor lui Zevedeu; Pocăința femeii păcătoase",
+      "apostol": "Evrei IX, 11-14",
+      "evanghelie": "Marcu X, 32-45",
+      "glas": 1,
+      "voscreasna": 9
+    }
+  ]
+}

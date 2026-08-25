@@ -11,6 +11,7 @@ class LiturgicalDay {
     required this.isPeriodStart,
     required this.isPeriodEnd,
     required this.glas,
+    required this.voscreasna,
     this.note,
   });
 
@@ -25,6 +26,9 @@ class LiturgicalDay {
 
   /// 1–8, or null on days the octoechos doesn't apply.
   final int? glas;
+
+  /// The resurrection gospel, 1–11.
+  final int? voscreasna;
 
   /// Why this day differs from the period's base rule, when it does.
   final String? note;
@@ -164,9 +168,14 @@ class LiturgicalCalendar {
   /// [rank] is the day's commemoration rank, looked up from the feasts table by
   /// the caller. It matters because a Praznic Împărătesc falling on a Wednesday
   /// or Friday brings a dezlegare that the period rules alone wouldn't produce.
+  /// [dezlegare] is an explicit override carried by a feast row — Sf. Nicolae
+  /// brings fish even though it falls inside the Nativity fast. It wins over
+  /// the period rule, but never over a strict day: Ajunul Crăciunului stays a
+  /// fast whatever else is commemorated.
   static LiturgicalDay dayFor(
     DateTime date, {
     FeastRank rank = FeastRank.simplu,
+    FastLevel? dezlegare,
   }) {
     final DateTime d = DateTime(date.year, date.month, date.day);
 
@@ -196,7 +205,12 @@ class LiturgicalCalendar {
       level = _levelOutsideFasts(d, rank);
     }
 
-    // Fixed strict days override whatever the surrounding rule produced.
+    if (dezlegare != null && level.isFasting) {
+      level = FastLevel.looser(level, dezlegare);
+    }
+
+    // Fixed strict days override whatever the surrounding rule produced,
+    // including a feast's dezlegare.
     final FastLevel? fixed = _fixedStrictDay(d);
     if (fixed != null) {
       level = FastLevel.stricter(level, fixed);
@@ -210,6 +224,7 @@ class LiturgicalCalendar {
       isPeriodStart: period?.isFirstDay(d) ?? false,
       isPeriodEnd: period?.isLastDay(d) ?? false,
       glas: glasFor(d),
+      voscreasna: voscreasnaFor(d),
       note: note,
     );
   }
@@ -339,15 +354,34 @@ class LiturgicalCalendar {
 
   // -------------------------------------------------------------------- glas
 
+  /// The eothinon — the resurrection gospel — cycling 1–11 weekly.
+  ///
+  /// The phase is fitted to a published calendar: 4 January 2026 is voscreasna
+  /// 8, and the three Sundays after it are 9, 10 and 11. That pins the offset
+  /// against the same Duminica Tomii anchor the glas uses. Verified for four
+  /// consecutive weeks; if you import another month and it disagrees, the
+  /// offset is what to adjust.
+  static int? voscreasnaFor(DateTime date) {
+    final int? weeks = _weeksSinceThomas(date);
+    if (weeks == null) return null;
+    return ((weeks + 4) % 11) + 1;
+  }
+
   /// The octoechos tone, 1–8, cycling weekly from Duminica Tomii (Pascha + 7).
   static int? glasFor(DateTime date) {
+    final int? weeks = _weeksSinceThomas(date);
+    if (weeks == null) return null;
+    return (weeks % 8) + 1;
+  }
+
+  /// Weeks elapsed since Duminica Tomii, the anchor both tone cycles hang off.
+  static int? _weeksSinceThomas(DateTime date) {
     final DateTime d = DateTime(date.year, date.month, date.day);
     DateTime anchor = _offset(FeastCalendar.pascha(d.year), 7);
     if (d.isBefore(anchor)) {
       anchor = _offset(FeastCalendar.pascha(d.year - 1), 7);
     }
     final int weeks = d.difference(anchor).inDays ~/ 7;
-    if (weeks < 0) return null;
-    return (weeks % 8) + 1;
+    return weeks < 0 ? null : weeks;
   }
 }

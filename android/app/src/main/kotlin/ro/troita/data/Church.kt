@@ -16,7 +16,6 @@ data class Church(
     val yearBuilt: Int?,
     val history: String?,
     val photoRef: String?,
-    val geofenceRadiusM: Int?,
     val priority: Int,
     val address: String?,
     val distanceM: Double = 0.0,
@@ -25,7 +24,7 @@ data class Church(
         "id" to id, "name" to name, "kind" to kind, "denomination" to denomination,
         "lat" to lat, "lon" to lon, "patron" to patron, "feast_day" to feastDay,
         "year_built" to yearBuilt, "history" to history, "photo_ref" to photoRef,
-        "geofence_radius_m" to geofenceRadiusM, "priority" to priority,
+        "priority" to priority,
         "address" to address, "distance_m" to distanceM,
     )
 }
