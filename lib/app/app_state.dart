@@ -5,9 +5,11 @@ import 'package:sqflite/sqflite.dart';
 
 import '../core/data/church_repository.dart';
 import '../core/data/day_repository.dart';
+import '../core/data/fast_journal_repository.dart';
 import '../core/data/feast_repository.dart';
 import '../core/data/local_church_repository.dart';
 import '../core/models/church.dart';
+import '../core/models/fast_day.dart';
 import '../core/native/troita_native.dart';
 import '../core/notifications/notification_planner.dart';
 import '../core/notifications/notification_prefs.dart';
@@ -32,6 +34,7 @@ class AppState extends ChangeNotifier {
   ChurchRepository? _repository;
   FeastRepository? _feasts;
   DayRepository? _days;
+  FastJournalRepository? _journal;
   StreamSubscription<String>? _openedSub;
 
   ChurchRepository get repository {
@@ -51,6 +54,14 @@ class AppState extends ChangeNotifier {
   /// overrides and the bundled sinaxar text, assembled together.
   DayRepository get days {
     final DayRepository? repo = _days;
+    if (repo == null) throw StateError('AppState.initialize() not awaited');
+    return repo;
+  }
+
+  /// The user's record of kept fast days. Lives in its own database, so a
+  /// content update never destroys it.
+  FastJournalRepository get journal {
+    final FastJournalRepository? repo = _journal;
     if (repo == null) throw StateError('AppState.initialize() not awaited');
     return repo;
   }
@@ -81,6 +92,7 @@ class AppState extends ChangeNotifier {
       final Database shared = await _openShared(init.databasePath);
       _feasts = FeastRepository(shared);
       _days = DayRepository(shared, _feasts!);
+      _journal = await FastJournalRepository.open();
       seed = init.seed;
       status = init.status;
       pendingChurchId = await _native.consumePendingChurchId();
@@ -148,6 +160,24 @@ class AppState extends ChangeNotifier {
         await TroitaNotifications.instance.requestPermission();
     if (granted) await rescheduleNotifications();
     return granted;
+  }
+
+  /// Bumped whenever a day is marked, so every screen showing the journal
+  /// rebuilds without each one holding its own subscription.
+  int journalRevision = 0;
+
+  /// "Ați ținut postul?" — the required answer.
+  Future<void> setFastKept(DateTime date, bool kept) async {
+    await journal.toggleKept(date, kept);
+    journalRevision++;
+    notifyListeners();
+  }
+
+  /// The optional face. Implies the day was kept.
+  Future<void> setFastMood(DateTime date, FastMood mood) async {
+    await journal.toggleMood(date, mood);
+    journalRevision++;
+    notifyListeners();
   }
 
   Future<void> refreshStatus() async {
