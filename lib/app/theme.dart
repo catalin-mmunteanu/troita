@@ -51,8 +51,13 @@ abstract final class TroitaColors {
   /// deeper and less orange than a UI alert red.
   static const Color feastRed = Color(0xFFC1272D);
 
-  /// Feasts with a black cross, and ordinary weekday numerals.
+  /// Ordinary weekday numerals.
   static const Color calendarInk = Color(0xFF1B1B1B);
+
+  /// Cruce albastră. Printed black in some calendars and blue in others; it is
+  /// the same rank, so this is purely which convention we follow. Switch it to
+  /// [calendarInk] to print black instead.
+  static const Color feastBlue = Color(0xFF1F4E8C);
 
   /// Romanian saints. The source markup singles them out with `class="rom"`,
   /// and printed calendars usually set them apart too.
@@ -186,23 +191,36 @@ IconData fastLevelIcon(FastLevel level) => switch (level) {
 Color feastRankColor(FeastRank rank) => switch (rank) {
       FeastRank.praznic => TroitaColors.feastRed,
       FeastRank.cruceRosie => TroitaColors.feastRed,
-      FeastRank.cruceNeagra => TroitaColors.calendarInk,
+      FeastRank.cruceAlbastra => TroitaColors.feastBlue,
       FeastRank.simplu => TroitaColors.muted,
     };
 
-/// The colour a day's numeral takes in the month grid.
+/// The colour a day's numeral takes.
 ///
-/// Sundays are red even when nothing is commemorated — that is how a printed
-/// calendar reads, and it is the fastest way to find your place in the month.
+/// Two independent reasons for red, and they add rather than compete:
+///
+///  * the day carries a red cross — praznic or cruce roșie
+///  * the day is a Sunday, red even when nothing is commemorated, because that
+///    is how a printed calendar reads and it is the fastest way to find your
+///    place in the month
+///
+/// In 2026, 11 Sundays are also red-cross days and get red digits for both
+/// reasons; 4 Sundays carry a *black* cross, where the numeral is still red
+/// (it is a Sunday) while the commemoration keeps its black cross and its
+/// "Cruce Neagră" label. That combination is correct, not a conflict — the
+/// numeral describes the day, the cross describes the commemoration.
 Color calendarDayColor({
   required FeastRank rank,
   required bool isSunday,
   required bool inMonth,
 }) {
   if (!inMonth) return TroitaColors.muted;
-  if (rank == FeastRank.praznic || rank == FeastRank.cruceRosie || isSunday) {
-    return TroitaColors.feastRed;
-  }
+  final bool redCross =
+      rank == FeastRank.praznic || rank == FeastRank.cruceRosie;
+  // Red wins over blue when both apply — a red-letter feast that falls on a
+  // Sunday is still printed red.
+  if (redCross || isSunday) return TroitaColors.feastRed;
+  if (rank == FeastRank.cruceAlbastra) return TroitaColors.feastBlue;
   return TroitaColors.calendarInk;
 }
 

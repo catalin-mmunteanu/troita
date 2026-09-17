@@ -46,7 +46,7 @@
       "weekday": "L",
       "row_class": "normal",
       "name": "Sf. Cuv. Mavra de pe Ceahlău; Sf. Mc. Pelaghia; Sf. Cuv. Monica, mama Fer. Augustin",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [
@@ -59,7 +59,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Cuv. Matrona de la Hurezi; Sf. M. Mc. Irina; Sf. Cuv. Mc. Efrem cel Nou",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [
@@ -96,7 +96,7 @@
       "weekday": "V",
       "row_class": "normal",
       "name": "Sf. Ap. și Ev. Ioan Teologul; Sf. Cuv. Arsenie cel Mare",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fish",
       "notes": [],
       "romanian": [],
@@ -135,7 +135,7 @@
       "weekday": "L",
       "row_class": "normal",
       "name": "Sf. Cuv. Dionisie Vatopedinul de la Colciu; Sf. Sfințit Mc. Mochie pr.;Sf. Ier. Metodie și Sf. Cuv. Chiril, luminătorii slavilor",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [
@@ -148,7 +148,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Mc. Ioan Valahul; Sf. Ier. Epifanie, arhiep. Ciprului și Gherman, patriarhul Constantinopolului",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [
@@ -296,7 +296,7 @@
       "weekday": "D",
       "row_class": "sarbatoare saptamana",
       "name": "Sf. Mărt. Blandina de la Iași; Sf. Cuv. Simeon cel din Muntele Minunat",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [
@@ -311,7 +311,7 @@
       "weekday": "L",
       "row_class": "normal",
       "name": "A treia aflare a capului Sf. Ioan, Înaintemergătorul și Botezătorul Domnului",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [],

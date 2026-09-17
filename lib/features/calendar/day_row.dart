@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../app/theme.dart';
 import '../../core/data/day_repository.dart';
 import '../../core/liturgical/fast_level.dart';
+import '../../core/models/fast_day.dart';
 import '../../core/models/feast.dart';
+import '../fasting/mood_selector.dart';
 
 /// One day, set like a line in a printed calendar.
 ///
@@ -17,12 +19,18 @@ class DayRow extends StatelessWidget {
     required this.entry,
     required this.isToday,
     required this.onTap,
+    this.marked,
     super.key,
   });
 
   final DayEntry entry;
   final bool isToday;
   final VoidCallback onTap;
+
+  /// The user's record for this day, if any. Shown, not editable — the
+  /// calendar list stays a reading surface, and recording happens in Posturi
+  /// or on the day's own page.
+  final FastDay? marked;
 
   static const List<String> _weekdayLetters = <String>[
     'L', 'Ma', 'Mi', 'J', 'V', 'S', 'D',
@@ -38,7 +46,8 @@ class DayRow extends StatelessWidget {
     return Semantics(
       button: true,
       label: '${entry.date.day} ${_monthName(entry.date.month)}, '
-          '${entry.title}, ${entry.liturgical.fastLevel.label}',
+          '${entry.title}, ${entry.liturgical.fastLevel.label}'
+          '${marked == null ? '' : ', ${marked!.kept ? 'ținut' : 'neținut'}'}',
       child: Material(
         color: isToday
             ? TroitaColors.accentSurface
@@ -101,45 +110,42 @@ class DayRow extends StatelessWidget {
                             ),
                           ),
                         ),
-                      if (major)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 3),
-                          child: Row(
-                            children: <Widget>[
-                              Icon(Icons.add,
-                                  size: 15, color: feastRankColor(entry.rank)),
-                              const SizedBox(width: 5),
-                              Text(
-                                entry.rank.label.toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  letterSpacing: 0.6,
-                                  fontWeight: FontWeight.w700,
-                                  color: feastRankColor(entry.rank),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      Text(
-                        entry.title,
-                        // Four lines is enough for the longest day in the year
-                        // and still lets the row breathe.
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                        style: TroitaCalendarText.commemoration.copyWith(
-                          fontSize: 17,
-                          height: 1.35,
-                          fontWeight:
-                              major ? FontWeight.w600 : FontWeight.w400,
-                          color: entry.primary?.kind == 'romanesc'
-                              ? TroitaColors.romanianSaint
-                              : TroitaColors.calendarInk,
-                        ),
-                      ),
+                      // One marker per commemoration, not one per day.
+                      // A day can carry a red-cross feast and a black-cross
+                      // one at the same time; a single badge for the whole row
+                      // put both under the wrong cross and hid the black one
+                      // completely.
+                      ..._commemorations(context),
                       if (entry.liturgical.isFasting) ...<Widget>[
                         const SizedBox(height: 8),
-                        FastPill(level: entry.liturgical.fastLevel),
+                        Row(
+                          children: <Widget>[
+                            FastPill(level: entry.liturgical.fastLevel),
+                            if (marked != null) ...<Widget>[
+                              const SizedBox(width: 8),
+                              // The face when one was given, otherwise a plain
+                              // tick or cross for the Da/Nu answer.
+                              if (marked!.kept && marked!.mood != null)
+                                Icon(
+                                  MoodSelector.iconFor(marked!.mood!,
+                                      filled: true),
+                                  size: 22,
+                                  color:
+                                      MoodSelector.colourFor(marked!.mood!),
+                                )
+                              else
+                                Icon(
+                                  marked!.kept
+                                      ? Icons.check_circle
+                                      : Icons.cancel_outlined,
+                                  size: 22,
+                                  color: marked!.kept
+                                      ? TroitaColors.burgundy
+                                      : TroitaColors.muted,
+                                ),
+                            ],
+                          ],
+                        ),
                       ],
                     ],
                   ),
@@ -150,6 +156,101 @@ class DayRow extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Up to three commemorations, each with its own cross.
+  ///
+  /// Red cross for praznice and cruce roșie, black cross for cruce neagră,
+  /// nothing for an ordinary day — the convention the printed calendars use,
+  /// applied per name rather than per date.
+  List<Widget> _commemorations(BuildContext context) {
+    final List<Feast> feasts = entry.feasts;
+    if (feasts.isEmpty) {
+      return <Widget>[
+        Text(
+          'Pomenirea zilei',
+          style: TroitaCalendarText.commemoration.copyWith(fontSize: 17),
+        ),
+      ];
+    }
+
+    const int limit = 3;
+    final List<Feast> shown = feasts.take(limit).toList();
+    final int hidden = feasts.length - shown.length;
+
+    return <Widget>[
+      for (final Feast f in shown)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              // The rank spelled out, per commemoration. On a day that carries
+              // both a red-cross and a black-cross feast, each name gets its
+              // own label rather than sharing one for the whole date.
+              if (f.rank != FeastRank.simplu)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.add, size: 14, color: feastRankColor(f.rank)),
+                      const SizedBox(width: 5),
+                      Text(
+                        f.rank.label.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          letterSpacing: 0.6,
+                          fontWeight: FontWeight.w700,
+                          color: feastRankColor(f.rank),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  if (f.rank == FeastRank.simplu)
+                    Container(
+                      margin: const EdgeInsets.only(top: 8, right: 8),
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: TroitaColors.muted,
+                      ),
+                    ),
+                  Expanded(
+                    child: Text(
+                      f.name,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: TroitaCalendarText.commemoration.copyWith(
+                        fontSize: 17,
+                        height: 1.3,
+                        fontWeight: f.rank == FeastRank.simplu
+                            ? FontWeight.w400
+                            : FontWeight.w600,
+                        color: f.kind == 'romanesc'
+                            ? TroitaColors.romanianSaint
+                            : TroitaColors.calendarInk,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      if (hidden > 0)
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Text(
+            'și încă $hidden',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+    ];
   }
 
   static String _monthName(int m) => const <String>[

@@ -58,8 +58,10 @@ enum FeastRank {
   /// Cruce roșie — major saints, polyeleos.
   cruceRosie,
 
-  /// Cruce neagră — lesser commemoration with special hymns.
-  cruceNeagra,
+  /// Cruce albastră, printed black by some publishers — the same rank either
+  /// way. A saint of particular importance, but not a day of obligatory rest
+  /// the way a red-cross feast is.
+  cruceAlbastra,
 
   /// Ordinary day.
   simplu;
@@ -67,21 +69,23 @@ enum FeastRank {
   static FeastRank parse(String? value) => switch (value) {
         'praznic' => FeastRank.praznic,
         'cruce_rosie' => FeastRank.cruceRosie,
-        'cruce_neagra' => FeastRank.cruceNeagra,
+        // Both spellings accepted: the rank is one thing with two names.
+        'cruce_albastra' => FeastRank.cruceAlbastra,
+        'cruce_neagra' => FeastRank.cruceAlbastra,
         _ => FeastRank.simplu,
       };
 
   String get id => switch (this) {
         FeastRank.praznic => 'praznic',
         FeastRank.cruceRosie => 'cruce_rosie',
-        FeastRank.cruceNeagra => 'cruce_neagra',
+        FeastRank.cruceAlbastra => 'cruce_albastra',
         FeastRank.simplu => 'simplu',
       };
 
   String get label => switch (this) {
         FeastRank.praznic => 'Praznic Împărătesc',
         FeastRank.cruceRosie => 'Cruce Roșie',
-        FeastRank.cruceNeagra => 'Cruce Neagră',
+        FeastRank.cruceAlbastra => 'Cruce Albastră',
         FeastRank.simplu => 'Pomenire',
       };
 
@@ -89,7 +93,7 @@ enum FeastRank {
   int get weight => switch (this) {
         FeastRank.praznic => 3,
         FeastRank.cruceRosie => 2,
-        FeastRank.cruceNeagra => 1,
+        FeastRank.cruceAlbastra => 1,
         FeastRank.simplu => 0,
       };
 }

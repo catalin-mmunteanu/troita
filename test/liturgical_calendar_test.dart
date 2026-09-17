@@ -129,7 +129,7 @@ void main() {
           FastLevel.fish);
       expect(levelOn(DateTime(2026, 10, 7), rank: FeastRank.cruceRosie),
           FastLevel.wineOil);
-      expect(levelOn(DateTime(2026, 10, 7), rank: FeastRank.cruceNeagra),
+      expect(levelOn(DateTime(2026, 10, 7), rank: FeastRank.cruceAlbastra),
           FastLevel.fast);
     });
   });

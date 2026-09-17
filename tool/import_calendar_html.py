@@ -64,16 +64,25 @@ def clean(fragment: str) -> str:
     return re.sub(r'\s+', ' ', text).strip().strip(';').strip()
 
 
-def rank_of(name: str) -> str:
-    """Rank from the dagger prefix. Order matters — (†) before †) before †."""
+def rank_of(name: str, row_class: str = '') -> str:
+    """Rank from the row class first, the dagger second.
+
+    Same rule as scrape_calendar.rank_of — see the reasoning there. In short:
+    `†)` marks 61 days of 2026 but only the 28 flagged class="sarbatoare" are
+    red-letter feasts; the rest are cruce albastră.
+    """
     stripped = name.lstrip()
     if stripped.startswith('(†)'):
         return 'praznic'
-    if stripped.startswith('†)'):
+
+    has_dagger = stripped.startswith('†')
+    if row_class.strip() == 'sarbatoare':
         return 'cruce_rosie'
-    if stripped.startswith('†'):
-        return 'cruce_neagra'
-    return 'simplu'
+    if 'saptamana' in row_class or 'duminica' in row_class:
+        if stripped.startswith('†)'):
+            return 'cruce_rosie'
+        return 'cruce_albastra' if has_dagger else 'simplu'
+    return 'cruce_albastra' if has_dagger else 'simplu'
 
 
 def strip_daggers(name: str) -> str:
@@ -107,7 +116,7 @@ def parse_month(source: str, year: int, month: int) -> list[dict]:
             'weekday': m.group('wd'),
             'row_class': m.group('cls'),
             'name': strip_daggers(raw_name),
-            'rank': rank_of(raw_name),
+            'rank': rank_of(raw_name, cls),
             'romanian': romanian,
             'prefeast': prefeast,
             'fast': fast,

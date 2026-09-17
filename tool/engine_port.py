@@ -4,7 +4,7 @@ against published calendars. Keep the two in step; if they diverge, the Dart
 one is the product and this one is wrong."""
 from datetime import date, timedelta
 
-RANK_WEIGHT = {'praznic': 3, 'cruce_rosie': 2, 'cruce_neagra': 1, 'simplu': 0}
+RANK_WEIGHT = {'praznic': 3, 'cruce_rosie': 2, 'cruce_albastra': 1, 'simplu': 0}
 ORDER = ['none', 'dairy', 'fish', 'wineOil', 'fast', 'strict']
 
 

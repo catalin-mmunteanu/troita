@@ -5,7 +5,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Anastasia, mama Sfântului Ier. Andrei Șaguna; Sf. Prooroc Naum; Sf. Cuv. Filaret cel Milostiv",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": "fish",
       "notes": [
         "Tedeum - Ziua Națională a României"
@@ -22,7 +22,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Cuv. Paisie și Cleopa de la Sihăstria; Sf. Prooroc Avacum; Sf. Mc. Miropi; Sf. Porfirie Cavsocalivitul; Sf. Ier. Solomon, arhiep. Efesului",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fast",
       "notes": [],
       "romanian": [
@@ -37,7 +37,7 @@
       "weekday": "J",
       "row_class": "normal",
       "name": "Sf. Cuv. Gheorghe de la Cernica și Căldărușani; Sf. Prooroc Sofonie",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fish",
       "notes": [],
       "romanian": [
@@ -52,7 +52,7 @@
       "weekday": "V",
       "row_class": "normal",
       "name": "Sf. M. Mc. Varvara; Sf. Cuv. Ioan Damaschin",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": "wineOil",
       "notes": [],
       "romanian": [],
@@ -63,7 +63,7 @@
       "weekday": "S",
       "row_class": "normal",
       "name": "Sf. Cuv. Sava cel Sfințit; Sf. Mc. Anastasie",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fish",
       "notes": [],
       "romanian": [],
@@ -89,7 +89,7 @@
       "weekday": "L",
       "row_class": "normal",
       "name": "Sf. Mc. Filofteia de la Curtea de Argeș; Sf. Ier. Ambrozie, ep. Mediolanului (Milano)",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fish",
       "notes": [],
       "romanian": [
@@ -150,7 +150,7 @@
       "weekday": "S",
       "row_class": "normal",
       "name": "Sf. Ier. Spiridon, ep. Trimitundei, făcătorul de minuni",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fish",
       "notes": [],
       "romanian": [],
@@ -224,7 +224,7 @@
       "weekday": "V",
       "row_class": "normal",
       "name": "Sf. Cuv. Daniil Sihastrul; Sf. Mc. Sebastian și Zoe; Sf. Ier. Modest, arhiep. Ierusalimului",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "wineOil",
       "notes": [],
       "romanian": [
@@ -237,7 +237,7 @@
       "weekday": "S",
       "row_class": "normal",
       "name": "Sf. Cuv. Muceniță Evloghia de la Samurcășești; Sf. Mc. Bonifatie; Sf. Cuv. Aglaia, Sf. Ier. Grichentie, ep. Etiopiei;",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": "fish",
       "notes": [
         "Sâmbăta dinaintea Nașterii Domnului"
@@ -278,7 +278,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Ier. Petru Movilă, mitr. Kievului; Sf. M. Mc. Anastasia",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fast",
       "notes": [],
       "romanian": [
@@ -291,7 +291,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Cuv. Antonina de la Tismana ; Sf. 10 Mc. din Creta; Sf. Ier. Pavel, arhiep. Neocezareei",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": "fast",
       "notes": [],
       "romanian": [
@@ -332,7 +332,7 @@
       "weekday": "S",
       "row_class": "sarbatoare",
       "name": "A doua zi de Crăciun; †) Soborul Maicii Domnului; †) Sf. Cuv. Nicodim cel Sfințit de la Tismana; †) Sf. Cuv. Mc. Gherasim de la Tismana; Sf. Sfințit Mc. Eftimie, ep. Sardelor",
-      "rank": "simplu",
+      "rank": "cruce_rosie",
       "fast": null,
       "notes": [
         "Sâmbăta după Nașterea Domnului"

@@ -1,5 +1,5 @@
 {
-  "_README": "Major commemorations for the Romanian Orthodox calendar. `rank` drives the calendar markers and the notification style: praznic > cruce_rosie > cruce_neagra > simplu. `dezlegare` overrides the computed fast level for that day (fish|wineOil|none). Movable feasts use `movable` instead of `date`, keyed to FeastCalendar._movable. Everything here is verified=0 until checked against the Patriarchate's printed calendar.",
+  "_README": "Major commemorations for the Romanian Orthodox calendar. `rank` drives the calendar markers and the notification style: praznic > cruce_rosie > cruce_albastra > simplu. `dezlegare` overrides the computed fast level for that day (fish|wineOil|none). Movable feasts use `movable` instead of `date`, keyed to FeastCalendar._movable. Everything here is verified=0 until checked against the Patriarchate's printed calendar.",
   "feasts": [
     {
       "movable": "pascha",
@@ -116,28 +116,28 @@
       "movable": "thomas_sunday",
       "name": "Duminica Tomii",
       "short": "Duminica Tomii",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "domnesc"
     },
     {
       "movable": "myrrhbearers",
       "name": "Duminica Mironosițelor",
       "short": "Mironosițele",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
       "movable": "orthodoxy_sunday",
       "name": "Duminica Ortodoxiei",
       "short": "Duminica Ortodoxiei",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "domnesc"
     },
     {
       "movable": "all_saints",
       "name": "Duminica Tuturor Sfinților",
       "short": "Toți Sfinții",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
@@ -151,14 +151,14 @@
       "movable": "lazarus_saturday",
       "name": "Sâmbăta lui Lazăr",
       "short": "Sâmbăta lui Lazăr",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "domnesc"
     },
     {
       "movable": "theodore_saturday",
       "name": "Sfântul Mucenic Teodor Tiron",
       "short": "Sf. Teodor Tiron",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
@@ -179,7 +179,7 @@
       "date": "01-05",
       "name": "Ajunul Bobotezei",
       "short": "Ajunul Bobotezei",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "domnesc",
       "note": "Zi de ajunare."
     },
@@ -215,7 +215,7 @@
       "date": "01-18",
       "name": "Sfinții Ierarhi Atanasie și Chiril, arhiepiscopii Alexandriei",
       "short": "Sf. Atanasie și Chiril",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
@@ -243,7 +243,7 @@
       "date": "02-17",
       "name": "Sfântul Mare Mucenic Teodor Tiron",
       "short": "Sf. Teodor Tiron",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
@@ -272,7 +272,7 @@
       "date": "04-25",
       "name": "Sfântul Apostol și Evanghelist Marcu",
       "short": "Sf. Ap. Marcu",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
@@ -323,7 +323,7 @@
       "date": "06-30",
       "name": "Soborul Sfinților 12 Apostoli",
       "short": "Soborul Sf. Apostoli",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
@@ -344,14 +344,14 @@
       "date": "07-22",
       "name": "Sfânta Maria Magdalena, întocmai cu apostolii",
       "short": "Sf. Maria Magdalena",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
       "date": "07-25",
       "name": "Adormirea Sfintei Ana, mama Născătoarei de Dumnezeu",
       "short": "Adormirea Sf. Ana",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
@@ -365,7 +365,7 @@
       "date": "08-05",
       "name": "Sfântul Cuvios Ioan Iacob de la Neamț",
       "short": "Sf. Ioan Iacob",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "romanesc"
     },
     {
@@ -387,7 +387,7 @@
       "date": "09-01",
       "name": "Începutul anului bisericesc",
       "short": "Anul bisericesc nou",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "domnesc"
     },
     {
@@ -457,7 +457,7 @@
       "date": "11-14",
       "name": "Sfântul Apostol Filip",
       "short": "Sf. Ap. Filip",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant",
       "note": "Lăsatul secului pentru Postul Nașterii Domnului."
     },
@@ -465,7 +465,7 @@
       "date": "11-15",
       "name": "Sfântul Cuvios Paisie de la Neamț",
       "short": "Sf. Paisie de la Neamț",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "romanesc",
       "note": "Începutul Postului Nașterii Domnului."
     },
@@ -473,7 +473,7 @@
       "date": "11-16",
       "name": "Sfântul Apostol și Evanghelist Matei",
       "short": "Sf. Ap. Matei",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
@@ -495,7 +495,7 @@
       "date": "12-04",
       "name": "Sfânta Mare Muceniță Varvara",
       "short": "Sf. Varvara",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
@@ -510,7 +510,7 @@
       "date": "12-09",
       "name": "Zămislirea Sfintei Fecioare Maria de către Sfânta Ana",
       "short": "Zămislirea Sf. Ana",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "maica_domnului"
     },
     {
@@ -524,21 +524,21 @@
       "date": "12-15",
       "name": "Sfântul Sfințit Mucenic Elefterie",
       "short": "Sf. Elefterie",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
       "date": "12-20",
       "name": "Sfântul Sfințit Mucenic Ignatie Teoforul",
       "short": "Sf. Ignatie Teoforul",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "sfant"
     },
     {
       "date": "12-24",
       "name": "Ajunul Nașterii Domnului",
       "short": "Ajunul Crăciunului",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "kind": "domnesc",
       "note": "Zi de ajunare."
     },
@@ -560,7 +560,7 @@
       "date": "01-07",
       "name": "Soborul Sfântului Prooroc Ioan Botezătorul și Înaintemergătorul Domnului",
       "short": "Soborul Sf. Ioan Botezătorul",
-      "rank": "cruce_neagra",
+      "rank": "cruce_rosie",
       "kind": "sfant",
       "dezlegare": "fish",
       "note": "Dezlegare la pește."

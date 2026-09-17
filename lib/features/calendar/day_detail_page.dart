@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/app_scope.dart';
+import '../../app/app_state.dart';
 import '../../app/theme.dart';
 import '../../core/data/day_repository.dart';
 import '../../core/liturgical/fast_level.dart';
 import '../../core/models/feast.dart';
+import '../../core/models/fast_day.dart';
 import '../../core/models/sinaxar.dart';
+import '../fasting/mood_selector.dart';
 import 'day_row.dart';
 
 /// The saint of the day, at length.
@@ -96,6 +99,13 @@ class _DayDetailPageState extends State<DayDetailPage> {
                 const SizedBox(height: 18),
                 _LiturgicalCard(entry: entry),
 
+                // Rating any past day, not just today — people fill these in
+                // after the fact, and refusing that makes the journal useless
+                // the first time someone forgets.
+                if (entry.liturgical.isFasting &&
+                    !widget.date.isAfter(DateTime.now()))
+                  _DayRating(date: widget.date),
+
                 if (entry.sinaxar != null && !entry.sinaxar!.isEmpty) ...<Widget>[
                   const SizedBox(height: 24),
                   const _Ornament(),
@@ -148,6 +158,60 @@ class _DayDetailPageState extends State<DayDetailPage> {
   }
 }
 
+/// Mark a fast day from its detail page.
+class _DayRating extends StatefulWidget {
+  const _DayRating({required this.date});
+
+  final DateTime date;
+
+  @override
+  State<_DayRating> createState() => _DayRatingState();
+}
+
+class _DayRatingState extends State<_DayRating> {
+  FastDay? _day;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _reload());
+  }
+
+  Future<void> _reload() async {
+    final FastDay? day =
+        await AppScope.of(context).journal.forDate(widget.date);
+    if (!mounted) return;
+    setState(() {
+      _day = day;
+      _loaded = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded) return const SizedBox(height: 8);
+    final AppState state = AppScope.of(context);
+
+    return Container(
+      margin: const EdgeInsets.only(top: 14),
+      padding: const EdgeInsets.all(TroitaSpacing.card),
+      decoration: TroitaTheme.cardDecoration(),
+      child: FastDayEditor(
+        day: _day,
+        onKept: (bool k) async {
+          await state.setFastKept(widget.date, k);
+          await _reload();
+        },
+        onMood: (FastMood m) async {
+          await state.setFastMood(widget.date, m);
+          await _reload();
+        },
+      ),
+    );
+  }
+}
+
 class _Commemoration extends StatelessWidget {
   const _Commemoration({required this.feast, required this.scale});
 
@@ -158,13 +222,17 @@ class _Commemoration extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool major = feast.rank == FeastRank.praznic ||
         feast.rank == FeastRank.cruceRosie;
+    // Cruce neagră gets its cross and its label too. Showing nothing for it
+    // meant a black-cross feast was indistinguishable from an ordinary day,
+    // and left the red cross above it looking like it belonged to both.
+    final bool ranked = feast.rank != FeastRank.simplu;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          if (major)
+          if (ranked)
             Row(
               children: <Widget>[
                 Icon(Icons.add, size: 16, color: feastRankColor(feast.rank)),

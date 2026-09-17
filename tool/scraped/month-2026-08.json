@@ -27,7 +27,7 @@
       "weekday": "L",
       "row_class": "normal",
       "name": "Sf. Cuv. Mărt. Iraclie din Basarabia; Sf. Cuv. Isaachie, Dalmat și Faust; Sf. Mironosiță Salomeea; Sf. Cuv. Teodora din Tesalonic",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fast",
       "notes": [],
       "romanian": [
@@ -78,7 +78,7 @@
       "weekday": "V",
       "row_class": "normal",
       "name": "Sf. Cuv. Teodora de la Sihla; †) Sf. Cuv. Pafnutie - Pârvu Zugravul; Sf. Cuv. Mc. Dometie Persul; Sf. Sfințit Mc. Narcis, arhep. Ierusalimului; Sf. Cuv. Nicanor",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fast",
       "notes": [],
       "romanian": [
@@ -92,7 +92,7 @@
       "weekday": "S",
       "row_class": "normal",
       "name": "Sf. Pr. Mc. Alexandru din Basarabia; Sf. Ier. Emilian Mărt., ep. Cizicului și Miron, ep. Cretei",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "wineOil",
       "notes": [],
       "romanian": [
@@ -127,7 +127,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Ier. Nifon, patr. Constantinopolului; Sf. M. Mc. Evplu, arhid.",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fast",
       "notes": [],
       "romanian": [
@@ -202,7 +202,7 @@
       "weekday": "L",
       "row_class": "normal",
       "name": "Sf. Gheorghe Pelerinul; † Sf. Cuv. Nazaria, Olimpiada, Elisabeta (Safta) Brâncoveanu, de la Văratec ; Sf. Mc. Miron pr., Straton și Ciprian",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [

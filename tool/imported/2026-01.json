@@ -73,7 +73,7 @@
       "weekday": "M",
       "row_class": "sarbatoare",
       "name": "Soborul Sf. Prooroc Ioan Botezătorul și Înaintemergătorul Domnului",
-      "rank": "cruce_neagra",
+      "rank": "cruce_rosie",
       "romanian": [],
       "prefeast": [],
       "fast": "fish",
@@ -119,7 +119,7 @@
       "weekday": "D",
       "row_class": "sarbatoare saptamana",
       "name": "Sf. Cuv. Teodosie, începătorul vieții călugărești de obște din Palestina; Sf. Cuv. Vitalie",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "romanian": [],
       "prefeast": [],
       "fast": null,
@@ -141,7 +141,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Mc. Ermil și Stratonic; Sf. Ier. Iacob, ep. din Nisibe",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "romanian": [
         "† Sf. Mc. Ermil și Stratonic"
       ],
@@ -189,7 +189,7 @@
       "weekday": "S",
       "row_class": "normal",
       "name": "Sf. Cuv. Antonie cel Mare; Sf. Cuv. Antonie cel nou de la Veria",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "romanian": [],
       "prefeast": [],
       "fast": null,
@@ -200,7 +200,7 @@
       "weekday": "D",
       "row_class": "sarbatoare saptamana",
       "name": "Sf. Ier. Atanasie și Chiril, arhiep. Alexandriei",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "romanian": [],
       "prefeast": [],
       "fast": null,
@@ -222,7 +222,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Cuv. Eftimie cel Mare; Sf. Mc. Eusebiu; † Sf. Mc. In, Pin și Rim",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "romanian": [
         "† Sf. Mc. In, Pin și Rim"
       ],
@@ -292,7 +292,7 @@
       "weekday": "L",
       "row_class": "normal",
       "name": "Sf. Ier. Iosif cel Milostiv, mitr. Moldovei; Sf. Cuv. Xenofont, Maria, Arcadie și Ioan",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "romanian": [
         "†) Sf. Ier. Iosif cel Milostiv, mitr. Moldovei"
       ],
@@ -305,7 +305,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Aducerea moaștelor Sf. Ier. Ioan Gură de Aur; Sf. Marciana, împ.",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "romanian": [],
       "prefeast": [],
       "fast": null,

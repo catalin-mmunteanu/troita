@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS feasts (
     movable_key TEXT,                      -- matches FeastCalendar._movable
     name        TEXT    NOT NULL,
     short_name  TEXT,                      -- for the calendar grid and badges
-    rank        TEXT    NOT NULL,          -- praznic|cruce_rosie|cruce_neagra|simplu
+    rank        TEXT    NOT NULL,          -- praznic|cruce_rosie|cruce_albastra|simplu
     kind        TEXT,                      -- domnesc|maica_domnului|sfant|romanesc
     note        TEXT,
     dezlegare   TEXT,                      -- overrides the computed fast level

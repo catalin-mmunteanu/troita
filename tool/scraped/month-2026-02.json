@@ -110,7 +110,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Sfințit Mc. Haralambie; Sf. Mc. Valentina",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [],
@@ -295,7 +295,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Întâia și a doua aflare a Capului Sf. Ioan, Înaintemergătorul și Botezătorul Domnului; †) Sf. Cuv. Petroniu de la Prodromu",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [
         "Canonul cel Mare, partea a II-a",
@@ -351,7 +351,7 @@
       "weekday": "S",
       "row_class": "normal",
       "name": "Sf. Cuv. Ioan Casian Romanul și Gherman din Dobrogea; Sf. Cuv. Vasile Mărt.",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "wineOil",
       "notes": [
         "Sâmbăta Sf. Teodor - Pomenirea morților",

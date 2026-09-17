@@ -16,7 +16,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. M. Mc. Ioan cel Nou de la Suceava; Sf. Ier. Nichifor, patr. Constantinopolului",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [
@@ -40,7 +40,7 @@
       "weekday": "J",
       "row_class": "normal",
       "name": "Sf. Mc. Zotic, Atal, Camasie și Filip de la Niculițel; Sf. Ier. Mitrofan, patr. Constantinopolului; Sf. Mironosițe Maria și Marta, surorile Dreptului Lazăr",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [
@@ -53,7 +53,7 @@
       "weekday": "V",
       "row_class": "normal",
       "name": "Sf. Cuv. Elisabeta de la Pasărea; Sf. Sfințit Mc. Dorotei, ep. Tirului; Sf. Mc. Apolon și Leonid",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": "none",
       "notes": [],
       "romanian": [
@@ -90,7 +90,7 @@
       "weekday": "L",
       "row_class": "normal",
       "name": "Sf. Mc. Nicandru și Marcian; Aducerea moaștelor Sf. M. Mc. Teodor Stratilat",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": "fish",
       "notes": [
         "Începutul Postului Sf. Ap. Petru și Pavel"
@@ -196,7 +196,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Ier. Martir Neofit Cretanul, mitropolitul Țării Româneti; Sf. Ier. Tihon, ep. Amatundei",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fish",
       "notes": [],
       "romanian": [
@@ -270,7 +270,7 @@
       "weekday": "L",
       "row_class": "normal",
       "name": "Sf. Ier. Grigorie Dascălul, mitr. Țării Românești; Sf. Sfințit Mc. Eusebiu, ep. Samosatei",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fish",
       "notes": [],
       "romanian": [
@@ -372,7 +372,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Soborul Sf. 12 Ap.; †) Sf. Ier. Ghelasie de la Râmeț",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [
         "\"copyBtn\"",

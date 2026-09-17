@@ -79,7 +79,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. M. Mc. Serghie și Vah; Sf. Mc. Iulian pr., Chesarie diac. și Polihronie",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": "fast",
       "notes": [],
       "romanian": [],
@@ -149,7 +149,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Aducerea moaștelor Sf. Ap. Andrei la Iași; Sf. Mc. Carp, Papil, Agatodor, Agatonica și Florentie",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [
@@ -173,7 +173,7 @@
       "weekday": "J",
       "row_class": "normal",
       "name": "Sf. Magdalena de la Mălainița; Sf. Mc. Luchian, pr. din Antiohia",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": null,
       "notes": [],
       "romanian": [
@@ -243,7 +243,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Cuv. Mărt. Visarion și Sofronie; Sf. Mc. Oprea; Sf. Pr. Mărt. Ioan din Galeș și Moise Măcinic din Sibiel; Sf. Cuv. Ilarion cel Mare",
-      "rank": "cruce_rosie",
+      "rank": "cruce_albastra",
       "fast": "fast",
       "notes": [],
       "romanian": [
@@ -328,7 +328,7 @@
       "weekday": "M",
       "row_class": "normal",
       "name": "Sf. Ier. Iachint, mitr. Țării Românești; †) Sf. Cuv. Teofana Basarab; Sf. Mc. Terentie, soția sa Neonila și cei 7 fii ai lor: Nita, Sarvil, Ierax, Teodul, Fota, Vilie si Evnichi; Sf. Ier. Firmilian, ep. Cezareei Capadociei;",
-      "rank": "cruce_neagra",
+      "rank": "cruce_albastra",
       "fast": "fast",
       "notes": [],
       "romanian": [
