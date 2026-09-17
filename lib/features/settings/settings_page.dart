@@ -112,8 +112,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
 
-          if (plan != null) ...<Widget>[
-            const _Header('Programate'),
+          const _Header('Programate'),
+          if (plan != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -125,7 +125,22 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
-          ],
+          const _NextScheduled(),
+          ListTile(
+            leading: const Icon(Icons.notifications_active_outlined,
+                color: TroitaColors.burgundy),
+            title: const Text('Trimite o notificare de test'),
+            subtitle: const Text(
+              'Apare imediat. Cea zilnică vine abia la ora stabilită.',
+            ),
+            onTap: () async {
+              await TroitaNotifications.instance.showTest();
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Notificare trimisă.')),
+              );
+            },
+          ),
 
           const _Header('Date'),
           ListTile(
@@ -146,6 +161,37 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Shows what is actually queued.
+///
+/// Without this, "nothing happened" is indistinguishable from "scheduled for
+/// tomorrow at 08:00", which is the normal state for most of the day.
+class _NextScheduled extends StatelessWidget {
+  const _NextScheduled();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<({DateTime? when, String? title, int total})>(
+      future: TroitaNotifications.instance.nextScheduled(),
+      builder: (BuildContext context,
+          AsyncSnapshot<({DateTime? when, String? title, int total})> snap) {
+        final ({DateTime? when, String? title, int total})? data = snap.data;
+        if (data == null) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+          child: Text(
+            data.when == null
+                ? 'Coada este goală (${data.total} în așteptare).'
+                : 'Următoarea: ${data.title ?? ''} — '
+                    '${data.when!.day}.${data.when!.month}.${data.when!.year}. '
+                    '${data.total} în coadă.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
     );
   }
 }

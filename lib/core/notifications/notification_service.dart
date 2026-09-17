@@ -51,7 +51,11 @@ class TroitaNotifications {
 
     await _plugin.initialize(
       settings: const InitializationSettings(
-        android: AndroidInitializationSettings('@drawable/ic_troita_notification'),
+        // Bare resource name, no '@drawable/' prefix. The plugin passes this
+        // straight to getIdentifier(name, "drawable", packageName); with the
+        // prefix it resolves to 0 and every notification fails silently — no
+        // crash, no log at the Dart layer, simply nothing appears.
+        android: AndroidInitializationSettings('ic_troita_notification'),
       ),
       onDidReceiveNotificationResponse: (NotificationResponse r) {
         final String? payload = r.payload;
@@ -85,6 +89,51 @@ class TroitaNotifications {
   }
 
   Future<void> cancelAll() => _plugin.cancelAll();
+
+  /// Fires immediately, for checking the pipeline end to end.
+  ///
+  /// Worth having permanently: the daily notification is scheduled for tomorrow
+  /// morning, so without this there is no way to distinguish "working, nothing
+  /// due yet" from "silently broken" — which is exactly the state this feature
+  /// shipped in.
+  Future<void> showTest() async {
+    await _plugin.show(
+      id: 999999,
+      title: 'Troița funcționează',
+      body: 'Notificările sunt configurate corect. '
+          'Cea zilnică va veni la ora stabilită.',
+      notificationDetails: NotificationDetails(
+        android: _details(
+          channelId: channelFeast,
+          channelName: 'Sărbători cu cruce roșie',
+          importance: Importance.defaultImportance,
+          sound: true,
+        ),
+      ),
+    );
+  }
+
+  /// The next scheduled notification, for showing in settings.
+  Future<({DateTime? when, String? title, int total})> nextScheduled() async {
+    final List<PendingNotificationRequest> queue = await pending();
+    // The plugin does not expose scheduled times, but our ids encode the date:
+    // base + (yy * 10000 + mm * 100 + dd).
+    DateTime? soonest;
+    String? title;
+    for (final PendingNotificationRequest r in queue) {
+      final int key = r.id % 100000;
+      final int year = 2000 + key ~/ 10000;
+      final int month = (key % 10000) ~/ 100;
+      final int day = key % 100;
+      if (month < 1 || month > 12 || day < 1 || day > 31) continue;
+      final DateTime when = DateTime(year, month, day);
+      if (soonest == null || when.isBefore(soonest)) {
+        soonest = when;
+        title = r.title;
+      }
+    }
+    return (when: soonest, title: title, total: queue.length);
+  }
 
   Future<List<PendingNotificationRequest>> pending() =>
       _plugin.pendingNotificationRequests();
