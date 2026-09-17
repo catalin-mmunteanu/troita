@@ -27,4 +27,20 @@ abstract interface class ChurchRepository {
 
   /// Churches whose hram falls within [days] — the "hram în apropiere" feed.
   Future<List<Church>> upcomingFeasts({int days = 14, int limit = 50});
+
+  /// Every church as a GeoJSON `FeatureCollection`, for the map.
+  ///
+  /// A decoded map rather than a JSON string, and that distinction is
+  /// load-bearing: MapLibre's Android bridge treats a `String` in a source's
+  /// `data` as a *URL* to fetch, so handing it the document itself produces a
+  /// source that silently fails to be created. The map then draws perfectly
+  /// and shows nothing.
+  ///
+  /// Not a list of [Church] either — at thirteen thousand points that would
+  /// build thirteen thousand model objects only to discard them.
+  /// Properties carry what a marker or cluster label needs; the detail page
+  /// reloads the full row by id when it is actually opened.
+  ///
+  /// Server equivalent: `SELECT json_build_object(...)` / ST_AsGeoJSON.
+  Future<Map<String, Object?>> allAsGeoJson();
 }

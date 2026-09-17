@@ -32,13 +32,32 @@ android {
         // required by the plugin from v10 onward whether or not you schedule
         // anything, so this is not optional.
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        // 21, not 17, because maplibre_gl compiles its own Android module at
+        // Java 21. A library's class files cannot be consumed by a build whose
+        // JDK is older than the bytecode it emits, so this is forced from
+        // outside — the whole Gradle daemon must run on JDK 21.
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = JavaVersion.VERSION_21.toString()
     }
+
+    // The highest NDK any plugin asks for. They are backward compatible, so
+    // the highest wins and every other plugin builds against it.
+    //
+    //   maplibre_gl                 28.2.13676358   <- this one
+    //   flutter_local_notifications 27.0.12077973
+    //   permission_handler_android  27.0.12077973
+    //   shared_preferences_android  27.0.12077973
+    //   sqflite_android             27.0.12077973
+    //
+    // Re-check when maplibre_gl is upgraded. Flutter prints the whole table at
+    // build time and names the version to use, so this is never a guess — the
+    // 28.1 that was here first came from reading the plugin's build.gradle on
+    // its main branch rather than the release actually installed.
+    ndkVersion = "28.2.13676358"
 
     sourceSets {
         getByName("main").java.srcDirs("src/main/kotlin")

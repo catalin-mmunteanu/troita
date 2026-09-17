@@ -33,7 +33,15 @@ AREAS = {
     "bucuresti-ilfov": (44.30, 25.85, 44.75, 26.40),
     "bucuresti":       (44.33, 25.96, 44.55, 26.23),
     "cluj":            (46.35, 22.85, 47.35, 24.25),
+    # The whole country, generous enough to include the Danube delta and the
+    # western border. Fetched tile by tile, not in one request — see fetch_tiled.
+    "romania":         (43.55, 20.20, 48.30, 29.80),
 }
+
+# Above this span a single Overpass request is a bad idea: it either times out
+# or returns tens of megabytes that a mirror is entitled to refuse mid-transfer.
+TILE_THRESHOLD_DEG = 2.0
+TILE_DEG = 1.0
 
 MIRRORS = [
     "https://overpass-api.de/api/interpreter",
@@ -85,6 +93,55 @@ def fetch(bbox: tuple[float, float, float, float]) -> list[dict]:
     raise SystemExit(f"all Overpass mirrors failed: {last}")
 
 
+def fetch_tiled(
+    bbox: tuple[float, float, float, float],
+    cache_dir: str,
+    tile_deg: float = TILE_DEG,
+) -> list[dict]:
+    """Fetch a large area one tile at a time, caching each tile on disk.
+
+    Country-scale extraction is a long job against a free, donated service, and
+    the two things that make it painful are both avoidable. A single request for
+    Romania times out; and a failure forty minutes in should not throw away the
+    thirty-nine minutes that worked. So each tile is a separate request written
+    to its own file, and re-running picks up exactly where it stopped.
+
+    Tiles overlap at their edges — an element on a boundary comes back in both
+    neighbours — so results are merged by OSM id before returning.
+    """
+    os.makedirs(cache_dir, exist_ok=True)
+    south, west, north, east = bbox
+
+    tiles: list[tuple[float, float, float, float]] = []
+    lat = south
+    while lat < north:
+        lon = west
+        while lon < east:
+            tiles.append((lat, lon, min(lat + tile_deg, north), min(lon + tile_deg, east)))
+            lon += tile_deg
+        lat += tile_deg
+
+    merged: dict[str, dict] = {}
+    print(f"  {len(tiles)} tiles of {tile_deg}°", file=sys.stderr)
+    for i, tile in enumerate(tiles, 1):
+        s, w, n, e = tile
+        path = os.path.join(cache_dir, f"{s:.2f}_{w:.2f}.json")
+        if os.path.exists(path):
+            elements = json.load(open(path, encoding="utf-8"))
+        else:
+            print(f"  [{i}/{len(tiles)}] {s:.2f},{w:.2f} …", file=sys.stderr)
+            elements = fetch(tile)
+            json.dump(elements, open(path, "w", encoding="utf-8"))
+            # Overpass asks for a gap between queries. Honour it: being rate
+            # limited halfway through costs far more than this does.
+            time.sleep(3)
+        for el in elements:
+            merged[f"{el.get('type')}/{el.get('id')}"] = el
+
+    print(f"  {len(merged)} unique elements across all tiles", file=sys.stderr)
+    return list(merged.values())
+
+
 # --------------------------------------------------------------------------- #
 # normalise
 # --------------------------------------------------------------------------- #
@@ -95,6 +152,26 @@ def coords(el: dict) -> tuple[float, float] | None:
     if c:
         return float(c["lat"]), float(c["lon"])
     return None
+
+
+# Names that identify nothing. Matched after folding away diacritics and case,
+# so "Biserica ortodoxă" and "BISERICĂ" both land here. Anything longer — a
+# dedication, a village in the name itself — is left alone.
+_GENERIC_NAMES = {
+    "biserica", "biserici", "biserica ortodoxa", "biserica ortodoxa romana",
+    "biserica de lemn", "capela", "manastire", "manastirea", "schit",
+    "troita", "cruce", "catedrala", "paraclis", "biserica noua",
+    "biserica veche", "church", "orthodox church",
+}
+
+
+def _is_generic(name: str) -> bool:
+    return hram._fold(name) in _GENERIC_NAMES
+
+
+def _within(el: dict, s: float, w: float, n: float, e: float) -> bool:
+    pos = coords(el)
+    return pos is not None and s <= pos[0] <= n and w <= pos[1] <= e
 
 
 def normalise(el: dict, keep_all_denominations: bool) -> dict | None:
@@ -114,11 +191,25 @@ def normalise(el: dict, keep_all_denominations: bool) -> dict | None:
             return None
 
     name = hram.clean_name(tags.get("name") or tags.get("name:ro") or "")
+    locality = tags.get("troita:locality")
+
+    # A quarter of the churches OSM knows about carry no name, and another
+    # thousand are called nothing but "Biserică". Both were useless: the first
+    # were dropped outright, the second produced screens of identical labels.
+    # The settlement they stand in, attached by extract_pbf, is the missing
+    # half — "Biserică — Curtici" locates a church, "Biserică" does not.
+    #
+    # Never a guessed dedication. If OSM does not say which saint a church is
+    # named for, neither do we.
     if not name:
         if is_wayside:
-            name = "Troiță"
+            name = f"Troiță — {locality}" if locality else "Troiță"
+        elif locality:
+            name = f"Biserică — {locality}"
         else:
             return None
+    elif locality and _is_generic(name):
+        name = f"{name} — {locality}"
 
     kind = hram.guess_kind(tags)
     patron, feast = hram.infer(
@@ -547,6 +638,10 @@ def main() -> None:
     ap.add_argument("--out", default=os.path.join(
         HERE, "..", "android", "app", "src", "main", "assets", "seed", "churches.db"))
     ap.add_argument("--offline", action="store_true", help="skip Overpass, curated rows only")
+    ap.add_argument("--elements",
+                    help="read an Overpass-shaped elements array from this file "
+                         "instead of querying — see extract_pbf.py, which is the "
+                         "fast path for anything country-sized")
     ap.add_argument("--all-denominations", action="store_true")
     ap.add_argument("--cache", default=os.path.join(HERE, ".overpass-cache.json"))
     args = ap.parse_args()
@@ -555,7 +650,21 @@ def main() -> None:
 
     rows: list[dict] = []
     if not args.offline:
-        if os.path.exists(args.cache):
+        span = max(bbox[2] - bbox[0], bbox[3] - bbox[1])
+        if args.elements:
+            print(f"reading elements from {args.elements}", file=sys.stderr)
+            elements = json.load(open(args.elements, encoding="utf-8"))
+            # A local extract covers the whole country; the bbox still applies
+            # so that --area cluj against a national file does what it says.
+            s, w, n, e = bbox
+            before = len(elements)
+            elements = [el for el in elements if _within(el, s, w, n, e)]
+            if len(elements) != before:
+                print(f"  {before - len(elements)} outside {bbox}", file=sys.stderr)
+        elif span > TILE_THRESHOLD_DEG:
+            print(f"querying Overpass for {bbox} in tiles …", file=sys.stderr)
+            elements = fetch_tiled(bbox, args.cache + ".tiles")
+        elif os.path.exists(args.cache):
             print("using cached Overpass response", file=sys.stderr)
             elements = json.load(open(args.cache, encoding="utf-8"))
         else:
@@ -575,16 +684,32 @@ def main() -> None:
 
     # Deduplicate: same name within 80 m is the same building mapped twice
     # (node + way). Keep the richer row.
+    #
+    # Compared against a spatial bucket rather than against every row kept so
+    # far. The exhaustive version is fine for the 20 rows of Bucharest and
+    # quadratic everywhere else — at country scale it is some 400 million
+    # haversine calls, which does not finish in any useful time. Bucketing by
+    # a hundredth of a degree (~1.1 km, comfortably wider than the 80 m radius)
+    # and checking only the nine surrounding buckets gives the same answer.
     rows.sort(key=lambda r: (-r["priority"], r["id"]))
+    buckets: dict[tuple[int, int], list[dict]] = {}
     kept: list[dict] = []
     for r in rows:
+        by, bx = int(r["lat"] * 100), int(r["lon"] * 100)
+        near = (
+            candidate
+            for dy in (-1, 0, 1)
+            for dx in (-1, 0, 1)
+            for candidate in buckets.get((by + dy, bx + dx), ())
+        )
         if any(haversine_m(r["lat"], r["lon"], k["lat"], k["lon"]) < 80
                and (hram._fold(r["name"]) == hram._fold(k["name"])
                     or (_distinctive(r["name"]) and
                         _distinctive(r["name"]) == _distinctive(k["name"])))
-               for k in kept):
+               for k in near):
             continue
         kept.append(r)
+        buckets.setdefault((by, bx), []).append(r)
 
     write_sqlite(kept, args.out, bbox, args.bbox or args.area)
     unverified = sum(1 for r in kept if not r["verified"])

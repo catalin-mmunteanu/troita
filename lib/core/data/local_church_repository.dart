@@ -115,6 +115,44 @@ class LocalChurchRepository implements ChurchRepository {
     };
   }
 
+  @override
+  Future<Map<String, Object?>> allAsGeoJson() async {
+    final List<Map<String, Object?>> rows = await _db.query(
+      'churches',
+      columns: <String>['id', 'name', 'kind', 'lat', 'lon'],
+      where: 'deleted = 0 AND lat IS NOT NULL AND lon IS NOT NULL',
+    );
+
+    final List<Map<String, Object?>> features = <Map<String, Object?>>[];
+    int since = 0;
+    for (final Map<String, Object?> r in rows) {
+      // Yield periodically: this runs on the UI isolate, because sqflite has
+      // to, and thirteen thousand rows in one uninterrupted pass is long
+      // enough to drop frames while the map is appearing.
+      if (++since >= 4000) {
+        since = 0;
+        await Future<void>.delayed(Duration.zero);
+      }
+      features.add(<String, Object?>{
+        'type': 'Feature',
+        'geometry': <String, Object?>{
+          'type': 'Point',
+          'coordinates': <Object?>[r['lon'], r['lat']],
+        },
+        'properties': <String, Object?>{
+          'id': r['id'],
+          'name': r['name'] ?? '',
+          'kind': r['kind'] ?? 'church',
+        },
+      });
+    }
+
+    return <String, Object?>{
+      'type': 'FeatureCollection',
+      'features': features,
+    };
+  }
+
   Future<int> count() async =>
       Sqflite.firstIntValue(
         await _db.rawQuery('SELECT COUNT(*) FROM churches WHERE deleted = 0'),
