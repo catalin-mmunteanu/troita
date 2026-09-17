@@ -6,8 +6,10 @@ import '../../app/app_state.dart';
 import '../../app/theme.dart';
 import '../../app/troita_icons.dart';
 import '../../core/data/day_repository.dart';
+import '../../core/models/fast_day.dart';
 import 'day_detail_page.dart';
 import 'day_row.dart';
+import 'month_grid_sheet.dart';
 
 /// The calendar, as a scrolling list of days.
 ///
@@ -28,6 +30,7 @@ class _CalendarPageState extends State<CalendarPage> {
   final ScrollController _scroll = ScrollController();
 
   List<DayEntry> _days = const <DayEntry>[];
+  Map<String, FastDay> _marked = const <String, FastDay>{};
   bool _loading = true;
 
   static const double _rowEstimate = 132;
@@ -51,9 +54,14 @@ class _CalendarPageState extends State<CalendarPage> {
     final AppState state = AppScope.of(context);
     final List<DayEntry> days =
         await state.days.forMonth(_month.year, _month.month);
+    final Map<String, FastDay> marked = await state.journal.inRange(
+      DateTime(_month.year, _month.month, 1),
+      DateTime(_month.year, _month.month + 1, 0),
+    );
     if (!mounted) return;
     setState(() {
       _days = days;
+      _marked = marked;
       _loading = false;
     });
 
@@ -80,8 +88,36 @@ class _CalendarPageState extends State<CalendarPage> {
     _load(scrollToday: true);
   }
 
+  Future<void> _openMonthGrid() async {
+    final DateTime? picked = await showMonthGrid(context, month: _month);
+    if (picked == null || !mounted) return;
+
+    // The user may have paged to another month inside the grid. Follow them, so
+    // that closing the saint's page leaves the list where they were looking
+    // rather than back where they started.
+    if (picked.year != _month.year || picked.month != _month.month) {
+      setState(() => _month = DateTime(picked.year, picked.month));
+      await _load();
+      if (!mounted) return;
+    }
+
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => DayDetailPage(date: picked)),
+    );
+  }
+
+  int _seenRevision = 0;
+
   @override
   Widget build(BuildContext context) {
+    final AppState state = AppScope.of(context);
+    // Ratings can be made from Posturi or a day page; pick them up when we
+    // come back rather than making every row listen individually.
+    if (state.journalRevision != _seenRevision) {
+      _seenRevision = state.journalRevision;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+    }
+
     final DateTime now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
     final bool isCurrentMonth =
@@ -97,6 +133,7 @@ class _CalendarPageState extends State<CalendarPage> {
             onPrevious: () => _shiftMonth(-1),
             onNext: () => _shiftMonth(1),
             onToday: isCurrentMonth ? null : _goToday,
+            onTapMonth: _openMonthGrid,
           ),
           Expanded(
             child: _loading
@@ -109,6 +146,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       return DayRow(
                         entry: entry,
                         isToday: entry.date == today,
+                        marked: _marked[FastDay.key(entry.date)],
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute<void>(
                             builder: (_) => DayDetailPage(date: entry.date),
@@ -129,12 +167,14 @@ class _Header extends StatelessWidget {
     required this.month,
     required this.onPrevious,
     required this.onNext,
+    required this.onTapMonth,
     this.onToday,
   });
 
   final DateTime month;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
+  final VoidCallback onTapMonth;
   final VoidCallback? onToday;
 
   @override
@@ -156,12 +196,30 @@ class _Header extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineMedium
-                      ?.copyWith(fontSize: 24),
+                // The month name doubles as the button that opens the grid.
+                // A caret is the only affordance there is room for, so the
+                // tap target is stretched to the full 44pt height instead.
+                InkWell(
+                  onTap: onTapMonth,
+                  borderRadius: TroitaRadius.smallAll,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(
+                          title,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(fontSize: 24),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.expand_more,
+                            size: 22, color: TroitaColors.muted),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Row(
