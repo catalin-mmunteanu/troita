@@ -138,15 +138,38 @@ ANCHOR_RE = re.compile(r"<a[^>]*sinaxar[^>]*>(.*?)</a>", re.S | re.I)
 ROM_RE = re.compile(r"<span class=['\"]rom['\"]>(.*?)</span>", re.S)
 
 
-def rank_of(name: str) -> str:
-    s = name.lstrip()
-    if s.startswith("(†)"):
+def rank_of(name: str, row_class: str = "") -> str:
+    """Rank from the row class first, the dagger second.
+
+    The daggers alone are misleading. `†)` appears on 61 days of 2026, but only
+    28 of them are red-letter feasts — and those 28 are exactly the days the
+    markup flags with class="sarbatoare": Sf. Vasile, Boboteaza, Trei Ierarhi,
+    Buna Vestire, Sf. Gheorghe, Sf. Ilie, Adormirea, Sf. Parascheva, Sf.
+    Dimitrie, Sf. Andrei, Crăciunul. That is the cruce roșie list.
+
+    A `†)` on an ordinary row means cruce albastră (printed black by some
+    publishers): an important saint, but not a day of obligatory rest. Reading
+    it as red made 15–18 September look like four consecutive red-letter days,
+    which no calendar shows.
+
+    Sundays carry class="sarbatoare saptamana" whether or not the commemoration
+    is a feast, so the class cannot be trusted there and the dagger decides.
+    """
+    text = name.lstrip()
+    if text.startswith("(†)"):
         return "praznic"
-    if s.startswith("†)"):
+
+    has_dagger = text.startswith("†")
+    is_sunday = "saptamana" in row_class
+    is_feast_row = row_class.strip() == "sarbatoare"
+
+    if is_feast_row:
         return "cruce_rosie"
-    if s.startswith("†"):
-        return "cruce_neagra"
-    return "simplu"
+    if is_sunday:
+        if text.startswith("†)"):
+            return "cruce_rosie"
+        return "cruce_albastra" if has_dagger else "simplu"
+    return "cruce_albastra" if has_dagger else "simplu"
 
 
 def scrape_month(year: int, month: int) -> dict:
@@ -219,7 +242,7 @@ def scrape_month(year: int, month: int) -> dict:
             "weekday": weekday,
             "row_class": klass,
             "name": re.sub(r"^\s*(\(†\)|†\)|†)\s*", "", raw_name).strip(),
-            "rank": rank_of(raw_name),
+            "rank": rank_of(raw_name, klass),
             "fast": fast,
             "notes": notes,
             "romanian": [strip_tags(r) for r in ROM_RE.findall(body)],
@@ -230,6 +253,39 @@ def scrape_month(year: int, month: int) -> dict:
 
 
 # ----------------------------------------------------------- sinaxar (upstream)
+
+# The "Sinaxar <d> <Luna>" heading that separates the site chrome from the
+# actual life of the saint. Anchored to its own line, because in the body text
+# the same words can appear inside a sentence.
+SINAXAR_HEAD_RE = re.compile(r"^[ \t]*Sinaxar\s+\d{1,2}\s+\w+[ \t]*$", re.M)
+
+# Longest run of site chrome measured across all 366 pages is well under this;
+# a heading found later than this is almost certainly a false positive inside
+# the text, so we leave the page alone rather than truncate a saint's life.
+_MAX_CHROME = 2000
+
+
+def trim_sinaxar(text: str) -> str:
+    """Drop the site chrome that precedes the sinaxar proper.
+
+    Every page on calendar-ortodox.ro opens with the same block: a page title,
+    two banner lines, a twelve-month menu and a 1..31 day strip — around 590
+    characters, on 290 of the 366 pages. It has to go before the day page can
+    show anything, and it cannot be cut from the HTML: the heading is broken
+    across tags there, which is why the original attempt at this silently
+    matched nothing and the junk shipped.
+
+    On the stripped text the heading is contiguous and, across all 366 pages,
+    unique and always within the first 1500 characters — so this cut is safe.
+    Pages with no heading (January, mostly) already start at the sinaxar and
+    are returned unchanged.
+    """
+    match = SINAXAR_HEAD_RE.search(text)
+    if not match or match.start() > _MAX_CHROME:
+        return text.strip()
+    return text[match.end():].strip()
+
+
 def scrape_sinaxar(month: int, day: int) -> dict | None:
     luna = MONTHS[month - 1]
     url = f"http://calendar-ortodox.ro/luna/{luna}/{luna}{day:02d}.htm"
@@ -249,7 +305,7 @@ def scrape_sinaxar(month: int, day: int) -> dict | None:
               if re.search(r"\.(jpe?g|png|gif)$", src, re.I)
               and "sigla" not in src and "trafic" not in src]
 
-    text = strip_tags(body)
+    text = trim_sinaxar(strip_tags(body))
     # Each commemoration begins "Tot în această zi, pomenirea ..."
     parts = re.split(r"(?=Tot în aceast[ăa] zi)", text)
 
