@@ -147,13 +147,25 @@ class _MonthGridSheetState extends State<_MonthGridSheet> {
               ],
             ),
             const SizedBox(height: TroitaSpacing.listGap),
+            // Swipeable, like the day list behind it. A sheet that answers only
+            // to its arrows, while the list underneath follows the finger,
+            // reads as the gesture having stopped working.
+            //
             // Reserve the grid's height while loading so the sheet does not
             // jump once the days arrive. The cell height is pinned rather than
             // derived from the width: with a square aspect ratio a tablet would
             // make each cell as tall as it is wide, and the grid would overflow
             // the box reserved here — silently clipped, because the grid does
             // not scroll.
-            SizedBox(
+            GestureDetector(
+              // Only the horizontal axis, so a tap on a day still reaches the
+              // cell underneath.
+              onHorizontalDragEnd: (DragEndDetails d) {
+                final double v = d.velocity.pixelsPerSecond.dx;
+                if (v.abs() < 200) return;
+                _shift(v < 0 ? 1 : -1);
+              },
+              child: SizedBox(
               height: (cells ~/ 7) * _cellHeight + (cells ~/ 7 - 1) * 2,
               child: _loading
                   ? const Center(child: CircularProgressIndicator())
@@ -183,6 +195,7 @@ class _MonthGridSheetState extends State<_MonthGridSheet> {
                         );
                       },
                     ),
+              ),
             ),
             const SizedBox(height: TroitaSpacing.gap),
             const _Legend(),
