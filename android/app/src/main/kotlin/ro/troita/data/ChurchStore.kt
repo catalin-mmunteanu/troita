@@ -4,7 +4,6 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
-import ro.troita.TroitaConfig
 import ro.troita.util.Geo
 import java.io.File
 
@@ -43,13 +42,11 @@ object ChurchStore {
         val file = databaseFile(ctx)
 
         val bundled = readAssetVersion(ctx)
-        val installed = ctx.getSharedPreferences(TroitaConfig.PREFS, Context.MODE_PRIVATE)
-            .getString(KEY_SEED_VERSION, null)
+        val installed = readInstalledVersion(file)
 
         if (!file.exists() || (bundled != null && bundled != installed)) {
+            Log.i(TAG, "seeding: bundled=$bundled installed=$installed")
             copySeed(ctx, file)
-            ctx.getSharedPreferences(TroitaConfig.PREFS, Context.MODE_PRIVATE)
-                .edit().putString(KEY_SEED_VERSION, bundled).apply()
         }
 
         val opened = SQLiteDatabase.openDatabase(
@@ -64,6 +61,33 @@ object ChurchStore {
     } catch (e: Exception) {
         Log.w(TAG, "no bundled seed version marker", e)
         null
+    }
+
+    /**
+     * The version of the copy actually on disk, read from its own `meta` table.
+     *
+     * This used to come from SharedPreferences, which meant the preference and
+     * the file could disagree: ship a rebuilt database without refreshing
+     * version.txt and the marker still matches, so the stale copy is kept and
+     * the new data never appears. That failure is silent and looks exactly like
+     * a bad build. Asking the file what it is removes the second source of
+     * truth — a wrong answer is now impossible rather than merely unlikely.
+     */
+    private fun readInstalledVersion(file: File): String? {
+        if (!file.exists()) return null
+        return try {
+            SQLiteDatabase.openDatabase(
+                file.absolutePath, null, SQLiteDatabase.OPEN_READONLY
+            ).use { db ->
+                db.rawQuery(
+                    "SELECT value FROM meta WHERE key = ?", arrayOf(KEY_SEED_VERSION)
+                ).use { c -> if (c.moveToFirst()) c.getString(0) else null }
+            }
+        } catch (e: Exception) {
+            // Corrupt or pre-meta database: treat as unknown so it gets replaced.
+            Log.w(TAG, "cannot read installed seed version; will re-seed", e)
+            null
+        }
     }
 
     /**
