@@ -1,0 +1,30 @@
+# Keep line endings out of the diffs.
+#
+# Without this, editing anything on Windows can rewrite a whole file's line
+# endings and git reports every line as changed. gradlew.bat showed up as 180
+# modified lines this way while containing no actual edit — noise that buries
+# the real change in review.
+
+# Let git decide for text it recognises, and normalise to LF in the repository.
+* text=auto
+
+# Scripts are the exception: each must keep the endings its interpreter needs,
+# whatever platform the working copy is on.
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+gradlew text eol=lf
+*.sh    text eol=lf
+
+# Binary. Never diffed, never line-ending converted. The seed database in
+# particular would be corrupted by CRLF translation.
+*.db    binary
+*.pbf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.ttf   binary
+*.otf   binary
+*.jar   binary
+*.keystore binary
+*.jks   binary

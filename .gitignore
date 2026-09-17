@@ -63,6 +63,26 @@ ios/Flutter/ephemeral/
 tool/.overpass-cache.json
 tool/.scrape-cache/
 
+# Per-tile Overpass cache from the country-scale path. One file per 1° tile,
+# so this is a directory of dozens of JSON blobs.
+tool/.overpass-cache.json.tiles/
+
+# The Geofabrik country extract. 328 MB, rebuilt daily upstream, and
+# reproducible with one command — exactly the kind of thing git should never
+# be asked to store. GitHub rejects files over 100 MB anyway, so committing
+# this does not fail at review, it fails at push.
+#   python3 tool/extract_pbf.py --download
+tool/*.osm.pbf
+tool/*.osm.pbf.part
+
+# Intermediate output of extract_pbf.py: a few MB, regenerated in twelve
+# seconds from the .pbf above.
+tool/.pbf-elements.json
+
+# Scratch node index written by extract_pbf.py --low-memory. Deleted on a clean
+# run; listed because an interrupted one leaves it behind.
+tool/.node-index.dat
+
 # SQLite side-car files. These appear next to the seed database when a build is
 # interrupted and must never be shipped inside the APK; a stray file under
 # assets/ or res/ is a build failure or, worse, a corrupted read.
