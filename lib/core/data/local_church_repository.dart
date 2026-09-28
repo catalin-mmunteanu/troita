@@ -70,16 +70,61 @@ class LocalChurchRepository implements ChurchRepository {
 
   @override
   Future<List<Church>> search(String query, {int limit = 50}) async {
-    final String q = '%${query.trim()}%';
+    final String folded = foldForSearch(query);
+    if (folded.isEmpty) return const <Church>[];
+
+    // Matched against the precomputed search_fold column rather than name,
+    // patron and address directly. SQLite has no unaccent, so a LIKE on the
+    // raw columns cannot match "Voronet" against "Voroneț" — and on a phone
+    // keyboard nobody types ț or ă. The column is built by hram._fold at seed
+    // time and holds name, hram and address together, which is why "Curtici"
+    // finds the churches in that village and "Parascheva" finds the ones
+    // dedicated to her.
     final List<Map<String, Object?>> rows = await _db.query(
       'churches',
       columns: _cols.split(', '),
-      where: 'deleted = 0 AND (name LIKE ? OR patron LIKE ? OR address LIKE ?)',
-      whereArgs: <Object?>[q, q, q],
+      where: 'deleted = 0 AND search_fold LIKE ?',
+      whereArgs: <Object?>['%$folded%'],
       orderBy: 'priority DESC, name ASC',
       limit: limit,
     );
     return rows.map(Church.fromRow).toList(growable: false);
+  }
+
+  /// Must produce the same text as `hram._fold` in tool/build_seed.py.
+  ///
+  /// Two implementations of one rule is a liability, so the rule is kept
+  /// deliberately small: lowercase, strip Romanian diacritics, replace anything
+  /// that is not a letter or digit with a space, collapse the spaces. If this
+  /// ever diverges from the Python, search stops matching and nothing else
+  /// breaks — so the failure is at least loud in testing.
+  static String foldForSearch(String input) {
+    const Map<String, String> diacritics = <String, String>{
+      'ș': 's', 'ş': 's', 'ț': 't', 'ţ': 't',
+      'ă': 'a', 'â': 'a', 'á': 'a', 'à': 'a',
+      'î': 'i', 'í': 'i',
+      'é': 'e', 'è': 'e', 'ê': 'e',
+      'ó': 'o', 'ö': 'o',
+      'ú': 'u', 'ü': 'u',
+    };
+
+    final String lower = input.toLowerCase();
+    final StringBuffer out = StringBuffer();
+    for (final String ch in lower.split('')) {
+      final String mapped = diacritics[ch] ?? ch;
+      final int code = mapped.codeUnitAt(0);
+      final bool alnum = (code >= 0x61 && code <= 0x7A) || // a-z
+          (code >= 0x30 && code <= 0x39); // 0-9
+      out.write(alnum ? mapped : ' ');
+    }
+    final String folded =
+        out.toString().replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    // Same fallback the seed uses: a query in an alphabet this does not know
+    // folds to nothing, and searching for nothing would match every row.
+    // Falling back to the trimmed original keeps the Cyrillic names the border
+    // margin drags in reachable by anyone who can type them.
+    return folded.isEmpty ? lower.trim() : folded;
   }
 
   @override

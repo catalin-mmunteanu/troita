@@ -8,6 +8,12 @@ PRAGMA user_version=1;
 CREATE TABLE IF NOT EXISTS churches (
     id                TEXT    PRIMARY KEY,           -- 'osm:node/123456' | 'troita:<uuid>'
     name              TEXT    NOT NULL,
+    -- name + patron + address, lowercased with diacritics stripped, for search.
+    -- Materialised rather than computed: SQLite has no unaccent, so LIKE on
+    -- `name` cannot match "Voronet" against "Voroneț" — and on a phone nobody
+    -- types ț or ă. Built by hram._fold at seed time; the server equivalent is
+    -- unaccent(lower(...)) in a generated column or a trigram index.
+    search_fold       TEXT    NOT NULL DEFAULT '',
     kind              TEXT    NOT NULL,              -- church|monastery|chapel|cathedral|wayside_cross
     denomination      TEXT,                          -- romanian_orthodox|orthodox|greek_catholic|...
     lat               REAL    NOT NULL,
@@ -33,6 +39,11 @@ CREATE TABLE IF NOT EXISTS churches (
 CREATE INDEX IF NOT EXISTS idx_churches_lat  ON churches(lat);
 CREATE INDEX IF NOT EXISTS idx_churches_bbox ON churches(lat, lon);
 CREATE INDEX IF NOT EXISTS idx_churches_live ON churches(deleted, lat, lon);
+
+-- Only helps a prefix search; a leading-wildcard LIKE still scans. At 13k rows
+-- the scan is a few milliseconds, so this is worth having for the common case
+-- and not worth an FTS table yet.
+CREATE INDEX IF NOT EXISTS idx_churches_fold ON churches(search_fold);
 
 
 CREATE TABLE IF NOT EXISTS meta (

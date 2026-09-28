@@ -349,10 +349,36 @@ def apply_defaults(rows: list[dict]) -> list[dict]:
 
 
 COLUMNS = [
-    "id", "name", "kind", "denomination", "lat", "lon", "patron", "feast_day",
+    "id", "name", "search_fold", "kind", "denomination", "lat", "lon",
+    "patron", "feast_day",
     "year_built", "history", "photo_ref", "priority",
     "address", "wikidata", "source", "verified", "updated_at", "deleted",
 ]
+
+
+def add_search_fold(rows: list[dict]) -> list[dict]:
+    """Precompute the diacritic-free haystack each row is searched against.
+
+    SQLite has no unaccent, so `name LIKE '%voronet%'` cannot match
+    "Voroneț" — and nobody types ț or ă on a phone keyboard. Materialising the
+    folded text at build time is what makes the obvious query work; doing it at
+    read time would mean pulling all thirteen thousand names into Dart on every
+    keystroke.
+
+    Name, hram and address all go in, so "Parascheva" finds a church dedicated
+    to her and "Curtici" finds the ones in that village.
+    """
+    for r in rows:
+        raw = " ".join(
+            p for p in (r.get("name"), r.get("patron"), r.get("address")) if p
+        )
+        folded = hram._fold(raw)
+        # _fold drops everything outside a-z0-9, which empties the field for the
+        # couple of dozen Cyrillic names the border margin drags in. Falling
+        # back to the lowercased original keeps them findable by someone who
+        # can type them, instead of making them unsearchable.
+        r["search_fold"] = folded or raw.lower()
+    return rows
 
 FEAST_COLUMNS = [
     "id", "month_day", "movable_key", "name", "short_name", "rank", "kind",
@@ -711,6 +737,7 @@ def main() -> None:
         kept.append(r)
         buckets.setdefault((by, bx), []).append(r)
 
+    kept = add_search_fold(kept)
     write_sqlite(kept, args.out, bbox, args.bbox or args.area)
     unverified = sum(1 for r in kept if not r["verified"])
     if unverified:
