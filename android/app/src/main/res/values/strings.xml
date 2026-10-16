@@ -8,4 +8,7 @@
     <string name="channel_feast_desc">Sfântul zilei, fără sunet.</string>
 
     <string name="year_prefix">din %d</string>
+
+    <string name="widget_description">Sfântul zilei și rânduiala postului</string>
+    <string name="widget_open_app">Deschideți aplicația pentru calendarul zilei.</string>
 </resources>

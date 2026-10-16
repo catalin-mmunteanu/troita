@@ -37,7 +37,8 @@
     <application
         android:name="${applicationName}"
         android:label="@string/app_name"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true">
 
         <activity
             android:name=".MainActivity"
@@ -74,6 +75,24 @@
         <receiver
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
             android:exported="false" />
+
+        <!-- The home-screen widget. Not exported: the system's widget service
+             delivers APPWIDGET_UPDATE regardless, and the midnight alarm is an
+             explicit intent from this app. TIME_SET and TIMEZONE_CHANGED are
+             among the broadcasts still delivered to manifest receivers, so a
+             changed clock redraws today too. -->
+        <receiver
+            android:name=".bridge.TroitaWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/troita_widget_info" />
+        </receiver>
 
     </application>
 </manifest>

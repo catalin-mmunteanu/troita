@@ -97,10 +97,14 @@ android {
         // stopForeground(int) and a handful of N-era APIs, and Android 7 is
         // under 1% of the Romanian install base.
         minSdk = 24
-        // Deliberately behind compileSdk. Android 16 (API 36) tightens
-        // notification and background rules; bump to 36 — Play will require
-        // it — but retest the scheduled notifications when you do.
-        targetSdk = 35
+        // 36 because Google Play requires it: since 31 August 2026 new apps and
+        // updates must target Android 16. What changes for this app when it
+        // does: predictive back is on by default (Flutter handles it, and the
+        // manifest opts in explicitly), and edge-to-edge can no longer be opted
+        // out of — already true at 35. Scheduled notifications use inexact
+        // alarms, which Android 16 leaves alone. Retest a notification and the
+        // back gesture on a device after building.
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 

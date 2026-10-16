@@ -1,6 +1,9 @@
 package ro.troita.bridge
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -18,8 +21,10 @@ import ro.troita.data.ChurchStore
 /**
  * The only place Dart and Kotlin meet.
  *
- * Down to three jobs: install the seed database, report onboarding status,
- * and pass on the church id from a notification tap. Everything else —
+ * Its jobs: install the seed database, report onboarding status, pass on the
+ * church id from a notification tap, hand a link or a text to another app
+ * (directions, an error report, sharing a day), and keep the home-screen
+ * widget's data current. Everything else —
  * queries, favourites, visits — happens in Dart against SQLite directly.
  *
  * There used to be a fourth, a fused-location fix "for the map". The map never
@@ -101,6 +106,43 @@ object TroitaBridge {
         }
 
         "consumePendingChurchId" -> pendingChurchId.also { pendingChurchId = null }
+
+        // A geo:, mailto: or https: link, handed to whichever app the user has
+        // for it. Through the bridge rather than a plugin: every plugin this
+        // project added so far has been a toolchain risk, and this is five
+        // lines. False when nothing on the phone can open it, so Dart can say
+        // so instead of the tap silently doing nothing.
+        "openUri" -> withContext(Dispatchers.Main) {
+            val uri = call.argument<String>("uri") ?: return@withContext false
+            try {
+                context.startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+                true
+            } catch (e: ActivityNotFoundException) {
+                Log.w(TAG, "nothing can open $uri")
+                false
+            }
+        }
+
+        // The system share sheet, so the user picks WhatsApp, SMS or anything
+        // else without the app knowing or caring which.
+        "shareText" -> withContext(Dispatchers.Main) {
+            val text = call.argument<String>("text") ?: return@withContext false
+            val send = Intent(Intent.ACTION_SEND)
+                .setType("text/plain")
+                .putExtra(Intent.EXTRA_TEXT, text)
+            context.startActivity(
+                Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+            true
+        }
+
+        "updateWidget" -> {
+            TroitaWidget.store(context, call.argument<String>("days") ?: "{}")
+            true
+        }
 
         else -> throw UnsupportedOperationException("unknown method ${call.method}")
     }

@@ -60,6 +60,23 @@ class TroitaNative {
         <String, Object?>{'value': value},
       );
 
+  /// Opens a `geo:`, `mailto:` or `https:` link in whatever app handles it.
+  /// False when nothing on the phone can, so the caller can say so.
+  Future<bool> openUri(String uri) async =>
+      await _channel.invokeMethod<bool>('openUri', <String, Object?>{
+        'uri': uri,
+      }) ??
+      false;
+
+  /// The system share sheet.
+  Future<void> shareText(String text) =>
+      _channel.invokeMethod<bool>('shareText', <String, Object?>{'text': text});
+
+  /// Hands the home-screen widget the days it should be able to show, as a
+  /// JSON object keyed by `YYYY-MM-DD`.
+  Future<void> updateWidget(String daysJson) => _channel
+      .invokeMethod<bool>('updateWidget', <String, Object?>{'days': daysJson});
+
   /// Church id from the notification that cold-started the app, if any.
   Future<String?> consumePendingChurchId() =>
       _channel.invokeMethod<String>('consumePendingChurchId');
