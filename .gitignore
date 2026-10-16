@@ -79,6 +79,11 @@ tool/*.osm.pbf.part
 # seconds from the .pbf above.
 tool/.pbf-elements.json
 
+# The scraper's per-day image download cache. assets/sinaxar/ holds the same
+# 447 files flattened, is what the app ships, and is what build_seed reads when
+# this folder is absent — so committing both stored every saint's icon twice.
+tool/scraped/images/
+
 # Scratch node index written by extract_pbf.py --low-memory. Deleted on a clean
 # run; listed because an interrupted one leaves it behind.
 tool/.node-index.dat

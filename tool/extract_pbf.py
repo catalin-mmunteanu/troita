@@ -16,7 +16,7 @@ partial tiles, whereas a local scan either reads the file or fails loudly.
 
 Usage
 -----
-    pip install osmium
+    pip install osmium shapely
     python3 tool/extract_pbf.py --download
     python3 tool/build_seed.py --area romania --elements tool/.pbf-elements.json
 
@@ -135,6 +135,78 @@ def attach_localities(elements: list[dict], places: list[tuple]) -> int:
     return tagged
 
 
+def romania_border(pbf: str):
+    """Romania's real admin_level=2 boundary, assembled from the same extract.
+
+    Geofabrik cuts its country files with a *buffered* polygon, so an extract
+    of Romania also contains a strip of Bulgaria, Serbia, Ukraine, Hungary and
+    Moldova — which is how 78 churches from across the Danube reached the map.
+    Clipping with Geofabrik's own .poly would remove none of them, by
+    construction. The national boundary relation is in the file, though, so the
+    clip uses that.
+
+    Cyrillic names are not a usable proxy: Maramureș and Bukovina have
+    Ukrainian-speaking Romanian parishes, and dropping them would be wrong.
+
+    Two filtered passes rather than pyosmium's general area assembly, which
+    would build a polygon for every building in the country to find one: the
+    first finds the relation and its member ways, the second fetches just those
+    ways with their node locations. Shapely stitches the ways into rings.
+
+    Returns a shapely geometry, or None if shapely is missing or the relation
+    cannot be found — callers then keep everything and say so.
+    """
+    try:
+        import osmium
+        from shapely.geometry import LineString
+        from shapely.ops import polygonize, unary_union
+    except ImportError:
+        return None
+
+    way_ids: set[int] = set()
+    for rel in osmium.FileProcessor(pbf, osmium.osm.RELATION).with_filter(
+        osmium.filter.TagFilter(("admin_level", "2"))
+    ):
+        if rel.tags.get("ISO3166-1") != "RO" and rel.tags.get("name:en") != "Romania":
+            continue
+        for m in rel.members:
+            if m.type == "w" and m.role in ("outer", ""):
+                way_ids.add(m.ref)
+        break
+    if not way_ids:
+        return None
+
+    lines = []
+    processor = (
+        osmium.FileProcessor(pbf)
+        .with_locations()
+        .with_filter(osmium.filter.EntityFilter(osmium.osm.WAY))
+        .with_filter(osmium.filter.IdFilter(way_ids))
+    )
+    for way in processor:
+        coords = [(n.lon, n.lat) for n in way.nodes if n.location.valid()]
+        if len(coords) >= 2:
+            lines.append(LineString(coords))
+
+    polygons = list(polygonize(lines))
+    if not polygons:
+        return None
+    return unary_union(polygons)
+
+
+def clip_to_border(elements: list[dict], border) -> list[dict]:
+    """Keep only the elements whose position falls inside [border]."""
+    import shapely
+
+    def pos(el):
+        c = el.get("center") or el
+        return c.get("lon"), c.get("lat")
+
+    xs, ys = zip(*(pos(e) for e in elements)) if elements else ((), ())
+    inside = shapely.contains_xy(border, xs, ys)
+    return [e for e, keep in zip(elements, inside) if keep]
+
+
 def download(dest: str) -> None:
     import urllib.request
 
@@ -163,7 +235,9 @@ def download(dest: str) -> None:
     os.replace(tmp, dest)
 
 
-def _extract_filtered(osmium, pbf: str, index: str, elements: list[dict]) -> list[dict]:
+def _extract_filtered(
+    osmium, pbf: str, index: str, elements: list[dict]
+) -> tuple[list[dict], list[tuple]]:
     """pyosmium 4's FileProcessor, with the filtering pushed down into C++."""
     started = time.time()
     seen = skipped = 0
@@ -239,12 +313,13 @@ def _extract_filtered(osmium, pbf: str, index: str, elements: list[dict]) -> lis
         print(f"  {skipped} ways had no resolvable location", file=sys.stderr)
 
     print(f"  {len(places)} settlements collected", file=sys.stderr)
-    tagged = attach_localities(elements, places)
-    print(f"  {tagged} of {len(elements)} placed in a settlement", file=sys.stderr)
-    return elements
+    # Localities are attached by the caller, after the border clip. Naming a
+    # church before clipping the settlements let a troiță on the Romanian bank
+    # of the Danube take its name from the Serbian village opposite.
+    return elements, places
 
 
-def extract(pbf: str, index: str = "flex_mem") -> list[dict]:
+def extract(pbf: str, index: str = "flex_mem") -> tuple[list[dict], list[tuple]]:
     try:
         import osmium
     except ImportError:
@@ -353,7 +428,7 @@ def extract(pbf: str, index: str = "flex_mem") -> list[dict]:
     # relation is rare — a few dozen nationally — and assembling their geometry
     # needs a second pass through an area handler for a fraction of a percent
     # of the rows. Worth revisiting only if a notable monastery turns up missing.
-    return elements
+    return elements, []
 
 
 def main() -> None:
@@ -389,10 +464,32 @@ def main() -> None:
           f"({os.path.getsize(args.pbf)/1e6:.0f} MB) — "
           f"one pass, no network, expect a few minutes", file=sys.stderr)
     try:
-        elements = extract(args.pbf, index)
+        elements, places = extract(args.pbf, index)
     finally:
         if args.low_memory and os.path.exists(scratch):
             os.remove(scratch)
+
+    print("clipping to Romania's border …", file=sys.stderr)
+    border = romania_border(args.pbf)
+    if border is None:
+        print("  WARNING: no border (is shapely installed? `pip install shapely`)."
+              " Keeping everything, including the strip across the frontier.",
+              file=sys.stderr)
+    else:
+        before = len(elements)
+        elements = clip_to_border(elements, border)
+        print(f"  {before - len(elements)} outside the border dropped", file=sys.stderr)
+        # The settlements too, or a church right on the frontier is named
+        # after the village across it.
+        import shapely
+        if places:
+            inside = shapely.contains_xy(
+                border, [p[1] for p in places], [p[0] for p in places])
+            places = [p for p, keep in zip(places, inside) if keep]
+
+    tagged = attach_localities(elements, places)
+    print(f"  {tagged} of {len(elements)} placed in a settlement "
+          f"({len(places)} settlements inside the border)", file=sys.stderr)
 
     with open(args.out, "w", encoding="utf-8") as fh:
         json.dump(elements, fh, ensure_ascii=False)

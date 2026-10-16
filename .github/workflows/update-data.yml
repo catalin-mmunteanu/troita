@@ -1,0 +1,79 @@
+# Refreshes the data the app ships and proposes it as a pull request.
+#
+# Runs tool/update_data.py — the same command you would run by hand — then, if
+# the database content changed, opens (or updates) one pull request with the new
+# seed and the scraped calendar months. Nothing is merged automatically: the
+# data reaches users only when you merge and publish an app update.
+#
+# A failed run is a red job, never a bad pull request. update_data.py refuses to
+# keep a database that loses published years, sinaxar days or more than a tenth
+# of the churches, and puts the previous one back.
+#
+# One-time repository setting this needs:
+#   Settings → Actions → General → Workflow permissions →
+#   "Allow GitHub Actions to create and approve pull requests"
+
+name: Update app data
+
+on:
+  schedule:
+    # The 3rd of every month, 04:00 UTC. Monthly is plenty: OSM changes slowly,
+    # and the calendar for next year appears once, some time in the autumn.
+    # Also polite — Geofabrik's extract is 330 MB.
+    - cron: "0 4 3 * *"
+  workflow_dispatch:
+    inputs:
+      skip_osm:
+        description: "Calendar only — keep the current church data"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tool/requirements.txt
+
+      - name: Install the pipeline's dependencies
+        run: pip install -r tool/requirements.txt
+
+      - name: Refresh the data
+        id: update
+        run: |
+          args="--summary $RUNNER_TEMP/summary.md"
+          if [ "${{ inputs.skip_osm }}" = "true" ]; then args="$args --skip-osm"; fi
+          python tool/update_data.py $args
+          # Shown on the run page as well as in the pull request.
+          cat "$RUNNER_TEMP/summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update the pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: data/auto-update
+          delete-branch: true
+          commit-message: "data: refresh calendar and church data"
+          title: "Actualizare date: calendar și lăcașuri"
+          body-path: ${{ runner.temp }}/summary.md
+          labels: data
+          # Only the files that are meant to change. The 330 MB extract, its
+          # intermediate JSON and the image cache are gitignored and never
+          # reach this list.
+          add-paths: |
+            android/app/src/main/assets/seed/churches.db
+            android/app/src/main/assets/seed/version.txt
+            tool/scraped/*.json

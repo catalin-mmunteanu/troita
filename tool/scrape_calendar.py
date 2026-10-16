@@ -53,8 +53,9 @@ OUT = os.path.join(HERE, "scraped")
 #     TROITA_SCRAPER_CONTACT="you@example.com" python3 scrape_calendar.py --all
 #
 # That is your decision to make deliberately, not a default.
-# _CONTACT = os.environ.get("TROITA_SCRAPER_CONTACT", "").strip()
-UA = "Scoala/0.1 (Orthodox calendar; facultate)"
+_CONTACT = os.environ.get("TROITA_SCRAPER_CONTACT", "").strip()
+_BASE_UA = "Scoala/0.1 (Orthodox calendar; facultate)"
+UA = f"{_BASE_UA} (+{_CONTACT})" if _CONTACT else _BASE_UA
 
 DELAY = 1.5  # seconds between requests
 
@@ -78,16 +79,56 @@ FAST_FROM_COMMENT = {
     "dezlegare la lactate": "dairy",
 }
 
+# The same rule, as the publisher's food icons. From 2027 the month pages stopped
+# writing "(Post)" or "(Dezlegare la pește)" next to each day and show only
+# these, so reading comments alone left 363 of 365 days with no rule at all.
+#
+# Meanings are not guessed from the drawings. post-4 (fish) agrees with the
+# comment on all 42 days of 2026 where both appear. The rest were fixed by where
+# they fall in 2027: the bottle appears only beside the fish, on the seven days
+# of Săptămâna Brânzei (so: milk); the bread only on the first two days of Lent
+# and of Holy Week, and the wheat only on 24 December (both: ajunare); the wine
+# glass, carrot and drumstick on exactly the days their weeks predict.
+#
+# post-7 (wedding rings) and post-8 (heart) are not about food — they mark
+# whether weddings are held — and are deliberately absent.
+FAST_FROM_ICON = {
+    "post-0.png": "strict",   # bread: ajunare
+    "post-1.png": "strict",   # wheat: ajunare (Ajunul Crăciunului)
+    "post-2.png": "fast",     # carrot: post
+    "post-3.png": "wineOil",  # wine glass: untdelemn și vin
+    "post-4.png": "fish",     # fish
+    "post-5.png": "dairy",    # milk bottle: lactate
+    "post-6.png": "none",     # drumstick: fără post
+}
+
+# Most permissive first, as in FastLevel. Two icons on one day — fish and milk
+# in Săptămâna Brânzei — mean the looser rule applies.
+_LEVEL_ORDER = ["none", "dairy", "fish", "wineOil", "fast", "strict"]
+
+
+def fast_from_icons(icons: list[str]) -> str | None:
+    levels = [FAST_FROM_ICON[i] for i in icons if i in FAST_FROM_ICON]
+    return min(levels, key=_LEVEL_ORDER.index) if levels else None
+
 
 # --------------------------------------------------------------------- fetch
-def fetch(url: str, *, binary: bool = False) -> bytes | str | None:
+def fetch(
+    url: str, *, binary: bool = False, use_cache: bool = True
+) -> bytes | str | None:
     """Cached GET. Returns None on failure rather than raising, so one dead
-    page cannot abort a 365-page run."""
+    page cannot abort a 365-page run.
+
+    `use_cache=False` re-downloads even when a copy exists. Month pages need
+    it: a page fetched before the publisher filled it in is cached exactly as
+    empty as it was, and every later run would keep reading that copy and
+    never notice the data had arrived.
+    """
     key = re.sub(r"[^A-Za-z0-9._-]", "_", url)[-180:]
     path = os.path.join(CACHE, key)
     os.makedirs(CACHE, exist_ok=True)
 
-    if os.path.exists(path):
+    if use_cache and os.path.exists(path):
         raw = open(path, "rb").read()
         return raw if binary else decode(raw)
 
@@ -172,7 +213,7 @@ def rank_of(name: str, row_class: str = "") -> str:
     return "cruce_albastra" if has_dagger else "simplu"
 
 
-def scrape_month(year: int, month: int) -> dict:
+def scrape_month(year: int, month: int, *, fresh: bool = False) -> dict:
     """Parse one month page.
 
     The markup does not close its <td> or <tr> tags — `<td class="ziua">1` with
@@ -183,7 +224,7 @@ def scrape_month(year: int, month: int) -> dict:
     url = (f"https://www.resurse-ortodoxe.ro/"
            f"calendar-ortodox-{MONTHS[month - 1]}-{year}_text")
     print(f"  {MONTHS[month - 1]} {year}", file=sys.stderr)
-    page = fetch(url)
+    page = fetch(url, use_cache=not fresh)
     if page is None:
         return {"days": [], "sundays": []}
 
@@ -236,6 +277,11 @@ def scrape_month(year: int, month: int) -> dict:
                 fast = FAST_FROM_COMMENT[key]
             else:
                 notes.append(c.strip())
+        icons = [i.split("/")[-1] for i in ICON_RE.findall(body)]
+        # Written text is the stronger evidence and wins; the icons fill in
+        # only where the page gives no comment, which from 2027 is everywhere.
+        if fast is None:
+            fast = fast_from_icons(icons)
 
         days.append({
             "month_day": f"{month:02d}-{int(day):02d}",
@@ -246,7 +292,7 @@ def scrape_month(year: int, month: int) -> dict:
             "fast": fast,
             "notes": notes,
             "romanian": [strip_tags(r) for r in ROM_RE.findall(body)],
-            "icons": [i.split("/")[-1] for i in ICON_RE.findall(body)],
+            "icons": icons,
         })
 
     return {"days": days, "sundays": sundays}
@@ -391,6 +437,8 @@ def main() -> None:
     ap.add_argument("--images", action="store_true",
                     help="download the saint images the sinaxar pages reference")
     ap.add_argument("--all", action="store_true")
+    ap.add_argument("--fresh", action="store_true",
+                    help="re-download month pages instead of using the cache")
     args = ap.parse_args()
 
     if not (args.months or args.sinaxar or args.icons or args.images or args.all):
@@ -401,13 +449,34 @@ def main() -> None:
 
     if args.months or args.all:
         print("Month pages (ranks, dezlegări, pericopes)…", file=sys.stderr)
+        written = 0
         for month in range(1, 13):
-            data = scrape_month(args.year, month)
+            data = scrape_month(args.year, month, fresh=args.fresh)
             path = os.path.join(OUT, f"month-{args.year}-{month:02d}.json")
+            got = len(data["days"])
+
+            # Two rules so that running unattended can only ever add data.
+            # A month the publisher has not filled in yet comes back empty and
+            # is not written: an empty file would claim the month is covered.
+            # And a scrape that returns fewer days than the file already holds
+            # — the site was down, or its markup changed — never replaces it.
+            # Overwriting good data with a failed fetch is silent, and by the
+            # time anyone notices, the old copy is gone.
+            if got == 0:
+                print("    nothing published yet — skipped", file=sys.stderr)
+                continue
+            if os.path.exists(path):
+                have = len(json.load(open(path, encoding="utf-8")).get("days", []))
+                if got < have:
+                    print(f"    WARNING: got {got} days but the file has {have} — "
+                          f"kept the file", file=sys.stderr)
+                    continue
             json.dump(data, open(path, "w", encoding="utf-8"),
                       ensure_ascii=False, indent=2)
-            print(f"    {len(data['days'])} days, {len(data['sundays'])} sundays",
+            written += 1
+            print(f"    {got} days, {len(data['sundays'])} sundays",
                   file=sys.stderr)
+        print(f"  {written} month files written for {args.year}", file=sys.stderr)
 
     if args.sinaxar or args.all:
         print("Sinaxar pages (366)…", file=sys.stderr)

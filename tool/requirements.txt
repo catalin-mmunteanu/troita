@@ -1,1 +1,5 @@
-requests>=2.31
+# What the data pipeline needs (tool/update_data.py and the scripts it runs).
+# The app itself needs none of this.
+requests>=2.31      # scrape_calendar.py, and Overpass in build_seed.py
+osmium>=4.0         # extract_pbf.py — FileProcessor and C++-side filters
+shapely>=2.0        # extract_pbf.py — clipping to Romania's real border

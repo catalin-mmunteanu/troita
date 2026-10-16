@@ -386,6 +386,70 @@ FEAST_COLUMNS = [
 ]
 
 
+# Moveable feasts that open a day's line in the published calendar. On those
+# days the line reads "<moveable feast>; <the saints of the date>", and only the
+# second half belongs in a table keyed by MM-DD. Matched as prefixes of a
+# segment, never anywhere in it: "Sf. Mironosiță Maria a lui Cleopa" is the
+# fixed saint of 23 May and must survive, though it contains "Mironosiță".
+MOVEABLE_PREFIXES = (
+    "Sf. și Marea ", "Sfânta și Marea ", "Sfintele Paști", "Învierea Domnului",
+    "A doua zi de Paști", "A treia zi de Paști", "Izvorul Tămăduirii",
+    "Înjumătățirea praznicului", "Odovania Înjumătățirii",
+    "Odovania praznicului Învierii", "Odovania praznicului Înălțării",
+    "Înălțarea Domnului", "Ziua Eroilor", "Pogorârea Duhului Sfânt",
+    "Sfânta Treime", "Ziua Sfintei Treimi", "Sfântul Duh", "Ziua Sfântului Duh",
+    "Duminica", "Sâmbăta lui Lazăr", "Intrarea Domnului în Ierusalim", "Floriile",
+    "Lăsatul secului", "Sâmbăta morților", "Sâmbăta Sf. Teodor",
+    "Săptămâna Luminată", "Vinerea Izvorului",
+)
+
+
+def _moveable_window(year: int):
+    """From the Triodion's start to the Monday after All Saints: every date in
+    it can carry a feast that belongs to Pascha rather than to the date."""
+    from engine_port import pascha
+    from datetime import timedelta
+    p = pascha(year)
+    return p - timedelta(days=70), p + timedelta(days=57)
+
+
+def _strip_moveable(name: str) -> tuple[str, bool]:
+    """Drop leading moveable-feast segments. Returns (rest, stripped)."""
+    parts = [x.strip() for x in name.split(";")]
+    dropped = False
+    while parts and parts[0].startswith(MOVEABLE_PREFIXES):
+        parts.pop(0)
+        dropped = True
+    return "; ".join(p for p in parts if p), dropped
+
+
+MOVEABLE_STRIPPED: list[str] = []
+
+
+# Every date whose rank could only be read off a Sunday row in the years
+# scraped so far. Reported at the end of a build, because each one is a guess
+# until a year puts that date on a weekday.
+SUNDAY_ONLY_RANKS: list[str] = []
+
+
+def _settled_rank(entry: dict, curated_row: tuple | None) -> str:
+    """The scraped rank, unless it was read off a Sunday and nothing confirms it.
+
+    On a weekday the row class is decisive. On a Sunday it is not, and the
+    scraper falls back to treating `†)` as red — right for Sf. Nicolae and the
+    Archangels, guesswork for the rest. With only a Sunday reading available:
+    an independently curated rank wins; failing that, `†)` keeps its weekday
+    meaning, cruce albastră. Nothing is promoted to red without evidence.
+    """
+    rank = entry.get("rank", "simplu")
+    if entry.get("_rank_basis") != "sunday" or rank != "cruce_rosie":
+        return rank
+    SUNDAY_ONLY_RANKS.append(entry.get("month_day", "?"))
+    if curated_row is not None and curated_row[9] in ("manual", "calendar-ro"):
+        return curated_row[5]
+    return "cruce_albastra"
+
+
 def load_feasts(published: dict[str, dict] | None = None) -> list[tuple]:
     """Curated commemorations. Fixed feasts key off MM-DD, movable ones off the
     same keys FeastCalendar resolves against Pascha."""
@@ -465,14 +529,14 @@ def load_feasts(published: dict[str, dict] | None = None) -> list[tuple]:
             covered.add(month_day)
             rows.append((
                 f"feast:{month_day}", month_day, None, name, _short(name),
-                entry.get("rank", "simplu"), None,
+                _settled_rank(entry, None), None,
                 "; ".join(entry.get("notes", [])) or None, None, "scraped", 1,
             ))
         else:
             old_row = rows[idx]
             rows[idx] = (
                 old_row[0], month_day, None, name, _short(name),
-                entry.get("rank", "simplu"), old_row[6],
+                _settled_rank(entry, old_row), old_row[6],
                 old_row[7] or ("; ".join(entry.get("notes", [])) or None),
                 old_row[8], "scraped", 1,
             )
@@ -512,10 +576,24 @@ def install_images() -> dict[str, list[str]]:
     a `MM-DD__` prefix means one line and no maintenance.
     """
     src_root = os.path.join(HERE, "scraped", "images")
-    if not os.path.isdir(src_root):
-        return {}
-
     dest = os.path.join(HERE, "..", "assets", "sinaxar")
+
+    # assets/sinaxar/ is the source of truth; the scraper's per-day folders are
+    # only a download cache, and are not committed. Without this fallback a
+    # fresh clone would rebuild the seed with no image references at all — the
+    # 447 files sitting in assets/ would be invisible to the app, because the
+    # map from day to filename used to be read only from the cache.
+    if not os.path.isdir(src_root):
+        installed: dict[str, list[str]] = {}
+        if os.path.isdir(dest):
+            for flat in sorted(os.listdir(dest)):
+                day, sep, _ = flat.partition("__")
+                if sep and len(day) == 5 and day[2] == "-":
+                    installed.setdefault(day, []).append(flat)
+        print(f"  images: scraper cache absent, read {sum(map(len, installed.values()))} "
+              f"from assets/sinaxar/")
+        return installed
+
     os.makedirs(dest, exist_ok=True)
 
     installed: dict[str, list[str]] = {}
@@ -579,12 +657,53 @@ def load_scraped() -> tuple[list[tuple], list[tuple], dict[str, dict]]:
         year = int(re.search(r"month-(\d{4})-", path).group(1))
         payload = json.load(open(path, encoding="utf-8"))
         for d in payload.get("days", []):
-            published[d["month_day"]] = d
+            # The feasts table is keyed by MM-DD and shared by every year, but
+            # a rank read off a Sunday row is a reading of that year's weekday:
+            # Sundays carry the feast class whether or not the saint is a
+            # red-letter one, so the dagger alone decides, and the same saint
+            # reads differently on a Monday. Keeping "the last year scraped"
+            # let 2026's Sundays leak into every other year. Prefer a weekday
+            # reading from any year; among equals, the most recent.
+            basis = "sunday" if "saptamana" in (d.get("row_class") or "") else "weekday"
+
+            # A second, stronger preference: a year in which this date is
+            # outside the Pascha-dependent window. Inside it the line can start
+            # with a moveable feast, and keeping "the last year scraped" stored
+            # "Înălțarea Domnului" as a praznic on 21 May — every year — because
+            # that is where it fell in 2026. Outside the window the line holds
+            # only the saints of the date.
+            from datetime import date as _date
+            mm, dd = int(d["month_day"][:2]), int(d["month_day"][3:])
+            try:
+                lo, hi = _moveable_window(year)
+                inside = lo <= _date(year, mm, dd) <= hi
+            except ValueError:            # 29 February in a common year
+                inside = False
+            score = (1 if inside else 0, 1 if basis == "sunday" else 0)
+
+            current = published.get(d["month_day"])
+            if current is None or score <= current["_score"]:
+                published[d["month_day"]] = {
+                    **d, "_rank_basis": basis, "_score": score, "_inside": inside}
             override_rows.append((
                 year, d["month_day"], d.get("fast"),
                 "; ".join(d.get("notes", [])) or None,
                 None, None, None, None, None, None,
             ))
+    from scrape_calendar import rank_of
+    for month_day, entry in published.items():
+        if not entry["_inside"]:
+            continue
+        rest, stripped = _strip_moveable(entry.get("name") or "")
+        if not stripped:
+            continue
+        MOVEABLE_STRIPPED.append(month_day)
+        # The row's class and leading dagger described the moveable feast, so
+        # the rank is re-read from what remains, as an ordinary weekday line
+        # would be. An empty remainder hands the date to the menologion.
+        entry["name"] = re.sub(r"^\s*(\(†\)|†\)|†)\s*", "", rest).strip()
+        entry["rank"] = rank_of(rest, "normal") if rest else "simplu"
+        entry["_rank_basis"] = "weekday"
     return sinaxar_rows, override_rows, published
 
 
@@ -632,6 +751,12 @@ def write_sqlite(rows: list[dict], out: str, bbox, area: str) -> None:
         "feast_count": str(len(feasts)),
         "sinaxar_count": str(len(sinaxar_rows)),
         "override_count": str(len(override_rows)),
+        # The years the published calendar covers. Beyond them the app falls
+        # back to the computed engine, and it reads this to say so rather than
+        # presenting a computed dezlegare with the same confidence as a
+        # published one.
+        "published_years": ",".join(
+            str(y) for y in sorted({r[0] for r in override_rows})),
         "attribution": "© OpenStreetMap contributors, ODbL 1.0",
     }
     db.executemany("INSERT OR REPLACE INTO meta (key,value) VALUES (?,?)", list(meta.items()))
@@ -655,6 +780,27 @@ def write_sqlite(rows: list[dict], out: str, bbox, area: str) -> None:
     ):
         flag = "   <-- EMPTY" if count == 0 else ""
         print(f"    {label:<16} {count}{flag}")
+
+    # The published calendar is what makes dezlegări right. Say loudly how far
+    # it reaches, because the day it runs out nothing breaks — the app quietly
+    # falls back to the engine and gets a fifth of the fast days wrong.
+    years = sorted({r[0] for r in override_rows})
+    if years:
+        last = years[-1]
+        print(f"    published years  {', '.join(map(str, years))}")
+        this_year = datetime.now(timezone.utc).year
+        if last <= this_year:
+            print(f"WARNING: published calendar ends 31 December {last}. Scrape "
+                  f"{last + 1}:  python3 tool/scrape_calendar.py --year "
+                  f"{last + 1} --months")
+    if MOVEABLE_STRIPPED:
+        print(f"    moveable feasts stripped from {len(MOVEABLE_STRIPPED)} fixed dates "
+              f"(no year had them outside Pascha's window yet)")
+    if SUNDAY_ONLY_RANKS:
+        print(f"NOTE: {len(SUNDAY_ONLY_RANKS)} red-cross ranks were read only off a "
+              f"Sunday and settled from curated data or downgraded: "
+              f"{', '.join(sorted(set(SUNDAY_ONLY_RANKS)))}. Scraping another year "
+              f"resolves them.")
 
 
 def main() -> None:
