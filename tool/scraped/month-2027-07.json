@@ -1,0 +1,524 @@
+{
+  "days": [
+    {
+      "month_day": "07-01",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. Ier. Leontie de la Rădăuți; Sf. Mc. Doctori fără de arginți, Cosma și Damian, cei din Roma",
+      "rank": "cruce_albastra",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "†) Sf. Ier. Leontie de la Rădăuți"
+      ],
+      "icons": [
+        "post-8.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-02",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Așezarea veșmântului Născătoarei de Dumnezeu în biserica Vlaherne; †) Sf. Voievod Ștefan cel Mare; Sf. Ier. Iuvenalie, patr. Ierusalimului; Sf. Ier. Ioan Maximovici",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [
+        "Post. Nu se fac nunți"
+      ],
+      "romanian": [
+        "†) Sf. Voievod Ștefan cel Mare"
+      ],
+      "icons": [
+        "post-2.png"
+      ]
+    },
+    {
+      "month_day": "07-03",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. Mc. Iachint; Sf. Ier. Anatolie, patr. Constantinopolului",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-04",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Olimpia de la Farcașa. ; Sf. Ier. Andrei, arhiep. Cretei; Sf. Cuv. Marta",
+      "rank": "cruce_albastra",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "† Sf. Olimpia de la Farcașa."
+      ],
+      "icons": [
+        "luna-2.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-05",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Atanasie Atonitul; Sf. Cuv. Lampadie",
+      "rank": "cruce_albastra",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-06",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Dometie cel Milostiv de la Râmeț și mama sa, Sf. Cuv. Filotimia; Sf. Cuv. Sisoe cel Mare; Sf. Mc. Lucia din Roma; Sf. Mc. Marius, soția sa, Marta, și fiii lor, Audifaciu și Avacum",
+      "rank": "cruce_albastra",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "†) Sf. Cuv. Dometie cel Milostiv de la Râmeț și mama sa, Sf. Cuv. Filotimia"
+      ],
+      "icons": [
+        "post-8.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-07",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. M. Mc. Chiriachi; Sf. Cuv. Toma din Maleon; Sf. Mc. Evanghel",
+      "rank": "cruce_albastra",
+      "fast": "fast",
+      "notes": [
+        "Post. Nu se fac nunți"
+      ],
+      "romanian": [],
+      "icons": [
+        "post-2.png"
+      ]
+    },
+    {
+      "month_day": "07-08",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. M. Mc. Procopie și mama sa, Teodosia; †) Sf. Mc. Epictet preotul și Astion monahul",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "†) Sf. Mc. Epictet preotul și Astion monahul"
+      ],
+      "icons": [
+        "post-8.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-09",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Cinstirea Ic. Maicii Domnului „Îndrumătoarea” de la M. Neamț; Sf. Sfințiți Mc. Pangratie, ep. Tavromeniei",
+      "rank": "cruce_albastra",
+      "fast": "fast",
+      "notes": [
+        "Post. Nu se fac nunți"
+      ],
+      "romanian": [
+        "†) Cinstirea Ic. Maicii Domnului „Îndrumătoarea” de la M. Neamț"
+      ],
+      "icons": [
+        "post-2.png"
+      ]
+    },
+    {
+      "month_day": "07-10",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. 45 de Mc. din Nicopolea Armeniei",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-11",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. M. Mc. Eufimia; Sf. Olga, cea întocmai cu Ap. și luminătoarea Rusiei",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-12",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Cinstirea Ic. Maicii Domnului „Prodromița” de la Muntele Athos; Sf. Mc. Proclu și Ilarie; Cuv. Mihai Maleinul; Sf. Veronica; Sf. Cuv. Paisie Aghioritul",
+      "rank": "cruce_albastra",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "†) Cinstirea Ic. Maicii Domnului „Prodromița” de la Muntele Athos"
+      ],
+      "icons": [
+        "luna-3.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-13",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Aducerea moaștelor Sfântului Cuvios Dimitrie cel Nou la București; Soborul Sf. Arh. Gavriil; Sf. Cuv. Ștefan Savaitul; Sf. Mc. Maria din Persia; Sf. Cuv. Sara",
+      "rank": "cruce_albastra",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "† Aducerea moaștelor Sfântului Cuvios Dimitrie cel Nou la București"
+      ],
+      "icons": [
+        "post-8.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-14",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Ap. Achila; Sf. Mc. Iust și Iraclie; Sf. Cuv. Nicodim Aghioritul",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [
+        "Post. Nu se fac nunți"
+      ],
+      "romanian": [],
+      "icons": [
+        "post-2.png"
+      ]
+    },
+    {
+      "month_day": "07-15",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. Mc. Chiric și Iulita; Sf. Vladimir, luminătorul Rusiei",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-8.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-16",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Sf. Sfințit Mc. Atinoghen cu cei 10 ucenici ai săi; Sf. Mc. Iulia",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [
+        "Post. Nu se fac nunți"
+      ],
+      "romanian": [],
+      "icons": [
+        "post-2.png"
+      ]
+    },
+    {
+      "month_day": "07-17",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. M. Mc. Marina; Sf. Ier. Eufrasie, ep. Ionopolei",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-18",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Sf. Mc. Emilian de la Durostorum (Ostrov); Sf. Cuv. Pamvo",
+      "rank": "cruce_rosie",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "†) Sf. Mc. Emilian de la Durostorum (Ostrov)"
+      ],
+      "icons": [
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-19",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Macrina, sora Sf. Vasile cel Mare; Sf. Cuv. Die; Aflarea moaștelor Sf. Cuv. Serafim de Sarov",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "luna-0.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-20",
+      "weekday": "M",
+      "row_class": "sarbatoare",
+      "name": "Sf. Slăvitul Prooroc Ilie Tesviteanul",
+      "rank": "cruce_rosie",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-21",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Cuv. Simeon și Ioan Pustnicul; Sf. Prooroc Iezechiel; †) Sf. Cuv. Rafail și Partenie, de la Agapia Veche",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [
+        "Post. Nu se fac nunți"
+      ],
+      "romanian": [
+        "†) Sf. Cuv. Rafail și Partenie, de la Agapia Veche"
+      ],
+      "icons": [
+        "post-2.png"
+      ]
+    },
+    {
+      "month_day": "07-22",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. Pr. Mărt. Ilie Lăcătușu; Sf. Mironosiță, întocmai cu Ap., Maria Magdalena; Sf. Cuv. Mc. Marcela",
+      "rank": "cruce_albastra",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "†) Sf. Pr. Mărt. Ilie Lăcătușu"
+      ],
+      "icons": [
+        "post-8.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-23",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Aducerea Moaștelor Sf. Sfințit Mc. Foca; Sf. Mc. Apolinarie, Vitalie și Valeria",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [
+        "Post. Nu se fac nunți"
+      ],
+      "romanian": [],
+      "icons": [
+        "post-2.png"
+      ]
+    },
+    {
+      "month_day": "07-24",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Sf. M. Mc. Hristina; Sf. Mc. Ermoghen",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-25",
+      "weekday": "D",
+      "row_class": "sarbatoare saptamana",
+      "name": "Adormirea Sf. Ana, mama Preasfintei Născătoare de Dumnezeu; Sf. Părinți de la Sinodul al V-lea Ecumenic; Sf. Cuv. Eupraxia și Olimpiada",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-26",
+      "weekday": "L",
+      "row_class": "normal",
+      "name": "Sf. Sfințit Mc. Ermolae; Sf. Mc. Cuv. Paraschevi din Roma; †) Sf. Cuv. Ioanichie cel Nou de la Muscel (Argeș)",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [
+        "†) Sf. Cuv. Ioanichie cel Nou de la Muscel (Argeș)"
+      ],
+      "icons": [
+        "luna-1.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-27",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. M. Mc. și Tămăduitor Pantelimon",
+      "rank": "cruce_albastra",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-8.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-28",
+      "weekday": "M",
+      "row_class": "normal",
+      "name": "Sf. Ap. și Diac. Prohor, Nicanor, Timon și Parmena; Sf. Cuv. Pavel de la Xiropotamu",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [
+        "Post. Nu se fac nunți"
+      ],
+      "romanian": [],
+      "icons": [
+        "post-2.png"
+      ]
+    },
+    {
+      "month_day": "07-29",
+      "weekday": "J",
+      "row_class": "normal",
+      "name": "Sf. Mc. Calinic, Veniamin și Mamant; Sf. Mc. Teodota cu fiii săi",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [],
+      "romanian": [],
+      "icons": [
+        "post-8.png",
+        "post-7.png"
+      ]
+    },
+    {
+      "month_day": "07-30",
+      "weekday": "V",
+      "row_class": "normal",
+      "name": "Sf. Ap. Sila, Silvan, Crescent, Epenet și Andronic; Sf. Mc. Valentin, ep. Umbriei",
+      "rank": "simplu",
+      "fast": "fast",
+      "notes": [
+        "Post. Nu se fac nunți"
+      ],
+      "romanian": [],
+      "icons": [
+        "post-2.png"
+      ]
+    },
+    {
+      "month_day": "07-31",
+      "weekday": "S",
+      "row_class": "normal",
+      "name": "Înainte-prăznuirea scoaterii Sf. Cruci; Sf. și Dreptul Evdochim; Sf. și Dreptul Iosif din Arimateea",
+      "rank": "simplu",
+      "fast": null,
+      "notes": [
+        "Lăsatul secului pentru Postul Adormirii Maicii Domnului",
+        "\"copyBtn\"",
+        "window.location.href",
+        "'text'",
+        "'text'",
+        "'togglePdf'",
+        "'pdfContainer'",
+        "'pdfIframe'",
+        "/\\.pdf$/i",
+        "\"http://\"",
+        "pdfUrl",
+        "!isOpen",
+        "inlocuiti [AT] cu @",
+        "i,s,o,g,r,a,m",
+        "i[r].q=i[r].q||[]",
+        "arguments",
+        "a,m",
+        "window,document,'script','//www.google-analytics.com/analytics.js','ga'",
+        "'create', 'UA-73320920-1', 'auto'",
+        "'send', 'pageview'",
+        "['Histats.start', '1,4550730,4,435,112,75,00011110']",
+        "['Histats.fasi', '1']",
+        "['Histats.track_hits', '']",
+        "'script'",
+        "'//s10.histats.com/js15_as.js'",
+        "'head'",
+        "'body'",
+        "hs"
+      ],
+      "romanian": [],
+      "icons": [
+        "post-7.png"
+      ]
+    }
+  ],
+  "sundays": [
+    {
+      "title": "Duminica a II-a după Rusalii",
+      "subtitle": "a Sf. Români; Chemarea primilor Apostoli; Lumina faptelor bune și mărturisirea lui Hristos",
+      "apostol": "Romani II, 10-16",
+      "evanghelie": "Matei IV, 18-23",
+      "glas": 1,
+      "voscreasna": 2
+    },
+    {
+      "title": "Duminica a III-a după Rusalii",
+      "subtitle": "Despre grijile vieții",
+      "apostol": "Romani V, 1-10",
+      "evanghelie": "Matei VI, 22-23",
+      "glas": 2,
+      "voscreasna": 3
+    },
+    {
+      "title": "Duminica a IV-a după Rusalii",
+      "subtitle": "a Sf. Părinţi de la Sinodul al IV-lea Ecumenic; Vindecarea slugii sutașului; Rugăciunea lui Iisus",
+      "apostol": "Romani VI, 18-23",
+      "evanghelie": "Matei VIII, 5-13",
+      "glas": 3,
+      "voscreasna": 4
+    },
+    {
+      "title": "Duminica a V-a după Rusalii",
+      "subtitle": "Vindecarea celor doi demonizați din ținutul Gadarei",
+      "apostol": "Romani X, 1-10",
+      "evanghelie": "Matei VIII, 28-34",
+      "glas": 4,
+      "voscreasna": 5
+    }
+  ]
+}

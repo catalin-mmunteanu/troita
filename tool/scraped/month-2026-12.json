@@ -305,7 +305,7 @@
       "row_class": "normal",
       "name": "Sf. Mc. Eugenia",
       "rank": "simplu",
-      "fast": null,
+      "fast": "strict",
       "notes": [
         "Ajunul Crăciunului",
         "Numai seara, grâu fiert îndulcit cu miere, poame, covrigi sau turte de făină"
