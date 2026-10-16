@@ -1,28 +1,35 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:troita/core/data/local_church_repository.dart';
 import 'package:troita/core/models/church.dart';
 
-/// Builds an in-memory database with the production schema, so these tests
-/// exercise the same SQL the app runs.
+/// Builds an in-memory database from tool/schema.sql itself.
+///
+/// This used to carry its own copy of the CREATE TABLE, which drifted the
+/// moment the real schema gained `search_fold`: the repository started
+/// querying a column the test database did not have, and every search test
+/// failed with "no such column". Loading the canonical file means the test can
+/// only ever disagree with production on purpose.
 Future<Database> _seed() async {
   final Database db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
-  await db.execute('''
-    CREATE TABLE churches (
-      id TEXT PRIMARY KEY, name TEXT NOT NULL, kind TEXT NOT NULL,
-      denomination TEXT, lat REAL NOT NULL, lon REAL NOT NULL, patron TEXT,
-      feast_day TEXT, year_built INTEGER, history TEXT, photo_ref TEXT,
-      priority INTEGER NOT NULL DEFAULT 0,
-      address TEXT, wikidata TEXT, source TEXT NOT NULL,
-      verified INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL,
-      deleted INTEGER NOT NULL DEFAULT 0);
-    CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-  ''');
+  final String schema = File('tool/schema.sql').readAsStringSync()
+      // Comments first: several contain semicolons mid-sentence, which would
+      // otherwise split a statement in half.
+      .replaceAll(RegExp(r'--[^\n]*'), '');
+  for (final String statement in schema.split(';')) {
+    final String sql = statement.trim();
+    if (sql.isNotEmpty) await db.execute(sql);
+  }
 
   Future<void> add(String id, String name, double lat, double lon,
       {String? feast, int deleted = 0, int priority = 0}) async {
     await db.insert('churches', <String, Object?>{
       'id': id, 'name': name, 'kind': 'church', 'lat': lat, 'lon': lon,
+      // Folded exactly as build_seed.add_search_fold does, so search runs
+      // against the same haystack it sees in production.
+      'search_fold': LocalChurchRepository.foldForSearch(name),
       'feast_day': feast, 'priority': priority, 'source': 'manual',
       'updated_at': '2026-01-01T00:00:00Z', 'deleted': deleted,
     });
@@ -84,6 +91,17 @@ void main() {
   test('search matches name fragments', () async {
     final List<Church> found = await repo.search('stavro');
     expect(found.single.id, 'c:stavropoleos');
+  });
+
+  test('search ignores diacritics and case', () async {
+    // Typed the way a phone keyboard produces it: no ț, no capital.
+    expect((await repo.search('coltea')).single.id, 'c:coltea');
+    expect((await repo.search('COLȚEA')).single.id, 'c:coltea');
+  });
+
+  test('search never returns soft-deleted rows', () async {
+    // "Demolată" is deleted; its fold is still in the table.
+    expect(await repo.search('demolata'), isEmpty);
   });
 
   test('upcomingFeasts filters by proximity to the feast', () async {
