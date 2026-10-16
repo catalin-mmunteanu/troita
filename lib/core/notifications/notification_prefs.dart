@@ -37,6 +37,7 @@ class NotificationPrefs {
     this.hour = 8,
     this.minute = 0,
     this.fastReminders = true,
+    this.hramReminders = true,
     this.sound = true,
   });
 
@@ -49,6 +50,9 @@ class NotificationPrefs {
   /// The evening before each great fast begins. Never for Wednesday/Friday.
   final bool fastReminders;
 
+  /// The evening before the hram of each favourite church.
+  final bool hramReminders;
+
   /// Sound on major feasts. Ordinary days stay silent regardless.
   final bool sound;
 
@@ -56,6 +60,7 @@ class NotificationPrefs {
   static const String _kHour = 'notif_hour';
   static const String _kMinute = 'notif_minute';
   static const String _kFast = 'notif_fast_reminders';
+  static const String _kHram = 'notif_hram_reminders';
   static const String _kSound = 'notif_sound';
 
   NotificationPrefs copyWith({
@@ -63,6 +68,7 @@ class NotificationPrefs {
     int? hour,
     int? minute,
     bool? fastReminders,
+    bool? hramReminders,
     bool? sound,
   }) =>
       NotificationPrefs(
@@ -70,6 +76,7 @@ class NotificationPrefs {
         hour: hour ?? this.hour,
         minute: minute ?? this.minute,
         fastReminders: fastReminders ?? this.fastReminders,
+        hramReminders: hramReminders ?? this.hramReminders,
         sound: sound ?? this.sound,
       );
 
@@ -82,6 +89,7 @@ class NotificationPrefs {
       hour: (p.getInt(_kHour) ?? 8).clamp(0, 23),
       minute: (p.getInt(_kMinute) ?? 0).clamp(0, 59),
       fastReminders: p.getBool(_kFast) ?? true,
+      hramReminders: p.getBool(_kHram) ?? true,
       sound: p.getBool(_kSound) ?? true,
     );
   }
@@ -92,6 +100,7 @@ class NotificationPrefs {
     await p.setInt(_kHour, hour);
     await p.setInt(_kMinute, minute);
     await p.setBool(_kFast, fastReminders);
+    await p.setBool(_kHram, hramReminders);
     await p.setBool(_kSound, sound);
   }
 

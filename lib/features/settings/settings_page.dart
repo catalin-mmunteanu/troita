@@ -112,6 +112,19 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
 
+          const _Header('Hramuri'),
+          SwitchListTile(
+            value: prefs.hramReminders,
+            onChanged: _busy
+                ? null
+                : (bool v) => _update(prefs.copyWith(hramReminders: v)),
+            title: const Text('Hramul bisericilor favorite'),
+            subtitle: const Text(
+              'Cu o seară înainte, la ora 18. Adăugați o biserică la favorite '
+              'din pagina ei.',
+            ),
+          ),
+
           const _Header('Programate'),
           if (plan != null)
             Padding(

@@ -64,6 +64,9 @@ class _MapPageState extends State<MapPage> {
 
   /// Whether the legend shows its rows or only its row of dots.
   bool _legendOpen = true;
+
+  int _seenMarks = -1;
+  int _favouriteCount = 0;
   int _shown = 0;
 
   final TextEditingController _query = TextEditingController();
@@ -75,6 +78,7 @@ class _MapPageState extends State<MapPage> {
 
   static const String _sourceId = 'churches';
   static const String _selectedSourceId = 'church-selected';
+  static const String _favouritesSourceId = 'church-favourites';
   static const String _pointsLayer = 'church-points';
   static const String _clusterLayer = 'church-clusters';
 
@@ -282,6 +286,31 @@ class _MapPageState extends State<MapPage> {
         enableInteraction: false,
       );
 
+      // Favourites: a gold ring around the dot, so they stand out at street
+      // zoom without changing what kind of place the dot says it is. Its own
+      // small source, refreshed whenever a church is marked.
+      await map.addSource(
+        _favouritesSourceId,
+        const GeojsonSourceProperties(
+          data: <String, dynamic>{
+            'type': 'FeatureCollection',
+            'features': <Object>[],
+          },
+        ),
+      );
+      await map.addCircleLayer(
+        _favouritesSourceId,
+        'church-favourite-ring',
+        CircleLayerProperties(
+          circleRadius: 11,
+          circleOpacity: 0,
+          circleStrokeWidth: 2.5,
+          circleStrokeColor: TroitaColors.gold.toHexStringRGB(),
+        ),
+        enableInteraction: false,
+      );
+      await _refreshFavourites();
+
       // The ring drawn around a search result. Its own source, so highlighting
       // is one small update instead of touching the thirteen-thousand-feature
       // collection. Added last, so it draws over everything.
@@ -319,6 +348,21 @@ class _MapPageState extends State<MapPage> {
     } catch (e) {
       if (mounted) setState(() => _error = '$e');
     }
+  }
+
+  Future<void> _refreshFavourites() async {
+    final MapLibreMapController? map = _controller;
+    if (map == null || _all.isEmpty) return;
+    final Set<String> ids = await AppScope.of(context).marks.favouriteIds();
+    final List<Map<String, Object?>> features = <Map<String, Object?>>[
+      for (final Map<String, Object?> f in _all)
+        if (ids.contains((f['properties'] as Map?)?['id'])) f,
+    ];
+    if (mounted) setState(() => _favouriteCount = features.length);
+    await map.setGeoJsonSource(_favouritesSourceId, <String, dynamic>{
+      'type': 'FeatureCollection',
+      'features': features,
+    });
   }
 
   /// `['match', ['get','kind'], 'monastery', x, 'cathedral', y, …, fallback]`.
@@ -478,6 +522,14 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    // A church marked from its own page, or from Bisericile mele: redraw the
+    // favourite rings when we are next built.
+    final int marks = AppScope.of(context).marksRevision;
+    if (marks != _seenMarks && _styleLoaded && _all.isNotEmpty) {
+      _seenMarks = marks;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _refreshFavourites());
+    }
+
     return Stack(
       children: <Widget>[
         MapLibreMap(
@@ -536,6 +588,7 @@ class _MapPageState extends State<MapPage> {
                         visible: _visible,
                         counts: _counts,
                         shown: _shown,
+                        favourites: _favouriteCount,
                         expanded: _legendOpen,
                         onToggleKind: _toggleKind,
                         onToggleOpen: () =>
@@ -706,6 +759,7 @@ class _Legend extends StatelessWidget {
     required this.visible,
     required this.counts,
     required this.shown,
+    required this.favourites,
     required this.expanded,
     required this.onToggleKind,
     required this.onToggleOpen,
@@ -714,6 +768,9 @@ class _Legend extends StatelessWidget {
   final Set<PlaceKind> visible;
   final Map<PlaceKind, int> counts;
   final int shown;
+
+  /// Explained in the legend only once there is a ring on the map to explain.
+  final int favourites;
   final bool expanded;
   final ValueChanged<PlaceKind> onToggleKind;
   final VoidCallback onToggleOpen;
@@ -786,6 +843,34 @@ class _Legend extends StatelessWidget {
                     on: visible.contains(k),
                     count: _n(counts[k] ?? 0),
                     onTap: () => onToggleKind(k),
+                  ),
+                if (favourites > 0)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(11, 7, 12, 7),
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          width: 15,
+                          height: 15,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: TroitaColors.gold, width: 2.5),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text('Favorite',
+                            style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                                color: TroitaColors.ink)),
+                        const SizedBox(width: 14),
+                        const Spacer(),
+                        Text(_n(favourites),
+                            style: const TextStyle(
+                                fontSize: 12, color: TroitaColors.muted)),
+                      ],
+                    ),
                   ),
                 const SizedBox(height: 4),
               ],

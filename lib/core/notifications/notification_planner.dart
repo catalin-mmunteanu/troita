@@ -1,8 +1,12 @@
+import '../data/church_marks_repository.dart';
+import '../data/church_repository.dart';
 import '../data/day_repository.dart';
 import '../liturgical/fast_level.dart';
 import '../liturgical/fasting_period.dart';
 import '../liturgical/liturgical_calendar.dart';
+import '../models/church.dart';
 import '../models/feast.dart';
+import '../models/feast_calendar.dart';
 import 'notification_prefs.dart';
 import 'notification_service.dart';
 
@@ -14,10 +18,18 @@ import 'notification_service.dart';
 /// mornings that is plenty; the window is long enough that a fortnight away
 /// from the phone changes nothing.
 class NotificationPlanner {
-  const NotificationPlanner(this._days, this._notifications);
+  const NotificationPlanner(
+    this._days,
+    this._notifications, {
+    ChurchRepository? churches,
+    ChurchMarksRepository? marks,
+  })  : _churches = churches,
+        _marks = marks;
 
   final DayRepository _days;
   final TroitaNotifications _notifications;
+  final ChurchRepository? _churches;
+  final ChurchMarksRepository? _marks;
 
   /// Days ahead to schedule. 60 keeps us far under Android's pending-alarm
   /// ceiling while surviving a long gap between openings.
@@ -43,7 +55,12 @@ class NotificationPlanner {
       fasts = await _scheduleFastReminders(today);
     }
 
-    return PlanResult(daily: daily, fasts: fasts, blocked: false);
+    int hram = 0;
+    if (prefs.hramReminders) {
+      hram = await _scheduleHramReminders(today);
+    }
+
+    return PlanResult(daily: daily, fasts: fasts + hram, blocked: false);
   }
 
   Future<int> _scheduleDaily(DateTime today, NotificationPrefs prefs) async {
@@ -105,6 +122,35 @@ class NotificationPlanner {
         fastStart: period.start,
         periodLabel: period.label,
         body: _fastBody(period),
+      );
+      if (queued) count++;
+    }
+    return count;
+  }
+
+  /// The evening before the hram of each favourite church, within the window.
+  ///
+  /// Only for favourites: a reminder for every church in Romania would be
+  /// thirteen thousand of them. Churches without a known hram, or whose hram
+  /// is a moveable feast the calendar cannot place, are skipped quietly.
+  Future<int> _scheduleHramReminders(DateTime today) async {
+    final ChurchRepository? churches = _churches;
+    final ChurchMarksRepository? marks = _marks;
+    if (churches == null || marks == null) return 0;
+
+    final DateTime horizon =
+        DateTime(today.year, today.month, today.day + windowDays);
+    int count = 0;
+    for (final String id in await marks.favouriteIds()) {
+      final Church? c = await churches.byId(id);
+      if (c == null) continue;
+      final DateTime? feast = FeastCalendar.next(c.feastDay, from: today);
+      if (feast == null || feast.isAfter(horizon)) continue;
+      final bool queued = await _notifications.scheduleHramReminder(
+        churchId: c.id,
+        churchName: c.name,
+        patron: c.patron,
+        feastDay: feast,
       );
       if (queued) count++;
     }

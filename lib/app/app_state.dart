@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../core/data/church_marks_repository.dart';
 import '../core/data/church_repository.dart';
 import '../core/data/day_repository.dart';
 import '../core/data/fast_journal_repository.dart';
@@ -15,6 +16,7 @@ import '../core/notifications/notification_planner.dart';
 import '../core/notifications/notification_prefs.dart';
 import '../core/notifications/notification_service.dart';
 import '../core/permissions/permission_service.dart';
+import 'widget_feed.dart';
 
 /// Single app-wide store. Deliberately a plain [ChangeNotifier]: the app has
 /// one screen's worth of state and adding a DI framework for it would be noise.
@@ -35,6 +37,7 @@ class AppState extends ChangeNotifier {
   FeastRepository? _feasts;
   DayRepository? _days;
   FastJournalRepository? _journal;
+  ChurchMarksRepository? _marks;
   StreamSubscription<String>? _openedSub;
 
   ChurchRepository get repository {
@@ -66,6 +69,13 @@ class AppState extends ChangeNotifier {
     return repo;
   }
 
+  /// Favourites and visits. Same database as the journal, for the same reason.
+  ChurchMarksRepository get marks {
+    final ChurchMarksRepository? repo = _marks;
+    if (repo == null) throw StateError('AppState.initialize() not awaited');
+    return repo;
+  }
+
   PermissionService get permissions => _permissions;
   TroitaNative get native => _native;
 
@@ -93,6 +103,7 @@ class AppState extends ChangeNotifier {
       _feasts = FeastRepository(shared);
       _days = DayRepository(shared, _feasts!);
       _journal = await FastJournalRepository.open();
+      _marks = await ChurchMarksRepository.open();
       seed = init.seed;
       status = init.status;
       pendingChurchId = await _native.consumePendingChurchId();
@@ -163,9 +174,25 @@ class AppState extends ChangeNotifier {
       return;
     }
     _lastPlannedAt = now;
-    lastPlan = await NotificationPlanner(days, TroitaNotifications.instance)
-        .reschedule(notificationPrefs);
+    lastPlan = await NotificationPlanner(
+      days,
+      TroitaNotifications.instance,
+      churches: _repository,
+      marks: _marks,
+    ).reschedule(notificationPrefs);
     notifyListeners();
+    await _refreshWidget();
+  }
+
+  /// Hands the home-screen widget its next sixty days. Rides on the same
+  /// throttle as the notification window, which needs the same refresh rhythm.
+  /// A failure here only means a stale widget, never a broken app.
+  Future<void> _refreshWidget() async {
+    try {
+      await _native.updateWidget(await WidgetFeed.build(days));
+    } catch (e) {
+      debugPrint('widget refresh failed: $e');
+    }
   }
 
   Future<void> setNotificationPrefs(NotificationPrefs prefs) async {
@@ -190,6 +217,26 @@ class AppState extends ChangeNotifier {
     await journal.toggleKept(date, kept);
     journalRevision++;
     notifyListeners();
+  }
+
+  /// Bumped whenever a church is marked, so the church page, the Profile list
+  /// and the map all pick it up without holding their own subscriptions.
+  int marksRevision = 0;
+
+  Future<ChurchMark> setFavourite(String churchId, bool on) async {
+    final ChurchMark mark = await marks.setFavourite(churchId, on);
+    marksRevision++;
+    notifyListeners();
+    // Hram reminders are scheduled for favourites, so the window changes too.
+    unawaited(rescheduleNotifications());
+    return mark;
+  }
+
+  Future<ChurchMark> setVisited(String churchId, bool on) async {
+    final ChurchMark mark = await marks.setVisited(churchId, on);
+    marksRevision++;
+    notifyListeners();
+    return mark;
   }
 
   Future<void> refreshStatus() async {

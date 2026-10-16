@@ -33,6 +33,11 @@ class TroitaNotifications {
   static const String channelDaily = 'troita_daily_v1';
   static const String channelFast = 'troita_fast_v1';
 
+  /// Separate from the fast reminders, so silencing one in the system settings
+  /// does not silence the other. Created by the plugin the first time a
+  /// reminder fires (createNotification sets up the channel from its details).
+  static const String channelHram = 'troita_hram_v1';
+
   /// Notification id ranges, so cancelling one kind never touches another.
   // Each kind gets its own million. The per-date key is yymmdd, at most
   // 991231, so the ranges cannot meet. They used to be 100000 and 200000,
@@ -42,6 +47,10 @@ class TroitaNotifications {
   // window, and ids outlive the code that chose them.
   static const int _dailyBase = 1000000;
   static const int _fastBase = 2000000;
+  // Hram reminders are per church, not per date — two favourites can share a
+  // feast day — so their ids come from the church id instead. Kept in a range
+  // of their own, and excluded from the date decoding in [nextScheduled].
+  static const int _hramBase = 3000000;
 
   /// Called when the user taps a notification; carries an ISO date.
   ValueChanged<String>? onOpenDay;
@@ -129,6 +138,7 @@ class TroitaNotifications {
     DateTime? soonest;
     String? title;
     for (final PendingNotificationRequest r in queue) {
+      if (r.id >= _hramBase) continue; // not date-keyed
       final int key = r.id % 1000000;
       final int year = 2000 + key ~/ 10000;
       final int month = (key % 10000) ~/ 100;
@@ -254,6 +264,55 @@ class TroitaNotifications {
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: _iso(fastStart),
     );    return true;
+  }
+
+  /// The evening before a favourite church's hram, at 18:00 like the fast
+  /// reminders. Returns false when that evening has already passed.
+  Future<bool> scheduleHramReminder({
+    required String churchId,
+    required String churchName,
+    required String? patron,
+    required DateTime feastDay,
+  }) async {
+    final DateTime eve =
+        DateTime(feastDay.year, feastDay.month, feastDay.day - 1);
+    final tz.TZDateTime when = _at(eve, 18, 0);
+    if (when.isBefore(tz.TZDateTime.now(tz.local))) return false;
+
+    final String body = <String>[
+      if (patron != null && patron.isNotEmpty) 'Hramul: $patron',
+      '${feastDay.day}.${feastDay.month}',
+    ].join(' · ');
+
+    await _plugin.zonedSchedule(
+      id: _hramBase + _stableHash(churchId),
+      title: 'Mâine este hramul: $churchName',
+      body: body,
+      scheduledDate: when,
+      notificationDetails: NotificationDetails(
+        android: _details(
+          channelId: channelHram,
+          channelName: 'Hramurile bisericilor favorite',
+          importance: Importance.defaultImportance,
+          sound: true,
+          bigText: body,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      payload: _iso(feastDay),
+    );
+    return true;
+  }
+
+  /// FNV-1a, folded into [0, 999983). Dart's String.hashCode is not stable
+  /// across runs, and an id must be, or rescheduling stacks duplicates.
+  static int _stableHash(String s) {
+    int h = 0x811c9dc5;
+    for (final int c in s.codeUnits) {
+      h ^= c;
+      h = (h * 0x01000193) & 0xFFFFFFFF;
+    }
+    return h % 999983;
   }
 
   // ------------------------------------------------------------------ utils

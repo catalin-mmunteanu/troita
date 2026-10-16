@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../../app/theme.dart';
 import '../../app/troita_icons.dart';
 import '../settings/settings_page.dart';
+import 'my_churches_page.dart';
 
 /// `profil` (2:430), minus the account header — there are no accounts yet, so a
 /// name and an avatar would be a lie.
-///
-/// The visited-churches and favourites lists belong here once those exist.
+
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -24,6 +24,14 @@ class ProfilePage extends StatelessWidget {
             ),
             child: Text('Profil',
                 style: Theme.of(context).textTheme.headlineMedium),
+          ),
+          _Row(
+            icon: Icons.star_border,
+            title: 'Bisericile mele',
+            subtitle: 'Favorite și locuri vizitate',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const MyChurchesPage()),
+            ),
           ),
           _Row(
             icon: TroitaIcons.bell,

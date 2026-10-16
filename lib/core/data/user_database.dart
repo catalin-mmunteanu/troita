@@ -17,7 +17,7 @@ class UserDatabase {
   final Database db;
 
   static const String fileName = 'troita_user.db';
-  static const int _version = 2;
+  static const int _version = 3;
 
   static UserDatabase? _instance;
 
@@ -41,9 +41,11 @@ class UserDatabase {
         await db.execute(
           'CREATE INDEX idx_fast_days_updated ON fast_days(updated_at DESC)',
         );
+        await db.execute(_createChurchMarks);
       },
       onUpgrade: (Database db, int from, int to) async {
         if (from < 2) await _migrateToV2(db);
+        if (from < 3) await db.execute(_createChurchMarks);
       },
     );
 
@@ -66,6 +68,23 @@ class UserDatabase {
       kept       INTEGER NOT NULL,      -- 1 = Da, 0 = Nu
       mood       INTEGER,               -- unused: the "cum a fost?" question was removed
       note       TEXT,
+      updated_at INTEGER NOT NULL
+    )
+  ''';
+
+  /// v3: the user's own marks on churches — favourite, visited.
+  ///
+  /// Keyed by the church id from the seed (`osm:way/123`), with no foreign
+  /// key, on purpose: the churches live in another database that is replaced
+  /// wholesale by every data update. A mark on a church the next seed no
+  /// longer contains is kept rather than cascaded away — OSM ids are stable,
+  /// and a church removed by mistake upstream usually comes back.
+  static const String _createChurchMarks = '''
+    CREATE TABLE IF NOT EXISTS church_marks (
+      church_id  TEXT    PRIMARY KEY,
+      favourite  INTEGER NOT NULL DEFAULT 0,
+      visited    INTEGER NOT NULL DEFAULT 0,
+      visited_on TEXT,                  -- 'YYYY-MM-DD', when first marked
       updated_at INTEGER NOT NULL
     )
   ''';
