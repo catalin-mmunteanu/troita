@@ -1,3 +1,5 @@
+import '../liturgical/calendar_days.dart';
+
 /// Resolves `feast_day` values to a real date.
 ///
 /// Fixed feasts are stored as `MM-DD`. Everything tied to Pascha is stored as
@@ -78,7 +80,7 @@ class FeastCalendar {
     final date = next(feastDay, from: from);
     if (date == null) return null;
     final now = from ?? DateTime.now();
-    return date.difference(DateTime(now.year, now.month, now.day)).inDays;
+    return calendarDaysBetween(now, date);
   }
 
   static bool isToday(String? feastDay, {DateTime? from}) =>

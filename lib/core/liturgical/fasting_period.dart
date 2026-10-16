@@ -1,3 +1,4 @@
+import 'calendar_days.dart';
 import 'fast_level.dart';
 
 /// A named stretch of the year with its own fasting rules.
@@ -21,7 +22,8 @@ class FastingPeriod {
 
   String get label => kind.label;
 
-  int get days => end.difference(start).inDays + 1;
+  /// Counted in calendar days, not elapsed time — see [calendarDaysBetween].
+  int get days => calendarDaysBetween(start, end) + 1;
 
   bool contains(DateTime date) {
     final DateTime d = DateTime(date.year, date.month, date.day);
