@@ -50,6 +50,29 @@ class _DayDetailPageState extends State<DayDetailPage> {
     });
   }
 
+  /// The day as a short message: date, the commemorations, the fasting rule.
+  ///
+  /// Plain text through the system share sheet, so it reads the same in
+  /// WhatsApp, an SMS or an email, and nothing of the user goes with it. The
+  /// sinaxar itself is left out on purpose — pages of text are not a message.
+  Future<void> _share(DayEntry entry) async {
+    final String date = toBeginningOfSentenceCase(
+          DateFormat('EEEE, d MMMM yyyy', 'ro').format(entry.date),
+        ) ??
+        '';
+    final List<String> lines = <String>[
+      date,
+      if (entry.feasts.isNotEmpty)
+        ...entry.feasts.take(3).map((Feast f) => f.name)
+      else
+        'Pomenirea zilei',
+      if (entry.liturgical.isFasting) entry.liturgical.fastLevel.label,
+      '',
+      '— din calendarul Troița',
+    ];
+    await AppScope.of(context).native.shareText(lines.join('\n'));
+  }
+
   @override
   Widget build(BuildContext context) {
     final DayEntry? entry = _entry;
@@ -75,6 +98,11 @@ class _DayDetailPageState extends State<DayDetailPage> {
                 ? null
                 : () => setState(() => _scale += 0.15),
             icon: const Text('A+', style: TextStyle(fontSize: 19)),
+          ),
+          IconButton(
+            tooltip: 'Trimite',
+            onPressed: entry == null ? null : () => _share(entry),
+            icon: const Icon(Icons.share_outlined),
           ),
           const SizedBox(width: 4),
         ],

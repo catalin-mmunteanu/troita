@@ -6,6 +6,7 @@ import '../../app/app_state.dart';
 import '../../app/theme.dart';
 import '../../core/data/day_repository.dart';
 import '../../core/models/fast_day.dart';
+import 'calendar_search_page.dart';
 import 'day_detail_page.dart';
 import 'day_row.dart';
 import 'month_grid_sheet.dart';
@@ -376,9 +377,15 @@ class _Header extends StatelessWidget {
           _NavButton(icon: Icons.chevron_left, onTap: onPrevious),
           const SizedBox(width: 6),
           _NavButton(icon: Icons.chevron_right, onTap: onNext),
-          // There was a search button here wired to nothing. A control that
-          // does nothing when pressed reads as a broken app, not a coming
-          // feature; it returns when there is a calendar search behind it.
+          const SizedBox(width: 6),
+          _NavButton(
+            icon: Icons.search,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const CalendarSearchPage(),
+              ),
+            ),
+          ),
         ],
       ),
     );
