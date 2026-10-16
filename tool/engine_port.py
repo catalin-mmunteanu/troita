@@ -73,19 +73,23 @@ def fast_level_for(year, month, day, rank='simplu'):
                 level = 'fish'
             elif d == p - timedelta(days=8):
                 level = 'wineOil'
+            elif d == p - timedelta(days=3):          # Joia Mare
+                level = 'wineOil'
+            elif (d.month, d.day) in ((3, 24), (3, 26)) and not weekend:
+                level = 'wineOil'
             else:
                 level = 'wineOil' if weekend else 'fast'
         elif kind == 'postulAdormirii':
             if (d.month, d.day) == (8, 6):
                 level = 'fish'
-            elif weekend or d.weekday() in (1, 3):
+            elif weekend:
                 level = 'wineOil'
             else:
                 level = 'fast'
         elif kind == 'postulApostolilor':
             if d.weekday() in (2, 4):
-                level = 'wineOil' if RANK_WEIGHT[rank] >= 2 else 'fast'
-            elif d.weekday() == 0:
+                level = {'praznic': 'fish', 'cruce_rosie': 'wineOil'}.get(rank, 'fast')
+            elif d.weekday() in (1, 3):
                 level = 'wineOil'
             else:
                 level = 'fish'
@@ -94,15 +98,21 @@ def fast_level_for(year, month, day, rank='simplu'):
                 level = 'strict'
             elif (d.month, d.day) in ((11, 21), (11, 30), (12, 6)):
                 level = 'fish'
-            elif d.month == 11 or d.day <= 20:
-                level = 'fish' if (weekend or d.weekday() in (1, 3)) else 'wineOil'
-            else:
+            elif (d.month == 11 and d.day < 21) or (d.month == 12 and d.day > 20):
                 level = 'wineOil' if weekend else 'fast'
+            elif weekend:
+                level = 'fish'
+            elif d.weekday() in (1, 3):
+                level = 'wineOil'
+            else:
+                level = 'fast'
         break
 
     if level is None:
         if d.weekday() not in (2, 4):
             level = 'none'
+        elif p + timedelta(days=8) <= d <= p + timedelta(days=48):
+            level = 'fish'
         else:
             level = {'praznic': 'fish', 'cruce_rosie': 'wineOil'}.get(rank, 'fast')
 
@@ -113,7 +123,7 @@ def _fixed(d, level):
     if (d.month, d.day) == (1, 5):
         return stricter(level, 'strict')
     if (d.month, d.day) in ((8, 29), (9, 14)):
-        return stricter(level, 'fast')
+        return 'wineOil'
     return level
 
 

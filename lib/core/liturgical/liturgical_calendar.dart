@@ -1,4 +1,5 @@
 import '../models/feast_calendar.dart';
+import 'calendar_days.dart';
 import 'fast_level.dart';
 import 'fasting_period.dart';
 
@@ -209,11 +210,16 @@ class LiturgicalCalendar {
       level = FastLevel.looser(level, dezlegare);
     }
 
-    // Fixed strict days override whatever the surrounding rule produced,
-    // including a feast's dezlegare.
+    // Fixed days override whatever the surrounding rule produced, including a
+    // feast's dezlegare. Ajunul Bobotezei is at least strict; Tăierea Capului
+    // and Înălțarea Sfintei Cruci are exactly "post, cu dezlegare la untdelemn
+    // și vin" — they used to be forced to a plain fast, which made them
+    // stricter than every Romanian calendar prints them.
     final FastLevel? fixed = _fixedStrictDay(d);
     if (fixed != null) {
-      level = FastLevel.stricter(level, fixed);
+      level = fixed == FastLevel.strict
+          ? FastLevel.stricter(level, fixed)
+          : fixed;
       note = _fixedStrictNote(d) ?? note;
     }
 
@@ -273,6 +279,14 @@ class LiturgicalCalendar {
         if (d == _offset(pascha, -8)) {
           return (FastLevel.wineOil, 'Sâmbăta lui Lazăr — dezlegare la icre.');
         }
+        if (d == _offset(pascha, -3)) {
+          return (FastLevel.wineOil, 'Joia Mare.');
+        }
+        // Înainte-prăznuirea and Odovania of the Annunciation (24 and 26
+        // March) carry oil and wine on a Lenten weekday.
+        if (d.month == 3 && (d.day == 24 || d.day == 26) && !weekend) {
+          return (FastLevel.wineOil, null);
+        }
         return weekend
             ? (FastLevel.wineOil, null)
             : (FastLevel.fast, null);
@@ -281,42 +295,64 @@ class LiturgicalCalendar {
         if (d.month == 8 && d.day == 6) {
           return (FastLevel.fish, 'Schimbarea la Față.');
         }
-        if (weekend ||
-            d.weekday == DateTime.tuesday ||
-            d.weekday == DateTime.thursday) {
-          return (FastLevel.wineOil, null);
-        }
+        // Oil and wine at the weekend only. Tuesday and Thursday used to get
+        // them too; the published calendar keeps both as plain fast days.
+        if (weekend) return (FastLevel.wineOil, null);
         return (FastLevel.fast, null);
 
       case FastingPeriodKind.postulApostolilor:
         if (d.weekday == DateTime.wednesday || d.weekday == DateTime.friday) {
-          return rank.weight >= FeastRank.cruceRosie.weight
-              ? (FastLevel.wineOil, null)
-              : (FastLevel.fast, null);
+          // A Praznic Împărătesc brings fish (Nașterea Sf. Ioan, 24 June); a
+          // red-cross saint brings oil and wine.
+          return switch (rank) {
+            FeastRank.praznic => (FastLevel.fish, null),
+            FeastRank.cruceRosie => (FastLevel.wineOil, null),
+            _ => (FastLevel.fast, null),
+          };
         }
-        if (d.weekday == DateTime.monday) return (FastLevel.wineOil, null);
+        // Tuesday and Thursday: oil and wine. Monday, Saturday and Sunday:
+        // fish. These were the other way round before; fitted to the 2026
+        // published calendar, where all three Mondays carry fish.
+        if (d.weekday == DateTime.tuesday || d.weekday == DateTime.thursday) {
+          return (FastLevel.wineOil, null);
+        }
         return (FastLevel.fish, null);
 
       case FastingPeriodKind.postulCraciunului:
         if (d.month == 12 && d.day == 24) {
           return (FastLevel.strict, 'Ajunul Nașterii Domnului.');
         }
-        // Named feasts inside the fast carry a dezlegare la pește.
-        if ((d.month == 11 && (d.day == 21 || d.day == 30)) ||
-            (d.month == 12 && d.day == 6)) {
-          return (FastLevel.fish, null);
+        // Named feasts inside the fast carry a dezlegare la pește — and say
+        // which feast, so a screen explaining the dezlegare can name it rather
+        // than attribute it to whatever weekday it fell on.
+        if (d.month == 11 && d.day == 21) {
+          return (FastLevel.fish, 'Intrarea în Biserică a Maicii Domnului.');
         }
-        final bool beforeThe20th = d.month == 11 || d.day <= 20;
-        if (beforeThe20th) {
-          if (weekend ||
-              d.weekday == DateTime.tuesday ||
-              d.weekday == DateTime.thursday) {
-            return (FastLevel.fish, null);
-          }
+        if (d.month == 11 && d.day == 30) {
+          return (FastLevel.fish, 'Sfântul Apostol Andrei.');
+        }
+        if (d.month == 12 && d.day == 6) {
+          return (FastLevel.fish, 'Sfântul Ierarh Nicolae.');
+        }
+        // Three stretches. Until Intrarea în Biserică (15–20 November) fish
+        // is not yet given: the weekend has oil and wine, weekdays are fast.
+        // From 21 November to 20 December: fish at the weekend, oil and wine
+        // on Tuesday and Thursday, fast on Monday, Wednesday and Friday.
+        // From 21 to 23 December: no fish again.
+        //
+        // The middle stretch used to give fish on Tuesday and Thursday and oil
+        // on the other weekdays — one step too lenient everywhere, which is
+        // why this fast was only half right before published data won.
+        final bool beforeIntrarea = d.month == 11 && d.day < 21;
+        final bool lastDays = d.month == 12 && d.day > 20;
+        if (beforeIntrarea || lastDays) {
+          return weekend ? (FastLevel.wineOil, null) : (FastLevel.fast, null);
+        }
+        if (weekend) return (FastLevel.fish, null);
+        if (d.weekday == DateTime.tuesday || d.weekday == DateTime.thursday) {
           return (FastLevel.wineOil, null);
         }
-        // 21–23 December: no fish, regardless of weekday.
-        return weekend ? (FastLevel.wineOil, null) : (FastLevel.fast, null);
+        return (FastLevel.fast, null);
 
       default:
         return (FastLevel.fast, null);
@@ -326,6 +362,13 @@ class LiturgicalCalendar {
   static FastLevel _levelOutsideFasts(DateTime d, FeastRank rank) {
     if (d.weekday != DateTime.wednesday && d.weekday != DateTime.friday) {
       return FastLevel.none;
+    }
+    // Between Duminica Tomii and Pentecost the weekly fast is kept with fish:
+    // the Paschal season is not a time of strict fasting. Săptămâna Luminată
+    // before it is already harți.
+    final DateTime pascha = FeastCalendar.pascha(d.year);
+    if (!d.isBefore(_offset(pascha, 8)) && !d.isAfter(_offset(pascha, 48))) {
+      return FastLevel.fish;
     }
     // A great feast landing on Wednesday or Friday relaxes the weekly fast.
     return switch (rank) {
@@ -338,8 +381,8 @@ class LiturgicalCalendar {
   /// Days of strict fasting that stand outside the period rules entirely.
   static FastLevel? _fixedStrictDay(DateTime d) {
     if (d.month == 1 && d.day == 5) return FastLevel.strict;
-    if (d.month == 8 && d.day == 29) return FastLevel.fast;
-    if (d.month == 9 && d.day == 14) return FastLevel.fast;
+    if (d.month == 8 && d.day == 29) return FastLevel.wineOil;
+    if (d.month == 9 && d.day == 14) return FastLevel.wineOil;
     return null;
   }
 
@@ -381,7 +424,11 @@ class LiturgicalCalendar {
     if (d.isBefore(anchor)) {
       anchor = _offset(FeastCalendar.pascha(d.year - 1), 7);
     }
-    final int weeks = d.difference(anchor).inDays ~/ 7;
+    // Calendar days, not elapsed time. The anchor is always after the March
+    // clock change so this happened to come out right, but only by luck of
+    // where Pascha falls; a Sunday is exactly when ~/7 cannot afford to be
+    // an hour short.
+    final int weeks = calendarDaysBetween(anchor, d) ~/ 7;
     return weeks < 0 ? null : weeks;
   }
 }

@@ -66,15 +66,57 @@ void main() {
       expect(levelOn(DateTime(2026, 3, 8)), FastLevel.wineOil); // Sunday
     });
 
+    test('Joia Mare and the Annunciation fore- and after-feast allow oil', () {
+      expect(levelOn(DateTime(2026, 4, 9)), FastLevel.wineOil); // Joia Mare
+      expect(levelOn(DateTime(2026, 3, 24)), FastLevel.wineOil);
+      expect(levelOn(DateTime(2026, 3, 26)), FastLevel.wineOil);
+    });
+
     test('Buna Vestire and Florii allow fish', () {
       expect(levelOn(DateTime(2026, 3, 25)), FastLevel.fish);
       expect(levelOn(DateTime(2026, 4, 5)), FastLevel.fish); // Florii
     });
   });
 
+  group('Postul Adormirii', () {
+    test('oil and wine at the weekend only', () {
+      expect(levelOn(DateTime(2026, 8, 1)), FastLevel.wineOil); // Saturday
+      expect(levelOn(DateTime(2026, 8, 4)), FastLevel.fast); // Tuesday
+      expect(levelOn(DateTime(2026, 8, 13)), FastLevel.fast); // Thursday
+      expect(levelOn(DateTime(2026, 8, 6)), FastLevel.fish); // Schimbarea
+    });
+  });
+
+  group('Postul Apostolilor', () {
+    test('fish on Monday and the weekend, oil midweek, fast Wed and Fri', () {
+      expect(levelOn(DateTime(2026, 6, 15)), FastLevel.fish); // Monday
+      expect(levelOn(DateTime(2026, 6, 9)), FastLevel.wineOil); // Tuesday
+      expect(levelOn(DateTime(2026, 6, 10)), FastLevel.fast); // Wednesday
+      expect(levelOn(DateTime(2026, 6, 13)), FastLevel.fish); // Saturday
+    });
+
+    test('a Praznic on Wednesday brings fish', () {
+      expect(levelOn(DateTime(2026, 6, 24), rank: FeastRank.praznic),
+          FastLevel.fish);
+    });
+  });
+
   group('Postul Crăciunului', () {
-    test('fish on Tuesday before 20 December', () {
-      expect(levelOn(DateTime(2026, 11, 17)), FastLevel.fish); // Tuesday
+    // Expectations below are the 2026 published calendar, not memory. The
+    // previous version of this test asserted fish on 17 November; the
+    // published calendar has a plain fast, and the engine was one step too
+    // lenient across the whole fast because of it.
+    test('no fish before Intrarea în Biserică', () {
+      expect(levelOn(DateTime(2026, 11, 17)), FastLevel.fast); // Tuesday
+      expect(levelOn(DateTime(2026, 11, 15)), FastLevel.wineOil); // Sunday
+    });
+
+    test('21 November to 20 December: fish at the weekend, oil midweek', () {
+      expect(levelOn(DateTime(2026, 11, 28)), FastLevel.fish); // Saturday
+      expect(levelOn(DateTime(2026, 11, 24)), FastLevel.wineOil); // Tuesday
+      expect(levelOn(DateTime(2026, 12, 10)), FastLevel.wineOil); // Thursday
+      expect(levelOn(DateTime(2026, 12, 14)), FastLevel.fast); // Monday
+      expect(levelOn(DateTime(2026, 12, 16)), FastLevel.fast); // Wednesday
     });
 
     test('named feasts inside the fast allow fish', () {
@@ -139,9 +181,18 @@ void main() {
       expect(levelOn(DateTime(2026, 1, 5)), FastLevel.strict);
     });
 
-    test('29 August and 14 September are fast days whatever the weekday', () {
-      expect(levelOn(DateTime(2026, 8, 29)), FastLevel.fast); // Saturday
-      expect(levelOn(DateTime(2026, 9, 14)), FastLevel.fast); // Monday
+    // Both are printed "post, dezlegare la untdelemn și vin" in the 2026
+    // published calendar. This test used to demand a plain fast.
+    test('29 August and 14 September keep oil and wine whatever the weekday',
+        () {
+      expect(levelOn(DateTime(2026, 8, 29)), FastLevel.wineOil); // Saturday
+      expect(levelOn(DateTime(2026, 9, 14)), FastLevel.wineOil); // Monday
+    });
+
+    test('Wednesday and Friday between Duminica Tomii and Pentecost allow fish',
+        () {
+      expect(levelOn(DateTime(2026, 4, 22)), FastLevel.fish); // Wednesday
+      expect(levelOn(DateTime(2026, 5, 29)), FastLevel.fish); // Friday
     });
   });
 
