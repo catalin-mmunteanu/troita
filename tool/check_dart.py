@@ -115,6 +115,10 @@ def check_kotlin() -> int:
             target = m.group(1)
             if target in declared:
                 continue
+            # Generated at build time from the Gradle namespace, so never in
+            # the source tree: the resource and build-config classes.
+            if target in ("ro.troita.R", "ro.troita.BuildConfig"):
+                continue
             # Could be a member import, e.g. ro.troita.TroitaConfig.PREFS
             if any(target.startswith(f"{k}.") for k in declared):
                 continue
