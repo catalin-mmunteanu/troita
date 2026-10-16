@@ -153,9 +153,13 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const Padding(
             padding: EdgeInsets.fromLTRB(20, 8, 20, 0),
+            // The one credit that stays. Church data and map tiles are both
+            // OpenStreetMap, used under the ODbL, whose condition is that the
+            // source is credited where users can find it. The map carries the
+            // same credit behind its ⓘ button; this is the place for screens
+            // that show OSM data without a map, like a church's own page.
             child: Text(
-              'Sinaxarul este preluat de pe calendar-ortodox.ro. Datele despre '
-              'biserici provin din OpenStreetMap, sub licența ODbL.',
+              'Date despre biserici și hartă: © contributorii OpenStreetMap.',
               style: TextStyle(fontSize: 12.5, color: TroitaColors.muted),
             ),
           ),

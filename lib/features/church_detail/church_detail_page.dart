@@ -123,11 +123,6 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                   '${church.lon.toStringAsFixed(5)}',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  'Date din OpenStreetMap (ODbL) și contribuții comunitare.',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
               ]),
             ),
           ),
