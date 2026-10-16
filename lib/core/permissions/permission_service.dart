@@ -1,22 +1,15 @@
 import 'package:permission_handler/permission_handler.dart';
 
-/// Two permissions, both foreground.
+/// One permission: notifications.
 ///
-/// Background location went away with journey mode and passive geofencing, and
-/// with it the strict request ordering, the settings-page redirect on API 30+,
-/// the Play Console declaration and the review video. What is left is ordinary.
+/// Location used to be here too, requested at onboarding "to centre the map".
+/// The map never asked for a position — the only caller was a screen nothing
+/// navigated to — so every user was being asked for location for nothing. An
+/// unused location permission is a Play review question and, more to the
+/// point, a request people are right to be wary of. It goes back only with a
+/// feature that uses it, asked for at the moment that feature needs it.
 class PermissionService {
   const PermissionService();
-
-  Future<bool> hasLocation() async =>
-      await Permission.locationWhenInUse.isGranted;
-
-  /// Enough to centre the map on the user. Nothing in the app needs more.
-  Future<bool> requestLocation() async =>
-      (await Permission.locationWhenInUse.request()).isGranted;
-
-  Future<bool> locationPermanentlyDenied() async =>
-      await Permission.locationWhenInUse.isPermanentlyDenied;
 
   Future<bool> hasNotifications() async =>
       await Permission.notification.isGranted;

@@ -34,8 +34,14 @@ class TroitaNotifications {
   static const String channelFast = 'troita_fast_v1';
 
   /// Notification id ranges, so cancelling one kind never touches another.
-  static const int _dailyBase = 100000;
-  static const int _fastBase = 200000;
+  // Each kind gets its own million. The per-date key is yymmdd, at most
+  // 991231, so the ranges cannot meet. They used to be 100000 and 200000,
+  // which overlapped: a daily notification and a fast reminder ten years apart
+  // on the same day and month shared an id, and the second silently replaced
+  // the first. Unreachable with a 60-day window, but only by luck of the
+  // window, and ids outlive the code that chose them.
+  static const int _dailyBase = 1000000;
+  static const int _fastBase = 2000000;
 
   /// Called when the user taps a notification; carries an ISO date.
   ValueChanged<String>? onOpenDay;
@@ -117,11 +123,13 @@ class TroitaNotifications {
   Future<({DateTime? when, String? title, int total})> nextScheduled() async {
     final List<PendingNotificationRequest> queue = await pending();
     // The plugin does not expose scheduled times, but our ids encode the date:
-    // base + (yy * 10000 + mm * 100 + dd).
+    // base + (yy * 10000 + mm * 100 + dd). The key is up to six digits, so it
+    // must be taken modulo a million — `% 100000` cut 261016 down to 61016 and
+    // reported every notification as due in 2006.
     DateTime? soonest;
     String? title;
     for (final PendingNotificationRequest r in queue) {
-      final int key = r.id % 100000;
+      final int key = r.id % 1000000;
       final int year = 2000 + key ~/ 10000;
       final int month = (key % 10000) ~/ 100;
       final int day = key % 100;
@@ -167,7 +175,9 @@ class TroitaNotifications {
       );
 
   /// A day's commemoration. [rank] decides how loudly it arrives.
-  Future<void> scheduleDaily({
+  /// Returns false when nothing was scheduled because the moment has passed —
+  /// today's notification, once its hour is gone.
+  Future<bool> scheduleDaily({
     required DateTime date,
     required FeastRank rank,
     required String title,
@@ -175,7 +185,7 @@ class TroitaNotifications {
     required NotificationPrefs prefs,
   }) async {
     final tz.TZDateTime when = _at(date, prefs.hour, prefs.minute);
-    if (when.isBefore(tz.TZDateTime.now(tz.local))) return;
+    if (when.isBefore(tz.TZDateTime.now(tz.local))) return false;
 
     final bool major = rank == FeastRank.praznic || rank == FeastRank.cruceRosie;
     final AndroidNotificationDetails android = switch (rank) {
@@ -214,18 +224,18 @@ class TroitaNotifications {
       // not worth that friction.
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: _iso(date),
-    );
+    );    return true;
   }
 
   /// The evening before a great fast begins.
-  Future<void> scheduleFastReminder({
+  Future<bool> scheduleFastReminder({
     required DateTime eveningBefore,
     required DateTime fastStart,
     required String periodLabel,
     required String body,
   }) async {
     final tz.TZDateTime when = _at(eveningBefore, 18, 0);
-    if (when.isBefore(tz.TZDateTime.now(tz.local))) return;
+    if (when.isBefore(tz.TZDateTime.now(tz.local))) return false;
 
     await _plugin.zonedSchedule(
       id: _fastBase + _key(fastStart),
@@ -243,7 +253,7 @@ class TroitaNotifications {
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: _iso(fastStart),
-    );
+    );    return true;
   }
 
   // ------------------------------------------------------------------ utils

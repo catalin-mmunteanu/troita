@@ -10,7 +10,14 @@ import '../profile/profile_page.dart';
 
 /// Four tabs, matching `bottom-nav` (2:239): Calendar · Posturi · Hartă · Profil.
 ///
-/// Hartă is a placeholder while the map feature is being redefined.
+/// An [IndexedStack] keeps a tab's state when you leave it, which the map
+/// needs — re-creating it means re-downloading its style and re-sending
+/// thirteen thousand places. But an IndexedStack also *builds* every child on
+/// the first frame, so the map used to start at launch for every user, opened
+/// or not: a request to tiles.openfreemap.org on each start (an IP address
+/// handed to a third party by someone who only wanted today's saint), and the
+/// whole country's GeoJSON built alongside the calendar's first frame. So the
+/// map is built the first time its tab is chosen, and kept from then on.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -20,6 +27,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _tab = 0;
+
+  /// Tabs that have been opened at least once. Only these are built.
+  final Set<int> _opened = <int>{0};
+
+  static const int _mapTab = 2;
 
   @override
   void initState() {
@@ -40,8 +52,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       final AppState app = AppScope.of(context);
       app.refreshStatus();
-      // Cheap, and it is what stops the 60-day window from silently expiring.
-      app.rescheduleNotifications();
+      // What stops the 60-day window from silently expiring. Throttled inside:
+      // only rebuilt on a new day or after a few hours.
+      app.rescheduleNotifications(force: false);
     }
   }
 
@@ -50,16 +63,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return Scaffold(
       body: IndexedStack(
         index: _tab,
-        children: const <Widget>[
-          CalendarPage(),
-          FastingPage(),
-          MapPage(),
-          ProfilePage(),
+        children: <Widget>[
+          const CalendarPage(),
+          const FastingPage(),
+          if (_opened.contains(_mapTab))
+            const MapPage()
+          else
+            const SizedBox.shrink(),
+          const ProfilePage(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
-        onDestinationSelected: (int i) => setState(() => _tab = i),
+        onDestinationSelected: (int i) => setState(() {
+          _tab = i;
+          _opened.add(i);
+        }),
         destinations: const <NavigationDestination>[
           NavigationDestination(
             icon: Icon(TroitaIcons.calendar),

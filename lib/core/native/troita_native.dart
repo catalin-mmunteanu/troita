@@ -4,10 +4,14 @@ import 'package:flutter/services.dart';
 
 /// Thin, typed wrapper over the only Dart↔Kotlin boundary in the app.
 ///
-/// Four jobs since the geofencing came out: install the seed database, create
-/// the notification channels, hand back a location fix for the map, and pass on
-/// the church id from a notification tap. Everything else — church queries,
+/// Three jobs: install the seed database, report onboarding status, and pass
+/// on the church id from a notification tap. Everything else — church queries,
 /// favourites, visits — is Dart against SQLite.
+///
+/// The location call that used to live here served only a screen nothing
+/// navigated to, while onboarding asked every user for location "for the map".
+/// It is gone along with the permission. If the map ever needs a position,
+/// MapLibre's own location component asks for it at the moment it is used.
 class TroitaNative {
   TroitaNative._();
 
@@ -51,18 +55,6 @@ class TroitaNative {
         ),
       );
 
-  /// Most recent fused position, or null if unavailable or not permitted.
-  Future<Position?> currentLocation() async {
-    final Map<Object?, Object?>? raw =
-        await _channel.invokeMethod<Map<Object?, Object?>>('currentLocation');
-    if (raw == null) return null;
-    return Position(
-      lat: (raw['lat']! as num).toDouble(),
-      lon: (raw['lon']! as num).toDouble(),
-      accuracyM: (raw['accuracy_m'] as num?)?.toDouble() ?? 0,
-    );
-  }
-
   Future<void> setOnboarded({bool value = true}) => _channel.invokeMethod<void>(
         'setOnboarded',
         <String, Object?>{'value': value},
@@ -86,31 +78,15 @@ class InitResult {
 }
 
 class NativeStatus {
-  const NativeStatus({
-    required this.location,
-    required this.onboarded,
-  });
+  const NativeStatus({required this.onboarded});
 
-  /// Foreground location. Optional — only the map needs it.
-  final bool location;
-
-  /// Distinct from [location] on purpose: declining location must not send the
-  /// user back through onboarding on every launch.
+  /// Whether the user has been through onboarding. Gated on this rather than on
+  /// any permission, so declining one never sends them back through it.
   final bool onboarded;
 
-  static const NativeStatus unknown =
-      NativeStatus(location: false, onboarded: false);
+  static const NativeStatus unknown = NativeStatus(onboarded: false);
 
   factory NativeStatus.fromMap(Map<String, Object?> map) => NativeStatus(
-        location: map['location'] as bool? ?? false,
         onboarded: map['onboarded'] as bool? ?? false,
       );
-}
-
-class Position {
-  const Position({required this.lat, required this.lon, this.accuracyM = 0});
-
-  final double lat;
-  final double lon;
-  final double accuracyM;
 }

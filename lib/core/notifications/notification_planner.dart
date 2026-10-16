@@ -61,14 +61,17 @@ class NotificationPlanner {
       final String title = entry.primary?.displayName ?? 'Pomenirea zilei';
       final String body = _body(entry);
 
-      await _notifications.scheduleDaily(
+      // Counted only when something was actually scheduled. Today's slot is
+      // skipped once its hour has passed, and counting it anyway made the
+      // settings screen report one more notification than was queued.
+      final bool queued = await _notifications.scheduleDaily(
         date: date,
         rank: rank,
         title: title,
         body: body,
         prefs: prefs,
       );
-      count++;
+      if (queued) count++;
     }
     return count;
   }
@@ -97,13 +100,13 @@ class NotificationPlanner {
         period.start.month,
         period.start.day - 1,
       );
-      await _notifications.scheduleFastReminder(
+      final bool queued = await _notifications.scheduleFastReminder(
         eveningBefore: eve,
         fastStart: period.start,
         periodLabel: period.label,
         body: _fastBody(period),
       );
-      count++;
+      if (queued) count++;
     }
     return count;
   }

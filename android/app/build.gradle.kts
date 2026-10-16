@@ -1,11 +1,28 @@
 // Version set, all four of which move together:
-//   Gradle wrapper 8.14.3 · AGP 8.11.1 · Kotlin 2.2.20 · JDK 17
+//   Gradle wrapper 8.14.3 · AGP 8.11.1 · Kotlin 2.2.20 · JDK 21
 // The floors come from the Flutter tool (>= AGP 8.6.0, >= Gradle 8.14.0 for
 // Flutter 3.44), not from anything this project needs.
 //
 // Nothing may live under res/ that isn't a resource: every file there becomes
 // an identifier and filenames are restricted to [a-z0-9_]. res/raw/ is absent
 // for that reason — create it only when you add the bell sound.
+
+import java.io.FileInputStream
+import java.util.Properties
+
+// Release signing, read from android/key.properties — the standard Flutter
+// layout. That file and the keystore it points to are gitignored and must
+// never be committed: the upload key is the app's identity on Play.
+//
+//   storePassword=…
+//   keyPassword=…
+//   keyAlias=upload
+//   storeFile=../upload-keystore.jks
+val keystoreProperties = Properties().apply {
+    val file = rootProject.file("key.properties")
+    if (file.exists()) load(FileInputStream(file))
+}
+val hasReleaseKey = keystoreProperties.getProperty("storeFile") != null
 
 plugins {
     id("com.android.application")
@@ -16,6 +33,17 @@ plugins {
 
 android {
     namespace = "ro.troita"
+
+    signingConfigs {
+        if (hasReleaseKey) {
+            create("release") {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+            }
+        }
+    }
 
     // Literals rather than flutter.compileSdkVersion: that accessor only exists
     // on the Kotlin DSL extension in recent Flutter versions, and an unresolved
@@ -92,8 +120,16 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            // TODO: replace with a real upload key before publishing.
-            signingConfig = signingConfigs.getByName("debug")
+            // The real key when key.properties exists; otherwise the debug
+            // key, so `flutter run --release` keeps working on a machine
+            // without it. An APK signed with the debug key cannot be uploaded
+            // to Play, which is the safety net: it fails loudly at upload
+            // rather than shipping something nobody can update.
+            signingConfig = if (hasReleaseKey) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
         debug {
             applicationIdSuffix = ".debug"
@@ -118,13 +154,13 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("com.google.android.gms:play-services-location:21.3.0")
 
-    // Version-agnostic: the BOM keeps coroutines-android and
-    // coroutines-play-services in lockstep with whatever Kotlin the Flutter
-    // toolchain is using, instead of pinning 1.8.1 against a 2.x compiler.
+    // Version-agnostic: the BOM keeps coroutines in lockstep with whatever
+    // Kotlin the Flutter toolchain is using, instead of pinning 1.8.1 against a
+    // 2.x compiler. The bridge still runs its channel calls on Dispatchers.IO.
+    //
+    // play-services-location and coroutines-play-services were here for a
+    // fused-location call that only an unreachable screen used. Gone with it.
     implementation(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.9.0"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android")
-    // Task.await(), for the single fused-location call that centres the map.
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services")
 }

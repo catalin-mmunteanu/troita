@@ -4,12 +4,13 @@ import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
 import '../../app/theme.dart';
 
-/// First run.
+/// First run: one screen, one permission.
 ///
-/// A fraction of what it was. With background location gone there is no
-/// prominent-disclosure requirement, no strict request ordering, and no
-/// settings-page redirect — just notifications and, optionally, location for
-/// the map. Location is not required to use the calendar, so it can be skipped.
+/// This used to ask for location "to show the churches on the map" — a
+/// promise the map did not keep, since it never asked for a position. Asking
+/// for something and then not using it is worse than not asking: the user is
+/// left wondering what it was really for. Only notifications are requested
+/// now, and declining them still lets the app open.
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
 
@@ -20,13 +21,12 @@ class OnboardingPage extends StatefulWidget {
 class _OnboardingPageState extends State<OnboardingPage> {
   bool _busy = false;
 
-  Future<void> _continue({required bool withLocation}) async {
+  Future<void> _continue() async {
     setState(() => _busy = true);
     final AppState state = AppScope.of(context);
     await state.permissions.requestNotifications();
-    if (withLocation) await state.permissions.requestLocation();
     // Record that we asked, regardless of the answer — otherwise declining
-    // location traps the user on this screen forever.
+    // notifications traps the user on this screen forever.
     await state.completeOnboarding();
     if (mounted) setState(() => _busy = false);
   }
@@ -48,28 +48,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
               const SizedBox(height: 12),
               Text(
                 'Calendarul ortodox, zi de zi: sfântul zilei, posturile și '
-                'dezlegările, și bisericile din jurul dumneavoastră.',
+                'dezlegările, și bisericile, mănăstirile și troițele din '
+                'toată țara.',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 18),
               Text(
-                'Locația este folosită doar pentru a vă arăta bisericile de pe '
-                'hartă. Rămâne pe telefon și nu o trimitem nicăieri.',
+                'Vă putem anunța sfântul zilei și începutul fiecărui post. '
+                'Notificările sunt programate pe telefon; nimic nu este '
+                'trimis nicăieri.',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const Spacer(),
               FilledButton(
-                onPressed: _busy ? null : () => _continue(withLocation: true),
+                onPressed: _busy ? null : _continue,
                 child: const Text('Continuă'),
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: _busy ? null : () => _continue(withLocation: false),
-                style: TextButton.styleFrom(
-                  minimumSize: const Size.fromHeight(44),
-                  foregroundColor: TroitaColors.muted,
-                ),
-                child: const Text('Fără acces la locație'),
               ),
             ],
           ),

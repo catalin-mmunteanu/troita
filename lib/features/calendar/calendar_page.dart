@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
 import '../../app/theme.dart';
-import '../../app/troita_icons.dart';
 import '../../core/data/day_repository.dart';
 import '../../core/models/fast_day.dart';
 import 'day_detail_page.dart';
@@ -377,8 +376,9 @@ class _Header extends StatelessWidget {
           _NavButton(icon: Icons.chevron_left, onTap: onPrevious),
           const SizedBox(width: 6),
           _NavButton(icon: Icons.chevron_right, onTap: onNext),
-          const SizedBox(width: 6),
-          _NavButton(icon: TroitaIcons.search, onTap: () {}),
+          // There was a search button here wired to nothing. A control that
+          // does nothing when pressed reads as a broken app, not a coming
+          // feature; it returns when there is a calendar search behind it.
         ],
       ),
     );
