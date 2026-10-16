@@ -9,7 +9,7 @@ import '../../core/liturgical/fast_level.dart';
 import '../../core/models/feast.dart';
 import '../../core/models/fast_day.dart';
 import '../../core/models/sinaxar.dart';
-import '../fasting/mood_selector.dart';
+import '../fasting/fast_day_editor.dart';
 import 'day_row.dart';
 
 /// The saint of the day, at length.
@@ -115,8 +115,7 @@ class _DayDetailPageState extends State<DayDetailPage> {
                     const SizedBox(height: 20),
                   ],
                   ..._sections(entry.sinaxar!),
-                  const SizedBox(height: 28),
-                  _Attribution(sinaxar: entry.sinaxar!),
+                  const SizedBox(height: 12),
                 ] else if (_missing) ...<Widget>[
                   const SizedBox(height: 24),
                   const _Ornament(),
@@ -201,10 +200,6 @@ class _DayRatingState extends State<_DayRating> {
         day: _day,
         onKept: (bool k) async {
           await state.setFastKept(widget.date, k);
-          await _reload();
-        },
-        onMood: (FastMood m) async {
-          await state.setFastMood(widget.date, m);
           await _reload();
         },
       ),
@@ -295,6 +290,16 @@ class _LiturgicalCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(entry.liturgical.note!,
                 style: Theme.of(context).textTheme.bodySmall),
+          ],
+          // Only worth saying on a fast day: a computed "zi fără post" is as
+          // reliable as a published one, a computed dezlegare is not.
+          if (!entry.isPublished && entry.liturgical.isFasting) ...<Widget>[
+            const SizedBox(height: 6),
+            const Text(
+              'Rânduiala acestei zile este calculată. Calendarul publicat '
+              'pentru acest an nu este încă inclus în aplicație.',
+              style: TextStyle(fontSize: 12, color: TroitaColors.muted),
+            ),
           ],
           if (entry.liturgical.glas != null) ...<Widget>[
             const Divider(height: 22),
@@ -395,20 +400,3 @@ class _Ornament extends StatelessWidget {
       );
 }
 
-class _Attribution extends StatelessWidget {
-  const _Attribution({required this.sinaxar});
-
-  final Sinaxar sinaxar;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(TroitaSpacing.card),
-        decoration: TroitaTheme.cardDecoration(
-          color: TroitaColors.surfaceSubtle,
-        ),
-        child: Text(
-          'Text preluat de pe ${sinaxar.attribution ?? 'calendar-ortodox.ro'}.',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      );
-}

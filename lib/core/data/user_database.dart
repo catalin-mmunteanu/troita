@@ -64,7 +64,7 @@ class UserDatabase {
     CREATE TABLE fast_days (
       date       TEXT    PRIMARY KEY,   -- 'YYYY-MM-DD', local date
       kept       INTEGER NOT NULL,      -- 1 = Da, 0 = Nu
-      mood       INTEGER,               -- -1 greu, 0 bine, 1 ușor; optional
+      mood       INTEGER,               -- unused: the "cum a fost?" question was removed
       note       TEXT,
       updated_at INTEGER NOT NULL
     )

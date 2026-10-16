@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
+import '../liturgical/calendar_days.dart';
 import '../liturgical/fasting_period.dart';
 import '../models/fast_day.dart';
 import 'user_database.dart';
@@ -17,9 +18,9 @@ class FastJournalRepository {
 
   /// Answer "ați ținut postul?".
   ///
-  /// Preserves any mood already recorded when the answer stays Da, so
-  /// re-tapping Da does not silently erase the face. Answering Nu clears the
-  /// mood, because "how did it feel" only makes sense for a kept day.
+  /// `mood` is written as null: the column survives from the removed "cum a
+  /// fost?" question, and a replaced row clears whatever an older version left
+  /// in it rather than carrying an answer nothing can show.
   Future<void> setKept(DateTime date, bool kept) async {
     final FastDay? existing = await forDate(date);
     await _db.insert(
@@ -27,23 +28,7 @@ class FastJournalRepository {
       <String, Object?>{
         'date': FastDay.key(date),
         'kept': kept ? 1 : 0,
-        'mood': kept ? existing?.mood?.value : null,
-        'note': existing?.note,
-        'updated_at': DateTime.now().millisecondsSinceEpoch,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  /// Set or clear the optional mood. Implies the day was kept.
-  Future<void> setMood(DateTime date, FastMood? mood) async {
-    final FastDay? existing = await forDate(date);
-    await _db.insert(
-      'fast_days',
-      <String, Object?>{
-        'date': FastDay.key(date),
-        'kept': 1,
-        'mood': mood?.value,
+        'mood': null,
         'note': existing?.note,
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
@@ -68,11 +53,6 @@ class FastJournalRepository {
     } else {
       await setKept(date, kept);
     }
-  }
-
-  Future<void> toggleMood(DateTime date, FastMood mood) async {
-    final FastDay? existing = await forDate(date);
-    await setMood(date, existing?.mood == mood ? null : mood);
   }
 
   // ------------------------------------------------------------------- reads
@@ -116,15 +96,13 @@ class FastJournalRepository {
         today.isBefore(period.end) ? today : period.end;
     final int elapsed = today.isBefore(period.start)
         ? 0
-        : lastCounted.difference(period.start).inDays + 1;
+        : calendarDaysBetween(period.start, lastCounted) + 1;
 
-    final Map<FastMood, int> byMood = <FastMood, int>{};
     int kept = 0;
     int notKept = 0;
     for (final FastDay d in days.values) {
       if (d.kept) {
         kept++;
-        if (d.mood != null) byMood[d.mood!] = (byMood[d.mood!] ?? 0) + 1;
       } else {
         notKept++;
       }
@@ -135,21 +113,18 @@ class FastJournalRepository {
       notKept: notKept,
       elapsed: elapsed.clamp(0, period.days),
       total: period.days,
-      byMood: byMood,
     );
   }
 
   /// Everything ever marked, for the all-time figure.
   Future<FastStats> allTime() async {
     final List<Map<String, Object?>> rows = await _db.query('fast_days');
-    final Map<FastMood, int> byMood = <FastMood, int>{};
     int kept = 0;
     int notKept = 0;
     for (final Map<String, Object?> r in rows) {
       final FastDay d = FastDay.fromRow(r);
       if (d.kept) {
         kept++;
-        if (d.mood != null) byMood[d.mood!] = (byMood[d.mood!] ?? 0) + 1;
       } else {
         notKept++;
       }
@@ -159,7 +134,6 @@ class FastJournalRepository {
       notKept: notKept,
       elapsed: rows.length,
       total: rows.length,
-      byMood: byMood,
     );
   }
 

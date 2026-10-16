@@ -28,6 +28,16 @@ class DayEntry {
 
   bool get isSunday => date.weekday == DateTime.sunday;
 
+  /// Whether the fasting rule comes from the published calendar rather than
+  /// the computed engine.
+  ///
+  /// Published data exists one year at a time, and past it the app falls back
+  /// to rules. Those rules are right on the boundaries and the weekly pattern,
+  /// but a dezlegare granted by a particular saint on a particular weekday is
+  /// only in the published calendar. Screens that state a dezlegare should
+  /// say when it is computed, rather than present it with the same certainty.
+  bool get isPublished => override?.fastLevel != null;
+
   /// Every commemoration on the day, joined the way a printed calendar sets it.
   String get title => feasts.isEmpty
       ? 'Pomenirea zilei'
@@ -133,6 +143,30 @@ class DayRepository {
       for (int day = 1; day <= days; day++)
         await entryFor(DateTime(year, month, day)),
     ];
+  }
+
+  /// Every day between [from] and [to], both inclusive.
+  ///
+  /// A fast does not respect month boundaries — Postul Mare runs about seven
+  /// weeks and the Nativity fast forty days — and the reason to read the range
+  /// day by day rather than compute it is that the dezlegări inside a great
+  /// fast follow the commemoration, not the weekday. The engine is exact on the
+  /// boundaries, the weekly rule, glas and voscreasnă, but it was only about 60%
+  /// right on the dezlegări of Postul Apostolilor. So each day goes through
+  /// [entryFor], where the published override wins.
+  Future<List<DayEntry>> forRange(DateTime from, DateTime to) async {
+    DateTime cursor = DateTime(from.year, from.month, from.day);
+    final DateTime last = DateTime(to.year, to.month, to.day);
+    final List<DayEntry> days = <DayEntry>[];
+    // Bounded so a bad range cannot spin: no fast approaches a year.
+    while (!cursor.isAfter(last) && days.length < 400) {
+      days.add(await entryFor(cursor));
+      // Calendar arithmetic, not `add(Duration(days: 1))`: adding 24 hours
+      // across a DST change lands on the same date at 23:00 or the next at
+      // 01:00, which repeats or skips a day.
+      cursor = DateTime(cursor.year, cursor.month, cursor.day + 1);
+    }
+    return days;
   }
 
   Future<bool> hasSinaxarText() async {

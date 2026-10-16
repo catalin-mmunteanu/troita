@@ -6,11 +6,13 @@ import '../../app/app_state.dart';
 import '../../app/theme.dart';
 import '../../app/troita_icons.dart';
 import '../../core/format_ro.dart' as ro;
+import '../../core/liturgical/calendar_days.dart';
 import '../../core/liturgical/fast_level.dart';
 import '../../core/liturgical/fasting_period.dart';
 import '../../core/liturgical/liturgical_calendar.dart';
 import '../../core/models/fast_day.dart';
-import 'mood_selector.dart';
+import 'fast_period_page.dart';
+import 'fast_day_editor.dart';
 
 /// `posturi-fasting` (2:296), now with the journal.
 ///
@@ -95,7 +97,6 @@ class _FastingPageState extends State<FastingPage> {
 
           const _SectionHeader('Total'),
           const _AllTimeCard(),
-          const _WeeklyRuleCard(),
         ],
       ),
     );
@@ -113,8 +114,8 @@ class _ActiveFastCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppState state = AppScope.of(context);
-    final int dayNumber = today.difference(period.start).inDays + 1;
-    final int left = period.end.difference(today).inDays;
+    final int dayNumber = calendarDaysBetween(period.start, today) + 1;
+    final int left = calendarDaysBetween(today, period.end);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: TroitaSpacing.page),
@@ -145,12 +146,37 @@ class _ActiveFastCard extends StatelessWidget {
               day: snap.data,
               question: 'Ați ținut postul astăzi?',
               onKept: (bool k) => state.setFastKept(today, k),
-              onMood: (FastMood m) => state.setFastMood(today, m),
             ),
           ),
 
           const Divider(height: 26),
           _PeriodStats(period: period),
+
+          // An explicit row rather than making the whole card tappable: this
+          // card already owns the Da/Nu control, and a card-wide tap target
+          // wrapped around a rating widget takes taps meant for it.
+          const Divider(height: 26),
+          InkWell(
+            onTap: () => openFastPeriod(context, period),
+            borderRadius: TroitaRadius.smallAll,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    'Vezi toate zilele postului',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: TroitaColors.burgundy,
+                        ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.chevron_right,
+                      size: 18, color: TroitaColors.burgundy),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -166,7 +192,7 @@ class _BetweenFastsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (next == null) return const SizedBox.shrink();
-    final int until = next!.start.difference(today).inDays;
+    final int until = calendarDaysBetween(today, next!.start);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: TroitaSpacing.page),
@@ -182,11 +208,6 @@ class _BetweenFastsCard extends StatelessWidget {
             '${next!.label} începe ${ro.inDays(until)}, '
             'pe ${DateFormat('d MMMM', 'ro').format(next!.start)}.',
             style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Miercurea și vinerea rămân zile de post.',
-            style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
       ),
@@ -212,15 +233,19 @@ class _PeriodCard extends StatelessWidget {
         '${DateFormat('d MMM yyyy', 'ro').format(period.end)}';
 
     final String when = status == PeriodStatus.upcoming
-        ? 'Începe ${ro.inDays(period.start.difference(today).inDays)}'
+        ? 'Începe ${ro.inDays(calendarDaysBetween(today, period.start))}'
         : 'Încheiat ${DateFormat('MMMM yyyy', 'ro').format(period.end)}';
 
     return Container(
       margin: const EdgeInsets.fromLTRB(
         TroitaSpacing.page, 0, TroitaSpacing.page, TroitaSpacing.gap,
       ),
-      padding: const EdgeInsets.all(TroitaSpacing.card),
       decoration: TroitaTheme.cardDecoration(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => openFastPeriod(context, period),
+        child: Padding(
+      padding: const EdgeInsets.all(TroitaSpacing.card),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -233,6 +258,9 @@ class _PeriodCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               _StatusChip(status: status),
+              const SizedBox(width: 4),
+              const Icon(Icons.chevron_right,
+                  size: 18, color: TroitaColors.muted),
             ],
           ),
           const SizedBox(height: 8),
@@ -259,8 +287,17 @@ class _PeriodCard extends StatelessWidget {
           ],
         ],
       ),
+        ),
+      ),
     );
   }
+}
+
+/// One route, so every way into a fast lands on the same screen.
+void openFastPeriod(BuildContext context, FastingPeriod period) {
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => FastPeriodPage(period: period)),
+  );
 }
 
 /// Gentle totals. No streaks — a visibly broken streak is when people stop
@@ -299,34 +336,6 @@ class _PeriodStats extends StatelessWidget {
                 '${ro.days(stats.notKept)} însemnate ca neținute',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
-            if (stats.byMood.isNotEmpty) ...<Widget>[
-              const SizedBox(height: 10),
-              Row(
-                children: <Widget>[
-                  for (final FastMood mood in FastMood.values)
-                    if ((stats.byMood[mood] ?? 0) > 0)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: Row(
-                          children: <Widget>[
-                            Icon(MoodSelector.iconFor(mood, filled: true),
-                                size: 20,
-                                color: MoodSelector.colourFor(mood)),
-                            const SizedBox(width: 5),
-                            Text(
-                              '${stats.byMood[mood]}',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: MoodSelector.colourFor(mood),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                ],
-              ),
-            ],
           ],
         );
       },
@@ -436,33 +445,6 @@ class _StatusChip extends StatelessWidget {
       ),
     );
   }
-}
-
-class _WeeklyRuleCard extends StatelessWidget {
-  const _WeeklyRuleCard();
-
-  @override
-  Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.fromLTRB(
-          TroitaSpacing.page, TroitaSpacing.gap, TroitaSpacing.page, 0,
-        ),
-        padding: const EdgeInsets.all(TroitaSpacing.card),
-        decoration: TroitaTheme.cardDecoration(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text('Miercurea și vinerea',
-                style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 6),
-            Text(
-              'Zile de post de peste an, în afara săptămânilor de harți: '
-              'de la Crăciun la Bobotează, după Duminica Vameșului și a '
-              'Fariseului, în Săptămâna Luminată și după Rusalii.',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
-      );
 }
 
 class _SectionHeader extends StatelessWidget {

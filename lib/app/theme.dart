@@ -59,6 +59,17 @@ abstract final class TroitaColors {
   /// [calendarInk] to print black instead.
   static const Color feastBlue = Color(0xFF1F4E8C);
 
+  /// Dezlegare la pește. Lighter than [feastBlue] so a fish day and a
+  /// blue-cross day never read as the same mark.
+  static const Color fishBlue = Color(0xFF2C6F9B);
+
+  /// Săptămâna Brânzei. Paler than [gold], which carries oil and wine.
+  static const Color dairyGold = Color(0xFFD9B54B);
+
+  /// Ajunare. Darker than [burgundy] so the two hardest days of the year are
+  /// visibly harder than the rest of the fast around them.
+  static const Color strictInk = Color(0xFF3A0A12);
+
   /// Romanian saints. The source markup singles them out with `class="rom"`,
   /// and printed calendars usually set them apart too.
   static const Color romanianSaint = Color(0xFF8C2F2A);
@@ -159,13 +170,23 @@ abstract final class TroitaCalendarText {
 
 /// Semantic colour for a day's fasting state — the calendar dots, the banner,
 /// and the Posturi rows all read from here so they cannot drift apart.
+/// One colour per level, all six distinct.
+///
+/// These used to collapse: dairy, fish and wine-and-oil were all the same gold,
+/// which is fine on a single day's badge next to its written label and useless
+/// the moment a whole fast is drawn as a grid — the dezlegări are the thing a
+/// reader is looking for, and they were indistinguishable from each other.
+///
+/// Read as a scale from relief to severity: grey is no fast at all, blue is
+/// fish (the fullest relief inside a fast), gold is oil and wine, burgundy is
+/// the fast itself, near-black is ajunare.
 Color fastLevelColor(FastLevel level) => switch (level) {
       FastLevel.none => TroitaColors.muted,
-      FastLevel.dairy => TroitaColors.gold,
-      FastLevel.fish => TroitaColors.gold,
+      FastLevel.dairy => TroitaColors.dairyGold,
+      FastLevel.fish => TroitaColors.fishBlue,
       FastLevel.wineOil => TroitaColors.gold,
       FastLevel.fast => TroitaColors.burgundy,
-      FastLevel.strict => TroitaColors.burgundy,
+      FastLevel.strict => TroitaColors.strictInk,
     };
 
 /// Icon for a day's fasting state.

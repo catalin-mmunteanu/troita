@@ -5,7 +5,7 @@ import '../../core/data/day_repository.dart';
 import '../../core/liturgical/fast_level.dart';
 import '../../core/models/fast_day.dart';
 import '../../core/models/feast.dart';
-import '../fasting/mood_selector.dart';
+import '../fasting/fast_day_editor.dart';
 
 /// One day, set like a line in a printed calendar.
 ///
@@ -123,26 +123,16 @@ class DayRow extends StatelessWidget {
                             FastPill(level: entry.liturgical.fastLevel),
                             if (marked != null) ...<Widget>[
                               const SizedBox(width: 8),
-                              // The face when one was given, otherwise a plain
-                              // tick or cross for the Da/Nu answer.
-                              if (marked!.kept && marked!.mood != null)
-                                Icon(
-                                  MoodSelector.iconFor(marked!.mood!,
-                                      filled: true),
-                                  size: 22,
-                                  color:
-                                      MoodSelector.colourFor(marked!.mood!),
-                                )
-                              else
-                                Icon(
-                                  marked!.kept
-                                      ? Icons.check_circle
-                                      : Icons.cancel_outlined,
-                                  size: 22,
-                                  color: marked!.kept
-                                      ? TroitaColors.burgundy
-                                      : TroitaColors.muted,
-                                ),
+                              // A tick or a cross for the Da/Nu answer.
+                              Icon(
+                                marked!.kept
+                                    ? Icons.check_circle
+                                    : Icons.cancel_outlined,
+                                size: 22,
+                                color: marked!.kept
+                                    ? TroitaColors.burgundy
+                                    : TroitaColors.muted,
+                              ),
                             ],
                           ],
                         ),

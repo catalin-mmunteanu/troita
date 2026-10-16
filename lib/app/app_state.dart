@@ -140,10 +140,29 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Rebuilds the rolling notification window. Cheap enough to call on every
-  /// resume, and that is what keeps the window from running out.
-  Future<void> rescheduleNotifications() async {
+  DateTime? _lastPlannedAt;
+
+  /// Rebuilds the rolling notification window.
+  ///
+  /// Not as cheap as it was once described: it cancels every pending
+  /// notification, reads sixty days through the repository and makes sixty
+  /// platform calls. That is fine at launch and after a settings change, and
+  /// wasteful every time someone glances at the app — so a resume only
+  /// rebuilds when the day has changed or a few hours have passed. A 60-day
+  /// window does not need refreshing more often than that to stay full.
+  Future<void> rescheduleNotifications({bool force = true}) async {
     if (_days == null) return;
+    final DateTime now = DateTime.now();
+    final DateTime? last = _lastPlannedAt;
+    if (!force &&
+        last != null &&
+        last.year == now.year &&
+        last.month == now.month &&
+        last.day == now.day &&
+        now.difference(last) < const Duration(hours: 6)) {
+      return;
+    }
+    _lastPlannedAt = now;
     lastPlan = await NotificationPlanner(days, TroitaNotifications.instance)
         .reschedule(notificationPrefs);
     notifyListeners();
@@ -169,13 +188,6 @@ class AppState extends ChangeNotifier {
   /// "Ați ținut postul?" — the required answer.
   Future<void> setFastKept(DateTime date, bool kept) async {
     await journal.toggleKept(date, kept);
-    journalRevision++;
-    notifyListeners();
-  }
-
-  /// The optional face. Implies the day was kept.
-  Future<void> setFastMood(DateTime date, FastMood mood) async {
-    await journal.toggleMood(date, mood);
     journalRevision++;
     notifyListeners();
   }
