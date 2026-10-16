@@ -56,6 +56,14 @@ class _MapPageState extends State<MapPage> {
   /// than another trip to SQLite.
   List<Map<String, Object?>> _all = const <Map<String, Object?>>[];
   Set<PlaceKind> _visible = PlaceKind.defaultVisible;
+
+  /// Places per kind, counted once when the data arrives. It was recomputed
+  /// in build — a pass over thirteen thousand features on every rebuild,
+  /// including every keystroke in the search field.
+  Map<PlaceKind, int> _counts = const <PlaceKind, int>{};
+
+  /// Whether the legend shows its rows or only its row of dots.
+  bool _legendOpen = true;
   int _shown = 0;
 
   final TextEditingController _query = TextEditingController();
@@ -168,6 +176,7 @@ class _MapPageState extends State<MapPage> {
       _all = (geojson['features'] as List<Object?>)
           .cast<Map<String, Object?>>()
           .toList(growable: false);
+      _counts = _countByKind();
 
       final Map<String, dynamic> initial = _collection();
       debugPrint('[map] ${_all.length} places, '
@@ -237,7 +246,9 @@ class _MapPageState extends State<MapPage> {
           ),
           circleRadius: _matchByKind((PlaceKind k) => k.radius),
           circleStrokeWidth: 1.5,
-          circleStrokeColor: TroitaColors.paper.toHexStringRGB(),
+          circleStrokeColor: _matchByKind(
+            (PlaceKind k) => k.stroke.toHexStringRGB(),
+          ),
         ),
         filter: <Object>[
           '!',
@@ -514,20 +525,23 @@ class _MapPageState extends State<MapPage> {
                       results: _results,
                       searching: _searching,
                       onTap: _select,
-                    )
-                  else ...<Widget>[
-                    const SizedBox(height: TroitaSpacing.listGap),
-                    _KindChips(
-                      visible: _visible,
-                      counts: _countByKind(),
-                      onToggle: _toggleKind,
                     ),
-                    const SizedBox(height: TroitaSpacing.listGap),
+                  const Spacer(),
+                  // Hidden while results are open: the list needs the height,
+                  // and the legend is one tap away once a result is chosen.
+                  if (_results.isEmpty && !_searching && _counts.isNotEmpty)
                     Align(
-                      alignment: Alignment.centerLeft,
-                      child: _Pill(text: '$_shown lăcașuri'),
+                      alignment: Alignment.bottomLeft,
+                      child: _Legend(
+                        visible: _visible,
+                        counts: _counts,
+                        shown: _shown,
+                        expanded: _legendOpen,
+                        onToggleKind: _toggleKind,
+                        onToggleOpen: () =>
+                            setState(() => _legendOpen = !_legendOpen),
+                      ),
                     ),
-                  ],
                 ],
               ),
             ),
@@ -676,57 +690,115 @@ class _Results extends StatelessWidget {
   }
 }
 
-class _KindChips extends StatelessWidget {
-  const _KindChips({
+/// The legend, which is also the filter.
+///
+/// It replaces a horizontally scrolling row of chips that had two problems.
+/// Five chips did not fit across a phone, so some were always off screen; and
+/// switched-off chips were moved to the front so the one you wanted stayed in
+/// view, which meant the chip you had just tapped jumped away from your finger.
+///
+/// This sits still. A small card in the corner, one row per kind in a fixed
+/// order — tapping a row switches it, and nothing moves. It is about as wide as
+/// its longest label, so it covers a corner of the map and not a band across
+/// it, and folding it leaves only the five dots, which still say what is shown.
+class _Legend extends StatelessWidget {
+  const _Legend({
     required this.visible,
     required this.counts,
-    required this.onToggle,
+    required this.shown,
+    required this.expanded,
+    required this.onToggleKind,
+    required this.onToggleOpen,
   });
 
   final Set<PlaceKind> visible;
   final Map<PlaceKind, int> counts;
-  final ValueChanged<PlaceKind> onToggle;
+  final int shown;
+  final bool expanded;
+  final ValueChanged<PlaceKind> onToggleKind;
+  final VoidCallback onToggleOpen;
+
+  static String _n(int n) {
+    // Romanian groups thousands with a dot: 11.059.
+    final String s = '$n';
+    final StringBuffer out = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) out.write('.');
+      out.write(s[i]);
+    }
+    return out.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Troițe start switched off and are last in the enum, so on a narrow phone
-    // the one chip the user is most likely to want is the one off screen.
-    // Off chips come first, which puts it in view.
-    final List<PlaceKind> ordered = <PlaceKind>[
-      ...PlaceKind.values.where((PlaceKind k) => !visible.contains(k)),
-      ...PlaceKind.values.where((PlaceKind k) => visible.contains(k)),
-    ];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: <Widget>[
-          for (final PlaceKind k in ordered) ...<Widget>[
-            _Chip(
-              kind: k,
-              on: visible.contains(k),
-              count: counts[k] ?? 0,
-              onTap: () => onToggle(k),
-            ),
-            const SizedBox(width: 6),
-          ],
-        ],
+    return Material(
+      color: TroitaColors.paper.withValues(alpha: 0.96),
+      elevation: 3,
+      borderRadius: TroitaRadius.mediumAll,
+      clipBehavior: Clip.antiAlias,
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 160),
+        alignment: Alignment.bottomLeft,
+        child: IntrinsicWidth(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              // Header: the count on the map, and the fold.
+              InkWell(
+                onTap: onToggleOpen,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 9, 8, 9),
+                  child: Row(
+                    children: <Widget>[
+                      if (expanded)
+                        Text(
+                          '${_n(shown)} pe hartă',
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: TroitaColors.ink,
+                          ),
+                        )
+                      else
+                        // Folded, the dots alone still say what is shown.
+                        for (final PlaceKind k in PlaceKind.values)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 5),
+                            child: _Dot(kind: k, on: visible.contains(k)),
+                          ),
+                      const SizedBox(width: 6),
+                      const Spacer(),
+                      Icon(
+                        expanded ? Icons.expand_more : Icons.expand_less,
+                        size: 20,
+                        color: TroitaColors.muted,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (expanded) ...<Widget>[
+                const Divider(height: 1, color: TroitaColors.border),
+                for (final PlaceKind k in PlaceKind.values)
+                  _LegendRow(
+                    kind: k,
+                    on: visible.contains(k),
+                    count: _n(counts[k] ?? 0),
+                    onTap: () => onToggleKind(k),
+                  ),
+                const SizedBox(height: 4),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-/// A chip that carries the same colour as the dots it controls, so it doubles
-/// as the legend and there is no second place for the colours to drift.
-///
-/// The off state is deliberately not greyed out. An unselected filter and a
-/// disabled control look the same the moment you fade the text and flatten the
-/// border, and then the one chip that starts off — troițe — reads as a
-/// category with nothing in it rather than a switch nobody has flipped. So off
-/// keeps full-strength text and a solid border, and says only that it is off:
-/// hollow dot, a plus, and its count.
-class _Chip extends StatelessWidget {
-  const _Chip({
+class _LegendRow extends StatelessWidget {
+  const _LegendRow({
     required this.kind,
     required this.on,
     required this.count,
@@ -735,53 +807,50 @@ class _Chip extends StatelessWidget {
 
   final PlaceKind kind;
   final bool on;
-  final int count;
+  final String count;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: on ? TroitaColors.paper : TroitaColors.surface,
-      borderRadius: TroitaRadius.smallAll,
-      elevation: 2,
+    return Semantics(
+      button: true,
+      toggled: on,
+      label: '${kind.label}, $count',
       child: InkWell(
         onTap: onTap,
-        borderRadius: TroitaRadius.smallAll,
-        child: Container(
-          height: 38,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            borderRadius: TroitaRadius.smallAll,
-            border: Border.all(color: kind.colour, width: on ? 2 : 1),
-          ),
+        child: Padding(
+          // 36 px rows: comfortably tappable, and five of them stay short.
+          padding: const EdgeInsets.fromLTRB(12, 9, 12, 9),
           child: Row(
             children: <Widget>[
-              Container(
-                width: 11,
-                height: 11,
-                decoration: BoxDecoration(
-                  color: on ? kind.colour : Colors.transparent,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: kind.colour, width: 1.5),
-                ),
-              ),
-              const SizedBox(width: 7),
+              _Dot(kind: kind, on: on),
+              const SizedBox(width: 9),
               Text(
                 kind.label,
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: on ? FontWeight.w700 : FontWeight.w600,
-                  color: TroitaColors.ink,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                  // Off reads as off, not as disabled: still legible, just
+                  // quieter, next to a hollow dot.
+                  color: on ? TroitaColors.ink : TroitaColors.muted,
+                  decoration: on ? null : TextDecoration.lineThrough,
+                  decorationColor: TroitaColors.muted,
                 ),
               ),
-              const SizedBox(width: 6),
-              // The count is what tells you an off chip has something to give.
+              const SizedBox(width: 14),
+              const Spacer(),
               Text(
-                on ? '$count' : '+$count',
+                count,
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: on ? TroitaColors.muted : kind.colour,
+                  // Still readable when off: the count is what tells you
+                  // there is something to switch back on.
+                  color: on
+                      ? TroitaColors.muted
+                      : TroitaColors.muted.withValues(alpha: 0.6),
+                  fontFeatures: const <FontFeature>[
+                    FontFeature.tabularFigures(),
+                  ],
                 ),
               ),
             ],
@@ -792,26 +861,31 @@ class _Chip extends StatelessWidget {
   }
 }
 
-class _Pill extends StatelessWidget {
-  const _Pill({required this.text});
+/// The same dot the map draws, at legend size: filled when shown, a ring when
+/// hidden.
+class _Dot extends StatelessWidget {
+  const _Dot({required this.kind, required this.on});
 
-  final String text;
+  final PlaceKind kind;
+  final bool on;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      width: 13,
+      height: 13,
       decoration: BoxDecoration(
-        color: TroitaColors.burgundy,
-        borderRadius: TroitaRadius.smallAll,
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: TroitaColors.onBurgundy,
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
+        color: on ? kind.colour : Colors.transparent,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: on ? kind.stroke : kind.colour,
+          width: on ? 1.5 : 2,
         ),
+        boxShadow: on
+            ? const <BoxShadow>[
+                BoxShadow(color: Color(0x33000000), blurRadius: 1.5),
+              ]
+            : null,
       ),
     );
   }
