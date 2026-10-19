@@ -181,19 +181,6 @@ class _Summary extends StatelessWidget {
               ),
             ],
           ),
-          // Past the published calendar the dezlegări are computed. The
-          // boundaries and the weekly pattern are reliable; a dezlegare that a
-          // particular saint grants on a particular weekday is not, so say so
-          // rather than state it with the same confidence.
-          if (days.any((DayEntry d) => !d.isPublished)) ...<Widget>[
-            const SizedBox(height: TroitaSpacing.gap),
-            const Text(
-              'Dezlegările pentru acest post sunt calculate după rânduiala '
-              'generală. Calendarul publicat pentru acest an nu este încă '
-              'inclus în aplicație, așa că unele zile pot diferi.',
-              style: TextStyle(fontSize: 12, color: TroitaColors.muted),
-            ),
-          ],
         ],
       ),
     );

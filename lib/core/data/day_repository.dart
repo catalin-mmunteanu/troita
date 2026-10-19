@@ -28,15 +28,6 @@ class DayEntry {
 
   bool get isSunday => date.weekday == DateTime.sunday;
 
-  /// Whether the fasting rule comes from the published calendar rather than
-  /// the computed engine.
-  ///
-  /// Published data exists one year at a time, and past it the app falls back
-  /// to rules. Those rules are right on the boundaries and the weekly pattern,
-  /// but a dezlegare granted by a particular saint on a particular weekday is
-  /// only in the published calendar. Screens that state a dezlegare should
-  /// say when it is computed, rather than present it with the same certainty.
-  bool get isPublished => override?.fastLevel != null;
 
   /// Every commemoration on the day, joined the way a printed calendar sets it.
   String get title => feasts.isEmpty

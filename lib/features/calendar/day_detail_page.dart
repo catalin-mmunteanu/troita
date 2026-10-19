@@ -319,16 +319,6 @@ class _LiturgicalCard extends StatelessWidget {
             Text(entry.liturgical.note!,
                 style: Theme.of(context).textTheme.bodySmall),
           ],
-          // Only worth saying on a fast day: a computed "zi fără post" is as
-          // reliable as a published one, a computed dezlegare is not.
-          if (!entry.isPublished && entry.liturgical.isFasting) ...<Widget>[
-            const SizedBox(height: 6),
-            const Text(
-              'Rânduiala acestei zile este calculată. Calendarul publicat '
-              'pentru acest an nu este încă inclus în aplicație.',
-              style: TextStyle(fontSize: 12, color: TroitaColors.muted),
-            ),
-          ],
           if (entry.liturgical.glas != null) ...<Widget>[
             const Divider(height: 22),
             Text(
