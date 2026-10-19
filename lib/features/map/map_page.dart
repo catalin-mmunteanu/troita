@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:math' show Point;
+import 'dart:math' show Point, ln2, log;
 
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -82,11 +82,27 @@ class _MapPageState extends State<MapPage> {
   static const String _pointsLayer = 'church-points';
   static const String _clusterLayer = 'church-clusters';
 
-  /// Romania, framed so the whole country is visible on first open.
-  static const CameraPosition _initialCamera = CameraPosition(
-    target: LatLng(45.9, 25.0),
-    zoom: 5.6,
+  /// Romania's extent, slightly generous so border towns sit inside it.
+  static final LatLngBounds _romania = LatLngBounds(
+    southwest: const LatLng(43.6, 20.2),
+    northeast: const LatLng(48.3, 29.8),
   );
+
+  static const LatLng _centre = LatLng(45.95, 25.0);
+
+  /// The zoom at which Romania's width just fits this screen.
+  ///
+  /// Used as both the opening zoom and the floor, so the map opens on the
+  /// whole country and cannot be zoomed out past it. Computed from the width
+  /// rather than fixed: MapLibre draws the world 512 px wide at zoom 0, so
+  /// 9.6 degrees of longitude need a different zoom on every screen size — a
+  /// fixed 5.6 cut the country off on a phone and left margins on a tablet.
+  /// Width decides because Romania is wider than it is tall, even in Mercator.
+  static double _fitZoom(double widthDp) {
+    const double degrees = 9.6;
+    final double z = log(widthDp * 0.95 * 360 / (512 * degrees)) / ln2;
+    return z.clamp(4.0, 7.0);
+  }
 
   static const String _styleUrl = 'https://tiles.openfreemap.org/styles/liberty';
 
@@ -530,11 +546,17 @@ class _MapPageState extends State<MapPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) => _refreshFavourites());
     }
 
+    final double minZoom = _fitZoom(MediaQuery.sizeOf(context).width);
+
     return Stack(
       children: <Widget>[
         MapLibreMap(
           key: ValueKey<int>(_attempt),
-          initialCameraPosition: _initialCamera,
+          initialCameraPosition: CameraPosition(target: _centre, zoom: minZoom),
+          // Kept over Romania: the centre cannot leave the country, and the
+          // view cannot be zoomed out past it. Zooming in is unlimited.
+          cameraTargetBounds: CameraTargetBounds(_romania),
+          minMaxZoomPreference: MinMaxZoomPreference(minZoom, null),
           styleString: _styleUrl,
           onMapCreated: (MapLibreMapController c) => _controller = c,
           onStyleLoadedCallback: _onStyleLoaded,

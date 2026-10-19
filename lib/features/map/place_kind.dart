@@ -103,8 +103,8 @@ enum PlaceKind {
     return PlaceKind.church;
   }
 
-  /// Everything except troițe. They outnumber monasteries two to one and
-  /// crowd the map without adding much, so they are opt-in.
-  static Set<PlaceKind> get defaultVisible =>
-      PlaceKind.values.toSet()..remove(PlaceKind.waysideCross);
+  /// Only churches at first. They are what most people open the map for, and
+  /// with everything switched on the country is a carpet of dots. The legend
+  /// switches the rest on with one tap each.
+  static Set<PlaceKind> get defaultVisible => <PlaceKind>{PlaceKind.church};
 }
