@@ -137,6 +137,34 @@ class FastJournalRepository {
     );
   }
 
+  /// The days answered Da, newest first, optionally within a range.
+  Future<List<DateTime>> keptDays({DateTime? from, DateTime? to}) async {
+    final List<String> where = <String>['kept = 1'];
+    final List<Object?> args = <Object?>[];
+    if (from != null) {
+      where.add('date >= ?');
+      args.add(FastDay.key(from));
+    }
+    if (to != null) {
+      where.add('date <= ?');
+      args.add(FastDay.key(to));
+    }
+    final List<Map<String, Object?>> rows = await _db.query(
+      'fast_days',
+      columns: <String>['date'],
+      where: where.join(' AND '),
+      whereArgs: args,
+      // ISO dates sort as text, so this is chronological.
+      orderBy: 'date DESC',
+    );
+    return rows
+        .map((Map<String, Object?> r) => FastDay.fromRow(<String, Object?>{
+              'date': r['date'],
+              'kept': 1,
+            }).date)
+        .toList(growable: false);
+  }
+
   Future<int> totalKept() async =>
       Sqflite.firstIntValue(
         await _db.rawQuery('SELECT COUNT(*) FROM fast_days WHERE kept = 1'),

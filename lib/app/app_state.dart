@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../core/data/church_marks_repository.dart';
@@ -104,6 +105,8 @@ class AppState extends ChangeNotifier {
       _days = DayRepository(shared, _feasts!);
       _journal = await FastJournalRepository.open();
       _marks = await ChurchMarksRepository.open();
+      journalEnabled =
+          (await SharedPreferences.getInstance()).getBool(_kJournal) ?? false;
       seed = init.seed;
       status = init.status;
       pendingChurchId = await _native.consumePendingChurchId();
@@ -206,6 +209,26 @@ class AppState extends ChangeNotifier {
         await TroitaNotifications.instance.requestPermission();
     if (granted) await rescheduleNotifications();
     return granted;
+  }
+
+  /// Whether the fast journal — "Ați ținut postul?" and its tallies — is shown.
+  ///
+  /// Off by default. Recording whether you kept a fast is a personal practice
+  /// some people want and many do not; the calendar is the app, and the
+  /// journal is something to opt into. Switching it off only hides it: days
+  /// already recorded stay in troita_user.db and reappear if it is switched
+  /// back on.
+  bool journalEnabled = false;
+
+  static const String _kJournal = 'journal_enabled';
+
+  Future<void> setJournalEnabled(bool on) async {
+    journalEnabled = on;
+    final SharedPreferences p = await SharedPreferences.getInstance();
+    await p.setBool(_kJournal, on);
+    // Every screen that shows journal data already rebuilds on this.
+    journalRevision++;
+    notifyListeners();
   }
 
   /// Bumped whenever a day is marked, so every screen showing the journal

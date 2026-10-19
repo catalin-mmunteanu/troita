@@ -12,6 +12,7 @@ import '../../core/liturgical/fasting_period.dart';
 import '../../core/liturgical/liturgical_calendar.dart';
 import '../../core/models/fast_day.dart';
 import 'fast_period_page.dart';
+import 'kept_days_page.dart';
 import 'fast_day_editor.dart';
 
 /// `posturi-fasting` (2:296), now with the journal.
@@ -95,8 +96,10 @@ class _FastingPageState extends State<FastingPage> {
                 period: p, today: today, status: PeriodStatus.finished)),
           ],
 
-          const _SectionHeader('Total'),
-          const _AllTimeCard(),
+          if (state.journalEnabled) ...<Widget>[
+            const _SectionHeader('Total'),
+            const _AllTimeCard(),
+          ],
         ],
       ),
     );
@@ -137,20 +140,20 @@ class _ActiveFastCard extends StatelessWidget {
           const SizedBox(height: 10),
           _Progress(fraction: dayNumber / period.days),
 
-          const Divider(height: 26),
-
-          FutureBuilder<FastDay?>(
-            future: state.journal.forDate(today),
-            builder: (BuildContext context, AsyncSnapshot<FastDay?> snap) =>
-                FastDayEditor(
-              day: snap.data,
-              question: 'Ați ținut postul astăzi?',
-              onKept: (bool k) => state.setFastKept(today, k),
+          if (state.journalEnabled) ...<Widget>[
+            const Divider(height: 26),
+            FutureBuilder<FastDay?>(
+              future: state.journal.forDate(today),
+              builder: (BuildContext context, AsyncSnapshot<FastDay?> snap) =>
+                  FastDayEditor(
+                day: snap.data,
+                question: 'Ați ținut postul astăzi?',
+                onKept: (bool k) => state.setFastKept(today, k),
+              ),
             ),
-          ),
-
-          const Divider(height: 26),
-          _PeriodStats(period: period),
+            const Divider(height: 26),
+            _PeriodStats(period: period),
+          ],
 
           // An explicit row rather than making the whole card tappable: this
           // card already owns the Da/Nu control, and a card-wide tap target
@@ -281,7 +284,8 @@ class _PeriodCard extends StatelessWidget {
                   .textTheme
                   .bodyMedium
                   ?.copyWith(fontWeight: FontWeight.w600)),
-          if (status == PeriodStatus.finished) ...<Widget>[
+          if (status == PeriodStatus.finished &&
+              AppScope.of(context).journalEnabled) ...<Widget>[
             const Divider(height: 22),
             _PeriodStats(period: period, compact: true),
           ],
@@ -321,7 +325,7 @@ class _PeriodStats extends StatelessWidget {
               style: Theme.of(context).textTheme.bodySmall);
         }
 
-        return Column(
+        final Widget tally = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
@@ -338,6 +342,22 @@ class _PeriodStats extends StatelessWidget {
               ),
           ],
         );
+        if (stats.kept == 0) return tally;
+
+        // Tappable only when there is something to list.
+        return InkWell(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            builder: (_) => KeptDaysPage(period: period),
+          )),
+          borderRadius: TroitaRadius.smallAll,
+          child: Row(
+            children: <Widget>[
+              Expanded(child: tally),
+              const Icon(Icons.chevron_right,
+                  size: 20, color: TroitaColors.muted),
+            ],
+          ),
+        );
       },
     );
   }
@@ -352,8 +372,16 @@ class _AllTimeCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: TroitaSpacing.page),
-      padding: const EdgeInsets.all(TroitaSpacing.card),
       decoration: TroitaTheme.cardDecoration(),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            builder: (_) => const KeptDaysPage(),
+          )),
+          child: Padding(
+      padding: const EdgeInsets.all(TroitaSpacing.card),
       child: FutureBuilder<FastStats>(
         future: state.journal.allTime(),
         builder: (BuildContext context, AsyncSnapshot<FastStats> snap) {
@@ -374,11 +402,28 @@ class _AllTimeCard extends StatelessWidget {
                     .headlineMedium
                     ?.copyWith(fontSize: 30),
               ),
-              Text('de post ținute de când folosiți aplicația',
-                  style: Theme.of(context).textTheme.bodySmall),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text('de post ținute de când folosiți aplicația',
+                        style: Theme.of(context).textTheme.bodySmall),
+                  ),
+                  const Text('Vezi zilele',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: TroitaColors.burgundy,
+                      )),
+                  const Icon(Icons.chevron_right,
+                      size: 18, color: TroitaColors.burgundy),
+                ],
+              ),
             ],
           );
         },
+      ),
+          ),
+        ),
       ),
     );
   }

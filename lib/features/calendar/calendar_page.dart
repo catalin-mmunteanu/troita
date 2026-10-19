@@ -83,7 +83,11 @@ class _CalendarPageState extends State<CalendarPage> {
     final AppState state = AppScope.of(context);
     final List<DayEntry> days =
         await state.days.forMonth(month.year, month.month);
-    final Map<String, FastDay> marked = await state.journal.inRange(
+    // With the journal off, no ticks or crosses on the day rows: an empty map
+    // rather than a flag threaded through every row.
+    final Map<String, FastDay> marked = !state.journalEnabled
+        ? const <String, FastDay>{}
+        : await state.journal.inRange(
       DateTime(month.year, month.month, 1),
       DateTime(month.year, month.month + 1, 0),
     );

@@ -46,7 +46,9 @@ class _FastPeriodPageState extends State<FastPeriodPage> {
       widget.period.start,
       widget.period.end,
     );
-    final Map<String, FastDay> marked = await state.journal.inRange(
+    final Map<String, FastDay> marked = !state.journalEnabled
+        ? const <String, FastDay>{}
+        : await state.journal.inRange(
       widget.period.start,
       widget.period.end,
     );

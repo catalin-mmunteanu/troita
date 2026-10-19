@@ -130,7 +130,8 @@ class _DayDetailPageState extends State<DayDetailPage> {
                 // Rating any past day, not just today — people fill these in
                 // after the fact, and refusing that makes the journal useless
                 // the first time someone forgets.
-                if (entry.liturgical.isFasting &&
+                if (AppScope.of(context).journalEnabled &&
+                    entry.liturgical.isFasting &&
                     !widget.date.isAfter(DateTime.now()))
                   _DayRating(date: widget.date),
 
