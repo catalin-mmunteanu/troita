@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
 import '../../app/theme.dart';
-import '../../core/notifications/notification_planner.dart';
 import '../../core/notifications/notification_prefs.dart';
 import '../../core/notifications/notification_service.dart';
 
@@ -47,7 +46,6 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final AppState state = AppScope.of(context);
     final NotificationPrefs prefs = state.notificationPrefs;
-    final PlanResult? plan = state.lastPlan;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Setări')),
@@ -78,8 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
           if (prefs.mode != DailyNotificationMode.off) ...<Widget>[
             ListTile(
               title: const Text('Ora'),
-              subtitle: Text('În fiecare zi la ${prefs.timeLabel}'),
-              trailing: Text(
+                trailing: Text(
                 prefs.timeLabel,
                 style: Theme.of(context)
                     .textTheme
@@ -94,9 +91,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ? null
                   : (bool v) => _update(prefs.copyWith(sound: v)),
               title: const Text('Sunet la sărbătorile mari'),
-              subtitle: const Text(
-                'Pomenirile obișnuite rămân silențioase oricum.',
-              ),
+
             ),
           ],
 
@@ -106,10 +101,15 @@ class _SettingsPageState extends State<SettingsPage> {
             onChanged:
                 _busy ? null : (bool v) => _update(prefs.copyWith(fastReminders: v)),
             title: const Text('Anunț cu o zi înainte'),
-            subtitle: const Text(
-              'Doar pentru cele patru posturi mari. Miercurea și vinerea nu '
-              'primiți notificări — ar fi peste o sută pe an.',
-            ),
+            subtitle: const Text('Pentru cele patru posturi mari.'),
+          ),
+
+          const _Header('Jurnal de post'),
+          SwitchListTile(
+            value: AppScope.of(context).journalEnabled,
+            onChanged: (bool v) => AppScope.of(context).setJournalEnabled(v),
+            title: const Text('Întrebarea „Ați ținut postul?”'),
+            subtitle: const Text('Notați zilele în care ați ținut postul.'),
           ),
 
           const _Header('Hramuri'),
@@ -119,58 +119,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 ? null
                 : (bool v) => _update(prefs.copyWith(hramReminders: v)),
             title: const Text('Hramul bisericilor favorite'),
-            subtitle: const Text(
-              'Cu o seară înainte, la ora 18. Adăugați o biserică la favorite '
-              'din pagina ei.',
-            ),
+            subtitle: const Text('Cu o seară înainte.'),
           ),
 
-          const _Header('Programate'),
-          if (plan != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                plan.blocked
-                    ? 'Nicio notificare programată — lipsește permisiunea.'
-                    : '${plan.daily} pomeniri și ${plan.fasts} anunțuri de post '
-                        'în următoarele ${NotificationPlanner.windowDays} de zile. '
-                        'Lista se reînnoiește de fiecare dată când deschideți aplicația.',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ),
-          const _NextScheduled(),
+          const _Header('Despre aplicație'),
           ListTile(
-            leading: const Icon(Icons.notifications_active_outlined,
-                color: TroitaColors.burgundy),
-            title: const Text('Trimite o notificare de test'),
-            subtitle: const Text(
-              'Apare imediat. Cea zilnică vine abia la ora stabilită.',
-            ),
-            onTap: () async {
-              await TroitaNotifications.instance.showTest();
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Notificare trimisă.')),
-              );
-            },
+            title: const Text('Versiunea datelor'),
+            trailing: Text(state.seed['seed_version'] ?? '—'),
           ),
-
-          const _Header('Date'),
-          ListTile(
-            title: const Text('Set de date'),
-            subtitle: Text(
-              'Versiunea ${state.seed['seed_version'] ?? '—'} · '
-              '${state.seed['feast_count'] ?? '0'} pomeniri · '
-              '${state.seed['sinaxar_count'] ?? '0'} sinaxare',
-            ),
-          ),
+          // Required by the ODbL licence of the church data and map tiles.
           const Padding(
-            padding: EdgeInsets.fromLTRB(20, 8, 20, 0),
-            // The one credit that stays. Church data and map tiles are both
-            // OpenStreetMap, used under the ODbL, whose condition is that the
-            // source is credited where users can find it. The map carries the
-            // same credit behind its ⓘ button; this is the place for screens
-            // that show OSM data without a map, like a church's own page.
+            padding: EdgeInsets.fromLTRB(20, 4, 20, 0),
             child: Text(
               'Date despre biserici și hartă: © contributorii OpenStreetMap.',
               style: TextStyle(fontSize: 12.5, color: TroitaColors.muted),
@@ -178,37 +137,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Shows what is actually queued.
-///
-/// Without this, "nothing happened" is indistinguishable from "scheduled for
-/// tomorrow at 08:00", which is the normal state for most of the day.
-class _NextScheduled extends StatelessWidget {
-  const _NextScheduled();
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<({DateTime? when, String? title, int total})>(
-      future: TroitaNotifications.instance.nextScheduled(),
-      builder: (BuildContext context,
-          AsyncSnapshot<({DateTime? when, String? title, int total})> snap) {
-        final ({DateTime? when, String? title, int total})? data = snap.data;
-        if (data == null) return const SizedBox.shrink();
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-          child: Text(
-            data.when == null
-                ? 'Coada este goală (${data.total} în așteptare).'
-                : 'Următoarea: ${data.title ?? ''} — '
-                    '${data.when!.day}.${data.when!.month}.${data.when!.year}. '
-                    '${data.total} în coadă.',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        );
-      },
     );
   }
 }
@@ -233,7 +161,7 @@ class _PermissionCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 4),
             Text(
-              'Fără permisiune, nimic nu poate fi programat.',
+              'Permiteți-le pentru a primi notificări.',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 12),

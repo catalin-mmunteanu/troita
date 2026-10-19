@@ -20,9 +20,9 @@ enum DailyNotificationMode {
   String get description => switch (this) {
         DailyNotificationMode.off => 'Nicio notificare zilnică.',
         DailyNotificationMode.majorOnly =>
-          'Praznice împărătești și sfinți cu cruce roșie — aproximativ 90 de zile pe an.',
+          'Praznice împărătești și sfinți cu cruce roșie.',
         DailyNotificationMode.everyDay =>
-          'Sfântul zilei, în fiecare dimineață.',
+          'Sfântul zilei.',
       };
 }
 
