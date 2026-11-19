@@ -1,0 +1,44 @@
+# Runs on every pull request, including the monthly data PR: the Dart tests
+# (with the engine golden vectors), the analyzer, the cheap static checks, and
+# the backtest of the engine against the published calendar years.
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Static checks
+        run: python tool/check_dart.py
+      - name: Golden vectors match the pipeline's engine
+        run: |
+          python tool/engine_golden.py --write
+          git diff --exit-code test/golden/ || {
+            echo "::error::test/golden is stale. Run: python3 tool/engine_golden.py --write"; exit 1; }
+      - name: Backtest against the published years
+        run: python tool/engine_golden.py --backtest | tee -a "$GITHUB_STEP_SUMMARY"
