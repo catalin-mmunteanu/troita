@@ -1,27 +1,19 @@
 # Fonts
 
-The Figma file uses two families, both OFL-licensed and free from Google Fonts:
+The same four families as the website (DESIGN.MD §3 in troita-web), all OFL,
+all with the Romanian comma-below ș and ț:
 
-| Family | Used for | Weights needed |
+| Family | Used for | Files |
 |---|---|---|
-| **Fraunces** | Headings — "Noiembrie 2026", section titles | Bold (700) |
-| **Geist** | Everything else | Regular 400, Medium 500, SemiBold 600, Bold 700 |
+| **Literata** | Headings, the calendar, saints' names | 400, 600, 700 |
+| **Plus Jakarta Sans** | Body text | 400, 500, 600, 700 |
+| **Alegreya Sans** | Buttons, navigation labels | 400, 500, 700 |
+| **JetBrains Mono** | Rubrics: small uppercase labels | 400, 500 |
 
-Fraunces is a variable font; the designs draw it with `SOFT 0, WONK 1`. If you
-grab the static Bold instead of the variable file you lose the wonky axis, which
-is most of its character on the headings — take the variable file where you can.
+Static instances (Flutter does not map `fontWeight` onto a variable font's
+weight axis), from the `@expo-google-fonts/*` npm packages, which repackage the
+Google Fonts releases. Licences: `OFL-*.txt`. Declared in `pubspec.yaml`;
+family names come from `lib/app/design_tokens.dart`.
 
-## Installing
-
-1. Download from https://fonts.google.com/specimen/Fraunces and
-   https://fonts.google.com/specimen/Geist
-2. Drop the `.ttf` files here.
-3. Uncomment the `fonts:` block in `pubspec.yaml`.
-
-## Why the app works without them
-
-`theme.dart` names the families in `TroitaFonts`, but they are deliberately not
-declared in `pubspec.yaml` yet. Flutter treats an undeclared family as a
-fallback to the platform default — it logs a warning and carries on rather than
-failing the build. So the app runs today with Roboto and upgrades to the real
-type the moment the files land, with no code change.
+Geist and Fraunces, the earlier choice, are gone: Geist is on the DESIGN.MD ban
+list.

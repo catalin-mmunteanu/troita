@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
+import '../../app/design_tokens.dart';
 import '../../app/theme.dart';
 import '../../core/data/day_repository.dart';
 import '../../core/format_ro.dart';
@@ -178,7 +179,8 @@ class _Summary extends StatelessWidget {
                 child: _Stat(
                   value: '$relief',
                   label: relief == 1 ? 'zi cu dezlegare' : 'zile cu dezlegare',
-                  colour: TroitaColors.gold,
+                  // Text: gold cannot carry it (2.0:1), olive can.
+                  colour: TroitaColors.wineOil,
                 ),
               ),
             ],
@@ -227,7 +229,7 @@ class _DayCounter extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         ClipRRect(
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(TroitaTokenRadius.xs),
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 7,

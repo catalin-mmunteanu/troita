@@ -64,23 +64,34 @@ flutter:
     # Flutter does not recurse into subdirectories — one line instead of 293.
     - assets/sinaxar/
 
-  # Uncomment once the .ttf files are in assets/fonts/ — see the README there.
-  # Until then Flutter falls back to the platform font, which is a warning
-  # rather than a build failure, so the app runs either way.
-  #
-  # fonts:
-  #   - family: Fraunces
-  #     fonts:
-  #       - asset: assets/fonts/Fraunces-VariableFont.ttf
-  #       - asset: assets/fonts/Fraunces-Bold.ttf
-  #         weight: 700
-  #   - family: Geist
-  #     fonts:
-  #       - asset: assets/fonts/Geist-Regular.ttf
-  #         weight: 400
-  #       - asset: assets/fonts/Geist-Medium.ttf
-  #         weight: 500
-  #       - asset: assets/fonts/Geist-SemiBold.ttf
-  #         weight: 600
-  #       - asset: assets/fonts/Geist-Bold.ttf
-  #         weight: 700
+  # The four families of the website (DESIGN.MD §3), static instances, OFL.
+  # Licences in assets/fonts/OFL-*.txt.
+  fonts:
+    - family: Literata
+      fonts:
+        - asset: assets/fonts/Literata_400Regular.ttf
+        - asset: assets/fonts/Literata_600SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Literata_700Bold.ttf
+          weight: 700
+    - family: Plus Jakarta Sans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans_400Regular.ttf
+        - asset: assets/fonts/PlusJakartaSans_500Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans_600SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/PlusJakartaSans_700Bold.ttf
+          weight: 700
+    - family: Alegreya Sans
+      fonts:
+        - asset: assets/fonts/AlegreyaSans_400Regular.ttf
+        - asset: assets/fonts/AlegreyaSans_500Medium.ttf
+          weight: 500
+        - asset: assets/fonts/AlegreyaSans_700Bold.ttf
+          weight: 700
+    - family: JetBrains Mono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono_400Regular.ttf
+        - asset: assets/fonts/JetBrainsMono_500Medium.ttf
+          weight: 500

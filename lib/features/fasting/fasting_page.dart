@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
+import '../../app/design_tokens.dart';
 import '../../app/theme.dart';
 import '../../app/troita_icons.dart';
 import '../../core/format_ro.dart' as ro;
@@ -436,7 +437,7 @@ class _Progress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: BorderRadius.circular(TroitaTokenRadius.xs),
         child: LinearProgressIndicator(
           value: fraction.clamp(0.0, 1.0),
           minHeight: 8,
@@ -477,7 +478,7 @@ class _StatusChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: BorderRadius.circular(TroitaTokenRadius.xs),
         border: borderColor == null ? null : Border.all(color: borderColor),
       ),
       child: Text(
