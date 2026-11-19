@@ -34,13 +34,16 @@ the seeding pipeline, and the liturgical engine.
 source. Everything hangs off the Pascha computus in `FeastCalendar`.
 
 - **Four fasting periods**, including Postul Sfinților Apostoli, whose length
-  varies with Pascha and **collapses to zero in ten years between 2020 and
-  2100**. Hardcoding date ranges would ship that bug.
-- **Per-day fast level**: `none · dairy · fish · wineOil · fast · strict`, with
-  the real rules — weekends in Postul Mare, fish on Tue/Thu/Sat/Sun before
-  20 December, Ajunul Crăciunului strict, Buna Vestire and Florii fish.
-- **All five harți weeks**, including the one crossing the year boundary, plus
-  Săptămâna Brânzei as its own `dairy` state.
+  varies with Pascha. In late-Pascha years, when the Monday after All Saints
+  would leave less than a week, it starts on the Tuesday after Rusalii (2027:
+  22–28 June, as published). Hardcoding date ranges would ship the bug.
+- **Per-day fast level**: `none · fish · wineOil · fast · strict` — the same
+  five states the website shows. There is no "dezlegare la lactate":
+  Săptămâna Brânzei is a week without fast.
+- **Rules by weekday and by the day's rank** (a saint with a cross relaxes the
+  fast a step), Holy Week, the first days of Lent, the named feasts inside the
+  Nativity fast, and the Sf. Gheorghe transfer to Bright Monday.
+- **All five harți weeks**, including the one crossing the year boundary.
 - **Wed/Fri fasting** outside the periods, relaxed when a feast falls on one —
   praznic brings fish, cruce roșie brings oil and wine.
 - **Glas** (1–8) and **voscreasna** (1–11), both cycling from Duminica Tomii.
@@ -64,6 +67,33 @@ python3 tool/import_calendar_html.py tool/raw/2026-02.html --year 2026 --month 2
 Imported days become `source = 'calendar-ro'`, `verified = 1`, and take
 precedence over the hand-written fallback on name and rank. **January is
 verified; the other eleven months are not.** Sending them is one command each.
+
+## Calendar years: published and computed
+
+The calendar runs **2026–2030** (`CALENDAR_UNTIL` in `tool/build_seed.py`).
+
+- **Published** years (2026, 2027) carry the per-day values of the official
+  calendar in `day_overrides`, scraped by the monthly pipeline.
+- **Computed** years (2028–2030) come from the engine alone: Pascha, the fixed
+  saints, the rules above. With the published values switched off, the engine
+  matches the published 2026–2027 calendars on **97% of days**
+  (`python3 tool/engine_golden.py --backtest`). The app and the website say
+  so on those days.
+- When the official calendar for a computed year appears (around October of the
+  year before), the pipeline scrapes it and the year becomes published.
+
+### One engine, three copies, one test file
+
+`lib/core/liturgical/` (Dart, the product), `tool/engine_port.py` (the
+pipeline) and `src/lib/liturgical.ts` in **troita-web** are kept identical by
+`test/golden/engine-2026-2030.json`: every day of 2026–2030 with its inputs
+(rank, dezlegare) and expected outputs. `flutter test` and the site's
+`npm test` both assert it. After a deliberate rule change:
+
+```bash
+python3 tool/engine_golden.py --backtest   # how close to the published years
+python3 tool/engine_golden.py --write      # new golden file, commit it
+```
 
 ## Calendar data
 

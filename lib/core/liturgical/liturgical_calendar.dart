@@ -39,7 +39,6 @@ class LiturgicalDay {
   /// Shown in the header banner: "Astăzi: Post cu dezlegare la untdelemn și vin".
   String get summary {
     if (fastLevel == FastLevel.none) return 'Zi fără post';
-    if (fastLevel == FastLevel.dairy) return 'Dezlegare la lactate';
     if (fastLevel == FastLevel.fast) return 'Post';
     if (fastLevel == FastLevel.strict) return 'Post aspru (ajunare)';
     return 'Post cu ${fastLevel.label.toLowerCase()}';
@@ -54,6 +53,14 @@ class LiturgicalDay {
 /// The rules encode common Romanian parish practice. Usage varies between
 /// monastic and parish typika (and between parishes), so treat the output as
 /// guidance and let a priest review it before it ships.
+///
+/// Two other copies exist and must stay in step: tool/engine_port.py and the
+/// website's src/lib/liturgical.ts. All three are tested against
+/// test/golden/engine-2026-2030.json (`python3 tool/engine_golden.py --write`
+/// regenerates it). Backtested against the published 2026 and 2027 calendars
+/// with the published values switched off: 97% of days identical
+/// (`--backtest`). That is what a computed year (2028–2030) is worth until its
+/// official calendar appears.
 class LiturgicalCalendar {
   const LiturgicalCalendar._();
 
@@ -75,15 +82,24 @@ class LiturgicalCalendar {
     );
   }
 
+  /// Shorter than this, the Apostles' fast starts the Tuesday after Rusalii.
+  static const int minApostlesDays = 7;
+
   /// Postul Sfinților Apostoli: Monday after Duminica Tuturor Sfinților
   /// (Pascha + 57) through 28 June.
   ///
-  /// Its length depends on Pascha and **collapses to nothing in late-Pascha
-  /// years** — hence the nullable return rather than a fixed range.
+  /// In late-Pascha years that Monday leaves less than a week — or nothing.
+  /// The Romanian Church then starts the fast on the Tuesday after Rusalii,
+  /// after the Monday of the Holy Trinity (2027: 22–28 June, as published;
+  /// 2024: 25–28 June). With that rule the fast never disappears before 2100,
+  /// but the return stays nullable for safety.
   static FastingPeriod? postulApostolilor(int year) {
     final DateTime pascha = FeastCalendar.pascha(year);
-    final DateTime start = _offset(pascha, 57);
+    DateTime start = _offset(pascha, 57);
     final DateTime end = _d(year, 6, 28);
+    if (calendarDaysBetween(start, end) + 1 < minApostlesDays) {
+      start = _offset(pascha, 51);
+    }
     if (start.isAfter(end)) return null;
     return FastingPeriod(
       kind: FastingPeriodKind.postulApostolilor,
@@ -118,6 +134,13 @@ class LiturgicalCalendar {
   /// Fast-free weeks. All Pascha-relative except the Nativity–Theophany one.
   static List<FastingPeriod> harti(int year) {
     final DateTime pascha = FeastCalendar.pascha(year);
+    // The week after Rusalii ends early when the Apostles' fast starts inside
+    // it (late-Pascha years).
+    DateTime afterRusaliiEnd = _offset(pascha, 56);
+    final FastingPeriod? apostles = postulApostolilor(year);
+    if (apostles != null && !apostles.start.isAfter(afterRusaliiEnd)) {
+      afterRusaliiEnd = _offset(apostles.start, -1);
+    }
     return <FastingPeriod>[
       // Crăciun → Bobotează. Split across the year boundary, so both halves
       // are emitted and the lookup below checks the neighbouring years too.
@@ -145,20 +168,21 @@ class LiturgicalCalendar {
       FastingPeriod(
         kind: FastingPeriodKind.harti,
         start: _offset(pascha, 50),
-        end: _offset(pascha, 56),
+        end: afterRusaliiEnd,
         note: 'Săptămâna de după Rusalii.',
       ),
     ];
   }
 
-  /// Săptămâna Brânzei — dairy and eggs all week, meat not.
+  /// Săptămâna Brânzei (Săptămâna Albă), before Postul Mare. Shown as a week
+  /// without fast, like the website.
   static FastingPeriod saptamanaBranzei(int year) {
     final DateTime pascha = FeastCalendar.pascha(year);
     return FastingPeriod(
       kind: FastingPeriodKind.saptamanaBranzei,
       start: _offset(pascha, -55),
       end: _offset(pascha, -49),
-      note: 'Se dezleagă la lactate și ouă în toate zilele.',
+      note: 'Săptămâna Albă, înaintea Postului Mare.',
     );
   }
 
@@ -194,7 +218,7 @@ class LiturgicalCalendar {
       note = harta.note;
     } else if (branza.contains(d)) {
       period = branza;
-      level = FastLevel.dairy;
+      level = FastLevel.none;
       note = branza.note;
     } else if (great != null) {
       period = great;
@@ -215,12 +239,12 @@ class LiturgicalCalendar {
     // and Înălțarea Sfintei Cruci are exactly "post, cu dezlegare la untdelemn
     // și vin" — they used to be forced to a plain fast, which made them
     // stricter than every Romanian calendar prints them.
-    final FastLevel? fixed = _fixedStrictDay(d);
+    final FastLevel? fixed = _fixedDay(d);
     if (fixed != null) {
       level = fixed == FastLevel.strict
           ? FastLevel.stricter(level, fixed)
           : fixed;
-      note = _fixedStrictNote(d) ?? note;
+      note = _fixedDayNote(d) ?? note;
     }
 
     return LiturgicalDay(
@@ -261,14 +285,27 @@ class LiturgicalCalendar {
     final DateTime pascha = FeastCalendar.pascha(d.year);
     final bool weekend =
         d.weekday == DateTime.saturday || d.weekday == DateTime.sunday;
+    final bool wedFri =
+        d.weekday == DateTime.wednesday || d.weekday == DateTime.friday;
+    final bool tueThu =
+        d.weekday == DateTime.tuesday || d.weekday == DateTime.thursday;
+    // A saint marked with a cross (red or blue) relaxes the fast a step.
+    final bool cross =
+        rank == FeastRank.cruceRosie || rank == FeastRank.cruceAlbastra;
 
     switch (period.kind) {
       case FastingPeriodKind.postulMare:
-        if (d == _offset(pascha, -48)) {
-          return (FastLevel.strict, 'Prima zi a Postului Mare.');
+        // Clean Monday and Tuesday are kept as ajunare, as published.
+        if (d == _offset(pascha, -48) || d == _offset(pascha, -47)) {
+          return (FastLevel.strict, 'Primele zile ale Postului Mare.');
         }
         if (d == _offset(pascha, -2)) {
           return (FastLevel.strict, 'Vinerea Mare.');
+        }
+        // Holy Monday, Tuesday and Wednesday: bread and water in the evening.
+        if (!d.isBefore(_offset(pascha, -6)) &&
+            !d.isAfter(_offset(pascha, -4))) {
+          return (FastLevel.strict, 'Săptămâna Patimilor.');
         }
         if (d.month == 3 && d.day == 25) {
           return (FastLevel.fish, 'Buna Vestire.');
@@ -282,11 +319,19 @@ class LiturgicalCalendar {
         if (d == _offset(pascha, -3)) {
           return (FastLevel.wineOil, 'Joia Mare.');
         }
+        if (d == _offset(pascha, -17)) {
+          return (FastLevel.wineOil, 'Joia Canonului cel Mare.');
+        }
         // Înainte-prăznuirea and Odovania of the Annunciation (24 and 26
-        // March) carry oil and wine on a Lenten weekday.
-        if (d.month == 3 && (d.day == 24 || d.day == 26) && !weekend) {
+        // March) carry oil and wine on a Lenten weekday — not on Wednesday or
+        // Friday (2027: 26 March, a Friday, published as a plain fast).
+        if (d.month == 3 &&
+            (d.day == 24 || d.day == 26) &&
+            !weekend &&
+            !wedFri) {
           return (FastLevel.wineOil, null);
         }
+        if (cross && !weekend) return (FastLevel.wineOil, null);
         return weekend
             ? (FastLevel.wineOil, null)
             : (FastLevel.fast, null);
@@ -301,21 +346,18 @@ class LiturgicalCalendar {
         return (FastLevel.fast, null);
 
       case FastingPeriodKind.postulApostolilor:
-        if (d.weekday == DateTime.wednesday || d.weekday == DateTime.friday) {
+        if (wedFri) {
           // A Praznic Împărătesc brings fish (Nașterea Sf. Ioan, 24 June); a
-          // red-cross saint brings oil and wine.
-          return switch (rank) {
-            FeastRank.praznic => (FastLevel.fish, null),
-            FeastRank.cruceRosie => (FastLevel.wineOil, null),
-            _ => (FastLevel.fast, null),
-          };
+          // saint with a cross brings oil and wine.
+          if (rank == FeastRank.praznic) return (FastLevel.fish, null);
+          return cross ? (FastLevel.wineOil, null) : (FastLevel.fast, null);
         }
+        // On the other days a saint with a cross brings fish.
+        if (cross || rank == FeastRank.praznic) return (FastLevel.fish, null);
         // Tuesday and Thursday: oil and wine. Monday, Saturday and Sunday:
         // fish. These were the other way round before; fitted to the 2026
         // published calendar, where all three Mondays carry fish.
-        if (d.weekday == DateTime.tuesday || d.weekday == DateTime.thursday) {
-          return (FastLevel.wineOil, null);
-        }
+        if (tueThu) return (FastLevel.wineOil, null);
         return (FastLevel.fish, null);
 
       case FastingPeriodKind.postulCraciunului:
@@ -349,9 +391,13 @@ class LiturgicalCalendar {
           return weekend ? (FastLevel.wineOil, null) : (FastLevel.fast, null);
         }
         if (weekend) return (FastLevel.fish, null);
-        if (d.weekday == DateTime.tuesday || d.weekday == DateTime.thursday) {
-          return (FastLevel.wineOil, null);
+        // A saint with a cross: oil and wine on Wednesday and Friday, fish on
+        // the other weekdays.
+        if (wedFri) {
+          return cross ? (FastLevel.wineOil, null) : (FastLevel.fast, null);
         }
+        if (cross) return (FastLevel.fish, null);
+        if (tueThu) return (FastLevel.wineOil, null);
         return (FastLevel.fast, null);
 
       default:
@@ -378,16 +424,19 @@ class LiturgicalCalendar {
     };
   }
 
-  /// Days of strict fasting that stand outside the period rules entirely.
-  static FastLevel? _fixedStrictDay(DateTime d) {
+  /// Days that stand outside the period rules entirely. Botezul Domnului has
+  /// no fast whatever the weekday (2027: a Wednesday, published without fast).
+  static FastLevel? _fixedDay(DateTime d) {
     if (d.month == 1 && d.day == 5) return FastLevel.strict;
+    if (d.month == 1 && d.day == 6) return FastLevel.none;
     if (d.month == 8 && d.day == 29) return FastLevel.wineOil;
     if (d.month == 9 && d.day == 14) return FastLevel.wineOil;
     return null;
   }
 
-  static String? _fixedStrictNote(DateTime d) {
+  static String? _fixedDayNote(DateTime d) {
     if (d.month == 1 && d.day == 5) return 'Ajunul Bobotezei.';
+    if (d.month == 1 && d.day == 6) return 'Botezul Domnului.';
     if (d.month == 8 && d.day == 29) {
       return 'Tăierea Capului Sfântului Ioan Botezătorul.';
     }

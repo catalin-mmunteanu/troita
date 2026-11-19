@@ -63,9 +63,6 @@ abstract final class TroitaColors {
   /// blue-cross day never read as the same mark.
   static const Color fishBlue = Color(0xFF2C6F9B);
 
-  /// Săptămâna Brânzei. Paler than [gold], which carries oil and wine.
-  static const Color dairyGold = Color(0xFFD9B54B);
-
   /// Ajunare. Darker than [burgundy] so the two hardest days of the year are
   /// visibly harder than the rest of the fast around them.
   static const Color strictInk = Color(0xFF3A0A12);
@@ -170,9 +167,9 @@ abstract final class TroitaCalendarText {
 
 /// Semantic colour for a day's fasting state — the calendar dots, the banner,
 /// and the Posturi rows all read from here so they cannot drift apart.
-/// One colour per level, all six distinct.
+/// One colour per level, all five distinct.
 ///
-/// These used to collapse: dairy, fish and wine-and-oil were all the same gold,
+/// These used to collapse: fish and wine-and-oil were all the same gold,
 /// which is fine on a single day's badge next to its written label and useless
 /// the moment a whole fast is drawn as a grid — the dezlegări are the thing a
 /// reader is looking for, and they were indistinguishable from each other.
@@ -182,7 +179,6 @@ abstract final class TroitaCalendarText {
 /// the fast itself, near-black is ajunare.
 Color fastLevelColor(FastLevel level) => switch (level) {
       FastLevel.none => TroitaColors.muted,
-      FastLevel.dairy => TroitaColors.dairyGold,
       FastLevel.fish => TroitaColors.fishBlue,
       FastLevel.wineOil => TroitaColors.gold,
       FastLevel.fast => TroitaColors.burgundy,
@@ -197,7 +193,6 @@ Color fastLevelColor(FastLevel level) => switch (level) {
 /// and so should we.
 IconData fastLevelIcon(FastLevel level) => switch (level) {
       FastLevel.none => Icons.restaurant_outlined,
-      FastLevel.dairy => Icons.egg_outlined,
       FastLevel.fish => Icons.set_meal_outlined,
       FastLevel.wineOil => Icons.wine_bar_outlined,
       FastLevel.fast => Icons.spa_outlined,

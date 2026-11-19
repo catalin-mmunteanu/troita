@@ -77,3 +77,5 @@ jobs:
             android/app/src/main/assets/seed/churches.db
             android/app/src/main/assets/seed/version.txt
             tool/scraped/*.json
+            tool/changes.json
+            test/golden/engine-2026-2030.json

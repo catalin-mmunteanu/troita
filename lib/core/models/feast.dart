@@ -1,3 +1,4 @@
+import '../data/note_text.dart';
 import '../liturgical/fast_level.dart';
 import 'feast_calendar.dart';
 
@@ -57,7 +58,8 @@ class Feast {
         'wineOil' => FastLevel.wineOil,
         'wine_oil' => FastLevel.wineOil,
         'none' => FastLevel.none,
-        'dairy' => FastLevel.dairy,
+        // Older seeds: Săptămâna Brânzei is shown as a day without fast.
+        'dairy' => FastLevel.none,
         _ => null,
       };
 
@@ -69,7 +71,11 @@ class Feast {
         movableKey: row['movable_key'] as String?,
         shortName: row['short_name'] as String?,
         kind: row['kind'] as String?,
-        note: row['note'] as String?,
+        // Hand-curated and movable feasts keep their note. A fixed date's note
+        // scraped from one year keeps only what is true every year.
+        note: row['movable_key'] != null || row['source'] == 'manual'
+            ? cleanNote(row['note'] as String?)
+            : dateInvariantNote(row['note'] as String?),
         dezlegare: _parseDezlegare(row['dezlegare'] as String?),
       );
 }

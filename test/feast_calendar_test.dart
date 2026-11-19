@@ -12,6 +12,7 @@ void main() {
       2026: '2026-04-12',
       2027: '2027-05-02',
       2028: '2028-04-16',
+      2029: '2029-04-08',
       2030: '2030-04-28',
     };
 
@@ -82,6 +83,19 @@ void main() {
       expect(FeastCalendar.resolve(''), isNull);
       expect(FeastCalendar.resolve('decembrie'), isNull);
       expect(FeastCalendar.resolve('13-99'), isNotNull); // DateTime normalises
+    });
+  });
+
+  group('transfers', () {
+    test('Sf. Gheorghe moves to Bright Monday when it falls in Holy Week', () {
+      // 2030: Pascha 28 April, so 23 April is Holy Tuesday.
+      expect(FeastCalendar.resolve('04-23', year: 2030), DateTime(2030, 4, 29));
+    });
+
+    test('Sf. Gheorghe stays on its date otherwise', () {
+      expect(FeastCalendar.resolve('04-23', year: 2026), DateTime(2026, 4, 23));
+      // 2027: in Lent, before Florii — kept on the day.
+      expect(FeastCalendar.resolve('04-23', year: 2027), DateTime(2027, 4, 23));
     });
   });
 }

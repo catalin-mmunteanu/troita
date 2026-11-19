@@ -380,6 +380,45 @@ def add_search_fold(rows: list[dict]) -> list[dict]:
         r["search_fold"] = folded or raw.lower()
     return rows
 
+# The calendar is built through this year. Years the published calendar covers
+# are "published"; the rest, up to here, are "computed" by the engine from the
+# fixed saints and Pascha, and the app and site say so on those days. When the
+# official calendar for a computed year appears, the monthly pipeline scrapes
+# it and the year moves to published.
+CALENDAR_UNTIL = 2030
+
+# A few scraped notes carry the source page's JavaScript (analytics snippets,
+# button handlers) — the last day of every month did. Any segment containing
+# code-like characters is dropped; real Romanian notes never contain them.
+# The same filter runs in troita-web's export and in the app (note_text.dart).
+_JUNK = re.compile(r"[\"'\[\]{}=|\\/<>]|window|script|\bpdf", re.IGNORECASE)
+
+
+def clean_notes(raw: str | None) -> str | None:
+    if not raw:
+        return None
+    parts = [p.strip() for p in raw.split(";")]
+    # Real notes start with a capital ("Post", "Zi aliturgică"); leftovers like
+    # "!isOpen" or "a,m" never do.
+    keep = [p for p in parts if len(p) > 2 and p[0].isupper() and not _JUNK.search(p)]
+    return "; ".join(keep) or None
+
+
+def date_invariant_note(raw: str | None) -> str | None:
+    """The part of a scraped note that is true every year.
+
+    A fixed-date feast is shared by every year, but its scraped note was read
+    off one year: "Post", "Dezlegare la pește", "Nu se fac nunți", "Sâmbăta a
+    IV-a din Post" all depend on where the date fell that year. Those already
+    live per year in day_overrides. Only the Tedeum notes (Anul Nou, Ziua
+    Națională…) are tied to the date itself."""
+    cleaned = clean_notes(raw)
+    if not cleaned:
+        return None
+    keep = [p for p in cleaned.split("; ") if p.startswith("Tedeum")]
+    return "; ".join(keep) or None
+
+
 FEAST_COLUMNS = [
     "id", "month_day", "movable_key", "name", "short_name", "rank", "kind",
     "note", "dezlegare", "source", "verified",
@@ -492,7 +531,7 @@ def load_feasts(published: dict[str, dict] | None = None) -> list[tuple]:
         rank = entry.get("rank", "simplu")
         name = entry["name"]
         kind = "romanesc" if entry.get("romanian") else None
-        note = "; ".join(entry.get("notes", [])) or None
+        note = date_invariant_note("; ".join(entry.get("notes", [])))
         dezlegare = entry.get("fast") if entry.get("fast") in (
             "fish", "wineOil", "none") else None
 
@@ -530,14 +569,15 @@ def load_feasts(published: dict[str, dict] | None = None) -> list[tuple]:
             rows.append((
                 f"feast:{month_day}", month_day, None, name, _short(name),
                 _settled_rank(entry, None), None,
-                "; ".join(entry.get("notes", [])) or None, None, "scraped", 1,
+                date_invariant_note("; ".join(entry.get("notes", []))), None,
+                "scraped", 1,
             ))
         else:
             old_row = rows[idx]
             rows[idx] = (
                 old_row[0], month_day, None, name, _short(name),
                 _settled_rank(entry, old_row), old_row[6],
-                old_row[7] or ("; ".join(entry.get("notes", [])) or None),
+                old_row[7] or date_invariant_note("; ".join(entry.get("notes", []))),
                 old_row[8], "scraped", 1,
             )
 
@@ -687,7 +727,7 @@ def load_scraped() -> tuple[list[tuple], list[tuple], dict[str, dict]]:
                     **d, "_rank_basis": basis, "_score": score, "_inside": inside}
             override_rows.append((
                 year, d["month_day"], d.get("fast"),
-                "; ".join(d.get("notes", [])) or None,
+                clean_notes("; ".join(d.get("notes", []))),
                 None, None, None, None, None, None,
             ))
     from scrape_calendar import rank_of
@@ -705,6 +745,17 @@ def load_scraped() -> tuple[list[tuple], list[tuple], dict[str, dict]]:
         entry["rank"] = rank_of(rest, "normal") if rest else "simplu"
         entry["_rank_basis"] = "weekday"
     return sinaxar_rows, override_rows, published
+
+
+def published_years(override_rows: list[tuple]) -> list[int]:
+    return sorted({r[0] for r in override_rows})
+
+
+def computed_years(override_rows: list[tuple]) -> list[int]:
+    """Years after the last published one, through CALENDAR_UNTIL."""
+    published = published_years(override_rows)
+    first = (published[-1] + 1) if published else datetime.now(timezone.utc).year
+    return [y for y in range(first, CALENDAR_UNTIL + 1) if y not in published]
 
 
 def write_sqlite(rows: list[dict], out: str, bbox, area: str) -> None:
@@ -755,8 +806,8 @@ def write_sqlite(rows: list[dict], out: str, bbox, area: str) -> None:
         # back to the computed engine, and it reads this to say so rather than
         # presenting a computed dezlegare with the same confidence as a
         # published one.
-        "published_years": ",".join(
-            str(y) for y in sorted({r[0] for r in override_rows})),
+        "published_years": ",".join(map(str, published_years(override_rows))),
+        "computed_years": ",".join(map(str, computed_years(override_rows))),
         "attribution": "© OpenStreetMap contributors, ODbL 1.0",
     }
     db.executemany("INSERT OR REPLACE INTO meta (key,value) VALUES (?,?)", list(meta.items()))
@@ -788,6 +839,10 @@ def write_sqlite(rows: list[dict], out: str, bbox, area: str) -> None:
     if years:
         last = years[-1]
         print(f"    published years  {', '.join(map(str, years))}")
+        computed = computed_years(override_rows)
+        if computed:
+            print(f"    computed years   {', '.join(map(str, computed))} "
+                  f"(engine only, until the official calendar appears)")
         this_year = datetime.now(timezone.utc).year
         if last <= this_year:
             print(f"WARNING: published calendar ends 31 December {last}. Scrape "

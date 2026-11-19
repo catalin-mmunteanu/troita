@@ -328,6 +328,14 @@ class _LiturgicalCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
+          if (entry.computed) ...<Widget>[
+            const Divider(height: 22),
+            Text(
+              'Calculat după rânduiala Bisericii; se confirmă când apare '
+              'calendarul oficial pe ${entry.date.year}.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
           if (entry.override?.apostol != null ||
               entry.override?.evanghelie != null) ...<Widget>[
             const SizedBox(height: 6),

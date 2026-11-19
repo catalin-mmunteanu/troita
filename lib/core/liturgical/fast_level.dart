@@ -1,14 +1,15 @@
 /// What is permitted on a given day, from most to least permissive.
 ///
+/// Five states, the same five the website shows (troita-web, liturgical.ts).
+/// There is no "dezlegare la lactate": Săptămâna Brânzei is a week without
+/// fast, like the other harți.
+///
 /// The order matters: `index` is used to resolve conflicts when several rules
 /// apply to the same date — a feast day's dezlegare wins over the base rule of
 /// the period it falls in, so we take the more permissive of the two.
 enum FastLevel {
   /// Harți — no fasting at all.
   none,
-
-  /// Săptămâna Brânzei: dairy and eggs permitted, meat not.
-  dairy,
 
   /// Dezlegare la pește (which implies oil and wine too).
   fish,
@@ -33,7 +34,6 @@ enum FastLevel {
 
   String get label => switch (this) {
         FastLevel.none => 'Zi fără post',
-        FastLevel.dairy => 'Dezlegare la lactate',
         FastLevel.fish => 'Dezlegare la pește',
         FastLevel.wineOil => 'Dezlegare la untdelemn și vin',
         FastLevel.fast => 'Post',
@@ -42,7 +42,6 @@ enum FastLevel {
 
   String get shortLabel => switch (this) {
         FastLevel.none => 'Fără post',
-        FastLevel.dairy => 'Lactate',
         FastLevel.fish => 'Pește',
         FastLevel.wineOil => 'Ulei și vin',
         FastLevel.fast => 'Post',
