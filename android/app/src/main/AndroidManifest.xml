@@ -56,6 +56,22 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Android App Links: troita.ro pages for a day, a month or a fast
+                 open here when the app is installed. Verified against
+                 https://www.troita.ro/.well-known/assetlinks.json, which needs
+                 the release signing key's SHA-256 (troita-web: site.ts,
+                 APP_LINKS). Until then Android asks, or opens the browser. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="www.troita.ro" />
+                <data android:host="troita.ro" />
+                <data android:pathPrefix="/calendar-ortodox" />
+                <data android:pathPrefix="/posturi" />
+                <data android:path="/azi" />
+            </intent-filter>
         </activity>
 
         <meta-data

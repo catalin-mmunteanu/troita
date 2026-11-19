@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
+import '../../app/site_links.dart';
 import '../../app/theme.dart';
 import '../../core/notifications/notification_prefs.dart';
 import '../../core/notifications/notification_service.dart';
@@ -126,6 +127,19 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             title: const Text('Versiunea datelor'),
             trailing: Text(state.seed['seed_version'] ?? '—'),
+          ),
+          // The site carries the same calendar, the fasting guide and the
+          // privacy policy Google Play links to.
+          ListTile(
+            title: const Text('Calendarul pe troita.ro'),
+            subtitle: const Text('Același calendar, pe orice dispozitiv.'),
+            trailing: const Icon(Icons.open_in_new, size: 18),
+            onTap: () => state.native.openUri(SiteLinks.base),
+          ),
+          ListTile(
+            title: const Text('Politica de confidențialitate'),
+            trailing: const Icon(Icons.open_in_new, size: 18),
+            onTap: () => state.native.openUri(SiteLinks.privacy),
           ),
           // Required by the ODbL licence of the church data and map tiles.
           const Padding(

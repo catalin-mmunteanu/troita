@@ -25,10 +25,19 @@ class TroitaNative {
   /// Church ids arriving from a notification tap while the app is running.
   Stream<String> get openedChurch => _openedChurch.stream;
 
+  final StreamController<String> _openedLink =
+      StreamController<String>.broadcast();
+
+  /// troita.ro links opened while the app is running (App Links).
+  Stream<String> get openedLink => _openedLink.stream;
+
   void listen() {
     _channel.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'onChurchOpened' && call.arguments is String) {
         _openedChurch.add(call.arguments as String);
+      }
+      if (call.method == 'onLinkOpened' && call.arguments is String) {
+        _openedLink.add(call.arguments as String);
       }
       return null;
     });
@@ -80,6 +89,10 @@ class TroitaNative {
   /// Church id from the notification that cold-started the app, if any.
   Future<String?> consumePendingChurchId() =>
       _channel.invokeMethod<String>('consumePendingChurchId');
+
+  /// The troita.ro link that cold-started the app, if any.
+  Future<String?> consumePendingLink() =>
+      _channel.invokeMethod<String>('consumePendingLink');
 }
 
 class InitResult {

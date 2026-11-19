@@ -26,11 +26,21 @@ class MainActivity : FlutterActivity() {
         // The engine is alive in this case, so tell Dart straight away instead
         // of waiting for it to poll on resume.
         TroitaBridge.emitPendingChurch()
+        TroitaBridge.emitPendingLink()
     }
 
     private fun capture(intent: Intent?) {
         intent?.getStringExtra(TroitaConfig.EXTRA_CHURCH_ID)?.let {
             TroitaBridge.pendingChurchId = it
+        }
+        // A troita.ro link (App Links). Dart decides what it points at.
+        if (intent?.action == Intent.ACTION_VIEW) {
+            val data = intent?.data
+            if (data != null && data.scheme == "https" &&
+                (data.host == "www.troita.ro" || data.host == "troita.ro")
+            ) {
+                TroitaBridge.pendingLink = data.toString()
+            }
         }
     }
 
