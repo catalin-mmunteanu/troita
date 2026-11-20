@@ -146,7 +146,7 @@ class DayRepository {
       );
     }
 
-    final Set<int> published = await publishedYears();
+    final Set<int> publishedYearSet = await publishedYears();
     return DayEntry(
       date: d,
       feasts: feasts,
@@ -155,7 +155,8 @@ class DayRepository {
       override: override,
       // An empty set means an old seed without the key: say nothing rather
       // than flag every day.
-      computed: published.isNotEmpty && !published.contains(d.year),
+      computed: publishedYearSet.isNotEmpty &&
+          !publishedYearSet.contains(d.year),
     );
   }
 
