@@ -1,0 +1,848 @@
+{
+ "about": "Zile de nume (onomastice) în calendarul ortodox român. Sursa 'dgep': listele de prenume pe care Direcția Generală pentru Evidența Persoanelor (MAI) le asociază fiecărei sărbători mari, preluate de Agerpres și presă (sourceUrl). Sursa 'calendar': sfinți al căror nume e chiar prenumele sărbătorit. Un nume poate avea mai multe zile; 'primary' arată ziua principală acolo unde diferă, iar 'notes' explică. Folosit de aplicație (assets/data/name_days.json) și copiat de site (troita-web: data/name-days.json).",
+ "sources": {
+  "dgep": "Direcția Generală pentru Evidența Persoanelor (MAI), statisticile de onomastică publicate la fiecare sărbătoare mare",
+  "calendar": "Calendarul ortodox: sfântul zilei poartă chiar acest nume"
+ },
+ "feasts": [
+  {
+   "id": "01-01",
+   "saint": "Sfântul Vasile cel Mare",
+   "source": "dgep",
+   "date": "01-01",
+   "sourceUrl": "https://www.puterea.ro/?p=207890",
+   "m": [
+    "Vasile",
+    "Vasilică",
+    "Vasilache",
+    "Sile",
+    "Sică",
+    "Silică",
+    "Vasi"
+   ],
+   "f": [
+    "Vasilica",
+    "Vasila",
+    "Vasilca",
+    "Sica",
+    "Silica"
+   ]
+  },
+  {
+   "id": "01-07",
+   "saint": "Soborul Sfântului Ioan Botezătorul",
+   "source": "dgep",
+   "date": "01-07",
+   "sourceUrl": "https://hotnews.ro/?p=87954",
+   "m": [
+    "Ioan",
+    "Ion",
+    "Ionuț",
+    "Ionel",
+    "Nelu",
+    "Ionică",
+    "Ioniță",
+    "Ivan",
+    "Jan",
+    "Jean"
+   ],
+   "f": [
+    "Ioana",
+    "Ionela",
+    "Oana",
+    "Ionica",
+    "Nela",
+    "Ionelia",
+    "Jana",
+    "Ionuța",
+    "Onuța"
+   ]
+  },
+  {
+   "id": "01-12",
+   "saint": "Sfânta Muceniță Tatiana",
+   "source": "calendar",
+   "date": "01-12",
+   "m": [],
+   "f": [
+    "Tatiana",
+    "Tania"
+   ]
+  },
+  {
+   "id": "01-17",
+   "saint": "Sfântul Cuvios Antonie cel Mare",
+   "source": "calendar",
+   "date": "01-17",
+   "m": [
+    "Antonie",
+    "Anton",
+    "Antonel",
+    "Tonel"
+   ],
+   "f": [
+    "Antonia",
+    "Antoaneta",
+    "Antonela"
+   ]
+  },
+  {
+   "id": "02-10",
+   "saint": "Sfântul Sfințit Mucenic Haralambie",
+   "source": "calendar",
+   "date": "02-10",
+   "m": [
+    "Haralambie",
+    "Haralamb"
+   ],
+   "f": []
+  },
+  {
+   "id": "03-26",
+   "saint": "Soborul Sfântului Arhanghel Gavriil",
+   "source": "calendar",
+   "date": "03-26",
+   "m": [
+    "Gavriil",
+    "Gavril",
+    "Gabriel"
+   ],
+   "f": [
+    "Gabriela"
+   ]
+  },
+  {
+   "id": "04-23",
+   "saint": "Sfântul Mare Mucenic Gheorghe",
+   "source": "dgep",
+   "date": "04-23",
+   "sourceUrl": "https://alba24.ro/sfantul-gheorghe-peste-un-milion-de-romani-isi-sarbatoresc-onomastica-in-23-aprilie-2025-cui-ii-poti-spune-la-multi-ani-1078249.html",
+   "m": [
+    "Gheorghe",
+    "George",
+    "Georgian",
+    "Gheorghiță",
+    "Georgel",
+    "Gigi",
+    "Gigel",
+    "Georgică",
+    "Gică",
+    "Ghiță",
+    "Gelu",
+    "Geo",
+    "Georgi"
+   ],
+   "f": [
+    "Georgiana",
+    "Georgeta",
+    "Gheorghița",
+    "Gina",
+    "Gherghina",
+    "Geta",
+    "Giorgiana",
+    "Gica",
+    "Georgica",
+    "Gicuța",
+    "Geluța",
+    "Gheorghina"
+   ]
+  },
+  {
+   "id": "04-25",
+   "saint": "Sfântul Apostol și Evanghelist Marcu",
+   "source": "calendar",
+   "date": "04-25",
+   "m": [
+    "Marcu",
+    "Marc",
+    "Marcel"
+   ],
+   "f": [
+    "Marcela"
+   ]
+  },
+  {
+   "id": "05-05",
+   "saint": "Sfânta Mare Muceniță Irina",
+   "source": "calendar",
+   "date": "05-05",
+   "m": [],
+   "f": [
+    "Irina"
+   ]
+  },
+  {
+   "id": "05-21",
+   "saint": "Sfinții Împărați Constantin și Elena",
+   "source": "dgep",
+   "date": "05-21",
+   "sourceUrl": "https://www.g4media.ro/aproape-18-milioane-de-romani-isi-sarbatoresc-onomastica-de-sfintii-constantin-si-elena.html",
+   "m": [
+    "Constantin",
+    "Cosmin",
+    "Costel",
+    "Costică",
+    "Costin",
+    "Costinel",
+    "Costache",
+    "Costi",
+    "Costea",
+    "Costeluș",
+    "Constandin",
+    "Dinu",
+    "Tinu",
+    "Ticu",
+    "Titi"
+   ],
+   "f": [
+    "Elena",
+    "Ileana",
+    "Lenuța",
+    "Constanța",
+    "Ilinca",
+    "Constantina",
+    "Eleonora",
+    "Costina",
+    "Ilenuța",
+    "Ilina",
+    "Leana",
+    "Lena",
+    "Nora",
+    "Ela",
+    "Eli",
+    "Tina"
+   ]
+  },
+  {
+   "id": "06-24",
+   "saint": "Nașterea Sfântului Ioan Botezătorul",
+   "source": "calendar",
+   "date": "06-24",
+   "m": [
+    "Ioan",
+    "Ion",
+    "Ionuț",
+    "Ionel"
+   ],
+   "f": [
+    "Ioana",
+    "Ionela",
+    "Oana",
+    "Sânziana"
+   ]
+  },
+  {
+   "id": "06-29",
+   "saint": "Sfinții Apostoli Petru și Pavel",
+   "source": "dgep",
+   "date": "06-29",
+   "sourceUrl": "https://www.forbes.ro/?p=453362",
+   "m": [
+    "Petru",
+    "Paul",
+    "Petre",
+    "Petrică",
+    "Pavel",
+    "Petrișor",
+    "Petronel",
+    "Paulică",
+    "Petruț",
+    "Petruș",
+    "Petrache"
+   ],
+   "f": [
+    "Paula",
+    "Petronela",
+    "Petruța",
+    "Petra",
+    "Paulina",
+    "Petrița"
+   ]
+  },
+  {
+   "id": "07-13",
+   "saint": "Soborul Sfântului Arhanghel Gavriil",
+   "source": "calendar",
+   "date": "07-13",
+   "m": [
+    "Gavriil",
+    "Gavril",
+    "Gabriel"
+   ],
+   "f": [
+    "Gabriela"
+   ]
+  },
+  {
+   "id": "07-20",
+   "saint": "Sfântul Proroc Ilie Tesviteanul",
+   "source": "dgep",
+   "date": "07-20",
+   "sourceUrl": "https://www.stiripesurse.ro/peste-140000-de-romani-si-romance-isi-serbeaza-ziua-onomastica-sambata-de-sarbatoarea-sfantului-ilie_3383143.html",
+   "m": [
+    "Ilie",
+    "Elias",
+    "Iliuță",
+    "Lică",
+    "Elis",
+    "Ilia",
+    "Eliade",
+    "Ilieș",
+    "Iliuș"
+   ],
+   "f": [
+    "Ilinca",
+    "Lia",
+    "Iliana",
+    "Lica",
+    "Eliana",
+    "Elis",
+    "Iliuța",
+    "Ilia",
+    "Ilincuța",
+    "Liana"
+   ]
+  },
+  {
+   "id": "07-24",
+   "saint": "Sfânta Muceniță Hristina",
+   "source": "calendar",
+   "date": "07-24",
+   "m": [],
+   "f": [
+    "Cristina",
+    "Hristina"
+   ]
+  },
+  {
+   "id": "07-25",
+   "saint": "Adormirea Sfintei Ana",
+   "source": "calendar",
+   "date": "07-25",
+   "m": [],
+   "f": [
+    "Ana",
+    "Anca",
+    "Anișoara",
+    "Ancuța",
+    "Anuța",
+    "Anica"
+   ]
+  },
+  {
+   "id": "08-15",
+   "saint": "Adormirea Maicii Domnului (Sfânta Maria Mare)",
+   "source": "dgep",
+   "date": "08-15",
+   "sourceUrl": "https://alba24.ro/sfanta-maria-mare-este-gresit-sau-nu-sa-faci-urari-la-sarbatoarea-adormirii-maicii-domnului-725517.html",
+   "m": [
+    "Marian",
+    "Marin",
+    "Marinel",
+    "Marinică",
+    "Marinache"
+   ],
+   "f": [
+    "Maria",
+    "Mariana",
+    "Marinela",
+    "Mioara",
+    "Marina",
+    "Marilena",
+    "Mărioara",
+    "Maricica",
+    "Marița",
+    "Măriuca",
+    "Mara",
+    "Mia",
+    "Ana-Maria",
+    "Marieta"
+   ]
+  },
+  {
+   "id": "08-26",
+   "saint": "Sfinții Mucenici Adrian și Natalia",
+   "source": "calendar",
+   "date": "08-26",
+   "m": [
+    "Adrian",
+    "Adi"
+   ],
+   "f": [
+    "Adriana",
+    "Natalia",
+    "Natașa"
+   ]
+  },
+  {
+   "id": "08-30",
+   "saint": "Sfântul Ierarh Alexandru",
+   "source": "dgep",
+   "date": "08-30",
+   "sourceUrl": "https://www.puterea.ro/?p=578752",
+   "m": [
+    "Alexandru",
+    "Alex",
+    "Sandu",
+    "Săndel",
+    "Alessandro",
+    "Alexei",
+    "Alecu",
+    "Sașa"
+   ],
+   "f": [
+    "Alexandra",
+    "Alexandrina",
+    "Sanda",
+    "Sandra",
+    "Alexa",
+    "Andra"
+   ]
+  },
+  {
+   "id": "09-05",
+   "saint": "Sfânta Elisabeta",
+   "source": "calendar",
+   "date": "09-05",
+   "m": [],
+   "f": [
+    "Elisabeta",
+    "Eliza",
+    "Elisa"
+   ]
+  },
+  {
+   "id": "09-08",
+   "saint": "Nașterea Maicii Domnului (Sfânta Maria Mică)",
+   "source": "calendar",
+   "date": "09-08",
+   "sourceUrl": "https://alba24.ro/ce-nume-se-sarbatoresc-pe-8-septembrie-de-sfanta-maria-mica-semnificatia-numelui-si-cui-ii-spui-la-multi-ani-1156935.html",
+   "m": [
+    "Marian",
+    "Marin",
+    "Marinică",
+    "Marinache"
+   ],
+   "f": [
+    "Maria",
+    "Mariana",
+    "Marina",
+    "Marinela",
+    "Mărioara",
+    "Mioara"
+   ]
+  },
+  {
+   "id": "09-09",
+   "saint": "Sfinții Părinți Ioachim și Ana",
+   "source": "calendar",
+   "date": "09-09",
+   "m": [
+    "Ioachim"
+   ],
+   "f": [
+    "Ana",
+    "Anca",
+    "Ancuța",
+    "Anișoara",
+    "Aneta",
+    "Anica",
+    "Anita",
+    "Anuța",
+    "Ana-Maria"
+   ]
+  },
+  {
+   "id": "09-17",
+   "saint": "Sfânta Muceniță Sofia",
+   "source": "calendar",
+   "date": "09-17",
+   "m": [],
+   "f": [
+    "Sofia"
+   ]
+  },
+  {
+   "id": "10-14",
+   "saint": "Sfânta Cuvioasă Parascheva",
+   "source": "dgep",
+   "date": "10-14",
+   "sourceUrl": "https://www.digi24.ro/stiri/actualitate/ce-nume-poarta-cei-peste-43-000-de-romani-care-isi-sarbatoresc-onomastica-la-praznicul-cuvioasei-parascheva-2116763",
+   "m": [],
+   "f": [
+    "Paraschiva",
+    "Parascheva",
+    "Chiva"
+   ]
+  },
+  {
+   "id": "10-18",
+   "saint": "Sfântul Apostol și Evanghelist Luca",
+   "source": "calendar",
+   "date": "10-18",
+   "m": [
+    "Luca"
+   ],
+   "f": []
+  },
+  {
+   "id": "10-26",
+   "saint": "Sfântul Mare Mucenic Dimitrie, Izvorâtorul de Mir",
+   "source": "dgep",
+   "date": "10-26",
+   "sourceUrl": "https://alba24.ro/ce-nume-se-sarbatoresc-de-sfantul-dumitru-2026-cui-ii-spui-la-multi-ani-pe-26-octombrie-1164076.html",
+   "m": [
+    "Dumitru",
+    "Mitică",
+    "Dimitrie",
+    "Dumitrache",
+    "Dimitri",
+    "Dima",
+    "Mitru",
+    "Mitrea",
+    "Mitruț",
+    "Mitu",
+    "Mitache"
+   ],
+   "f": [
+    "Dumitra",
+    "Dumitrița",
+    "Mița",
+    "Dumitrica",
+    "Dumitrana",
+    "Demetra"
+   ]
+  },
+  {
+   "id": "11-01",
+   "saint": "Sfinții Doctori fără de arginți Cosma și Damian",
+   "source": "calendar",
+   "date": "11-01",
+   "m": [
+    "Cosma",
+    "Cosmin",
+    "Damian"
+   ],
+   "f": [
+    "Cosmina"
+   ]
+  },
+  {
+   "id": "11-08",
+   "saint": "Soborul Sfinților Arhangheli Mihail și Gavriil",
+   "source": "dgep",
+   "date": "11-08",
+   "sourceUrl": "https://agerpres.ro/social/2022/11/08/aproape-1-5-milioane-de-romani-isi-sarbatoresc-onomastica-de-sfintii-arhangheli-mihail-si-gavriil--1009587",
+   "m": [
+    "Mihai",
+    "Gabriel",
+    "Mihail",
+    "Mihăiță",
+    "Gavril",
+    "Gavrilă",
+    "Mihnea",
+    "Gabi",
+    "Mihalache",
+    "Gavriil"
+   ],
+   "f": [
+    "Mihaela",
+    "Gabriela",
+    "Mihaiela",
+    "Gabi",
+    "Găbița",
+    "Michaela"
+   ]
+  },
+  {
+   "id": "11-16",
+   "saint": "Sfântul Apostol și Evanghelist Matei",
+   "source": "calendar",
+   "date": "11-16",
+   "m": [
+    "Matei"
+   ],
+   "f": []
+  },
+  {
+   "id": "11-25",
+   "saint": "Sfânta Mare Muceniță Ecaterina",
+   "source": "dgep",
+   "date": "11-25",
+   "sourceUrl": "https://jurnalul.ro/calendar/25-noiembrie-sfanta-mare-mucenita-ecaterina-916557.html",
+   "m": [
+    "Cătălin",
+    "Călin"
+   ],
+   "f": [
+    "Ecaterina",
+    "Cătălina",
+    "Caterina",
+    "Cati",
+    "Catinca",
+    "Călina",
+    "Tincuța"
+   ]
+  },
+  {
+   "id": "11-30",
+   "saint": "Sfântul Apostol Andrei",
+   "source": "dgep",
+   "date": "11-30",
+   "sourceUrl": "https://www.puterea.ro/?p=200148",
+   "m": [
+    "Andrei",
+    "Andi",
+    "Andu",
+    "Andreas",
+    "Andrea"
+   ],
+   "f": [
+    "Andreea",
+    "Andra",
+    "Andrada",
+    "Andreia",
+    "Andruța",
+    "Deea",
+    "Deia"
+   ]
+  },
+  {
+   "id": "12-04",
+   "saint": "Sfânta Mare Muceniță Varvara",
+   "source": "calendar",
+   "date": "12-04",
+   "m": [],
+   "f": [
+    "Varvara",
+    "Barbara"
+   ]
+  },
+  {
+   "id": "12-06",
+   "saint": "Sfântul Ierarh Nicolae",
+   "source": "dgep",
+   "date": "12-06",
+   "sourceUrl": "https://www.gandul.ro/actualitate/cati-romani-isi-serbeaza-onomastica-de-sfantul-nicolae-cele-mai-intalnite-prenume-20731647",
+   "m": [
+    "Nicolae",
+    "Nicolas",
+    "Nicușor",
+    "Neculai",
+    "Nicu",
+    "Niculae",
+    "Nicoară",
+    "Nichifor"
+   ],
+   "f": [
+    "Nicoleta",
+    "Niculina",
+    "Nicole",
+    "Nika"
+   ]
+  },
+  {
+   "id": "12-12",
+   "saint": "Sfântul Ierarh Spiridon",
+   "source": "calendar",
+   "date": "12-12",
+   "m": [
+    "Spiridon"
+   ],
+   "f": []
+  },
+  {
+   "id": "12-17",
+   "saint": "Sfântul Proroc Daniel",
+   "source": "calendar",
+   "date": "12-17",
+   "m": [
+    "Daniel",
+    "Dan",
+    "Dănuț"
+   ],
+   "f": [
+    "Daniela",
+    "Dana"
+   ]
+  },
+  {
+   "id": "12-22",
+   "saint": "Sfânta Mare Muceniță Anastasia",
+   "source": "calendar",
+   "date": "12-22",
+   "m": [],
+   "f": [
+    "Anastasia"
+   ]
+  },
+  {
+   "id": "12-25",
+   "saint": "Nașterea Domnului (Crăciunul)",
+   "source": "dgep",
+   "date": "12-25",
+   "sourceUrl": "https://www.puterea.ro/?p=427584",
+   "m": [
+    "Cristian",
+    "Cristinel",
+    "Cristi",
+    "Christian",
+    "Crăciun",
+    "Kristian",
+    "Crăciunel"
+   ],
+   "f": [
+    "Cristina",
+    "Cristiana",
+    "Krisztina",
+    "Cristinela",
+    "Kristina",
+    "Crăciunița"
+   ]
+  },
+  {
+   "id": "12-27",
+   "saint": "Sfântul Arhidiacon Ștefan",
+   "source": "dgep",
+   "date": "12-27",
+   "sourceUrl": "https://www.euronews.ro/articole/peste-jumatate-de-milion-de-romani-isi-sarbatoresc-onomastica-de-sfantul-stefan",
+   "m": [
+    "Ștefan",
+    "Istvan",
+    "Fănel",
+    "Fănică",
+    "Ștefănel",
+    "Ștefănuț",
+    "Fane"
+   ],
+   "f": [
+    "Ștefania",
+    "Ștefana",
+    "Fănica",
+    "Fănuța",
+    "Fana"
+   ]
+  },
+  {
+   "id": "mov:palm_sunday",
+   "saint": "Intrarea Domnului în Ierusalim (Floriile)",
+   "source": "dgep",
+   "movable": "palm_sunday",
+   "sourceUrl": "https://www.g4media.ro/cui-spunem-la-multi-ani-de-florii-cele-mai-frecvente-nume-dar-si-cele-mai-rare-celebrate-duminica-o-singura-persoana-poarta-numele-zambilica-aproape-2-milioane-de-romani-isi-serbeaza-onomastica.html",
+   "m": [
+    "Florin",
+    "Viorel",
+    "Florian",
+    "Florea",
+    "Florentin",
+    "Florinel",
+    "Narcis",
+    "Bujor",
+    "Trandafir",
+    "Codrin",
+    "Codruț",
+    "Ghiocel",
+    "Crin",
+    "Laurențiu"
+   ],
+   "f": [
+    "Florentina",
+    "Viorica",
+    "Florica",
+    "Floarea",
+    "Florina",
+    "Angela",
+    "Angelica",
+    "Camelia",
+    "Crina",
+    "Violeta",
+    "Viorela",
+    "Lăcrămioara",
+    "Brândușa",
+    "Narcisa",
+    "Liliana",
+    "Laura",
+    "Codruța",
+    "Codrina",
+    "Margareta",
+    "Iasmina",
+    "Iris",
+    "Roza"
+   ]
+  },
+  {
+   "id": "mov:thomas_sunday",
+   "saint": "Duminica Sfântului Apostol Toma",
+   "source": "calendar",
+   "movable": "thomas_sunday",
+   "m": [
+    "Toma",
+    "Tomiță"
+   ],
+   "f": []
+  }
+ ],
+ "primary": {
+  "Ioan": "01-07",
+  "Ion": "01-07",
+  "Ionuț": "01-07",
+  "Ionel": "01-07",
+  "Ioana": "01-07",
+  "Ionela": "01-07",
+  "Oana": "01-07",
+  "Maria": "08-15",
+  "Mariana": "08-15",
+  "Marian": "08-15",
+  "Marin": "08-15",
+  "Marina": "08-15",
+  "Marinela": "08-15",
+  "Mărioara": "08-15",
+  "Mioara": "08-15",
+  "Marinică": "08-15",
+  "Marinache": "08-15",
+  "Ana": "09-09",
+  "Anca": "09-09",
+  "Anișoara": "09-09",
+  "Ancuța": "09-09",
+  "Anuța": "09-09",
+  "Anica": "09-09",
+  "Gabriel": "11-08",
+  "Gabriela": "11-08",
+  "Gavril": "11-08",
+  "Gavriil": "11-08",
+  "Cristina": "12-25",
+  "Cosmin": "05-21"
+ },
+ "notes": {
+  "Maria": "Se sărbătorește de Adormirea Maicii Domnului (Sfânta Maria Mare, 15 august) și de Nașterea Maicii Domnului (Sfânta Maria Mică, 8 septembrie). Cei mai mulți își serbează numele pe 15 august.",
+  "Ioan": "Ziua principală e Soborul Sfântului Ioan Botezătorul (7 ianuarie). Unii își serbează numele și la Nașterea Sfântului Ioan Botezătorul (24 iunie, Sânzienele).",
+  "Ana": "Sfânta Ana se pomenește pe 9 septembrie, împreună cu Sfântul Ioachim, și pe 25 iulie (Adormirea Sfintei Ana).",
+  "Gabriel": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
+  "Cristina": "Statisticile oficiale o trec la Crăciun (25 decembrie). În calendar e pomenită și Sfânta Muceniță Hristina, pe 24 iulie.",
+  "Cosmin": "Statisticile oficiale trec numele la Sfinții Constantin și Elena (21 mai). Pornind de la Sfântul Cosma, unii își serbează numele pe 1 noiembrie.",
+  "Ileana": "Se sărbătorește de Sfinții Constantin și Elena (21 mai); statisticile o trec și la Sfântul Ilie (20 iulie).",
+  "Ilinca": "Statisticile oficiale o trec și la Sfântul Ilie (20 iulie), și la Sfinții Constantin și Elena (21 mai).",
+  "Andra": "Statisticile o trec și la Sfântul Andrei (30 noiembrie), și la Sfântul Alexandru (30 august).",
+  "Ion": "Ziua principală e Soborul Sfântului Ioan Botezătorul (7 ianuarie). Unii își serbează numele și la Nașterea Sfântului Ioan Botezătorul (24 iunie, Sânzienele).",
+  "Ionuț": "Ziua principală e Soborul Sfântului Ioan Botezătorul (7 ianuarie). Unii își serbează numele și la Nașterea Sfântului Ioan Botezătorul (24 iunie, Sânzienele).",
+  "Ionel": "Ziua principală e Soborul Sfântului Ioan Botezătorul (7 ianuarie). Unii își serbează numele și la Nașterea Sfântului Ioan Botezătorul (24 iunie, Sânzienele).",
+  "Ioana": "Ziua principală e Soborul Sfântului Ioan Botezătorul (7 ianuarie). Unii își serbează numele și la Nașterea Sfântului Ioan Botezătorul (24 iunie, Sânzienele).",
+  "Ionela": "Ziua principală e Soborul Sfântului Ioan Botezătorul (7 ianuarie). Unii își serbează numele și la Nașterea Sfântului Ioan Botezătorul (24 iunie, Sânzienele).",
+  "Oana": "Ziua principală e Soborul Sfântului Ioan Botezătorul (7 ianuarie). Unii își serbează numele și la Nașterea Sfântului Ioan Botezătorul (24 iunie, Sânzienele).",
+  "Mariana": "Se sărbătorește de Adormirea Maicii Domnului (Sfânta Maria Mare, 15 august) și de Nașterea Maicii Domnului (Sfânta Maria Mică, 8 septembrie). Cei mai mulți își serbează numele pe 15 august.",
+  "Marian": "Se sărbătorește de Adormirea Maicii Domnului (Sfânta Maria Mare, 15 august) și de Nașterea Maicii Domnului (Sfânta Maria Mică, 8 septembrie). Cei mai mulți își serbează numele pe 15 august.",
+  "Marin": "Se sărbătorește de Adormirea Maicii Domnului (Sfânta Maria Mare, 15 august) și de Nașterea Maicii Domnului (Sfânta Maria Mică, 8 septembrie). Cei mai mulți își serbează numele pe 15 august.",
+  "Marina": "Se sărbătorește de Adormirea Maicii Domnului (Sfânta Maria Mare, 15 august) și de Nașterea Maicii Domnului (Sfânta Maria Mică, 8 septembrie). Cei mai mulți își serbează numele pe 15 august.",
+  "Marinela": "Se sărbătorește de Adormirea Maicii Domnului (Sfânta Maria Mare, 15 august) și de Nașterea Maicii Domnului (Sfânta Maria Mică, 8 septembrie). Cei mai mulți își serbează numele pe 15 august.",
+  "Mărioara": "Se sărbătorește de Adormirea Maicii Domnului (Sfânta Maria Mare, 15 august) și de Nașterea Maicii Domnului (Sfânta Maria Mică, 8 septembrie). Cei mai mulți își serbează numele pe 15 august.",
+  "Mioara": "Se sărbătorește de Adormirea Maicii Domnului (Sfânta Maria Mare, 15 august) și de Nașterea Maicii Domnului (Sfânta Maria Mică, 8 septembrie). Cei mai mulți își serbează numele pe 15 august.",
+  "Anca": "Sfânta Ana se pomenește pe 9 septembrie, împreună cu Sfântul Ioachim, și pe 25 iulie (Adormirea Sfintei Ana).",
+  "Anișoara": "Sfânta Ana se pomenește pe 9 septembrie, împreună cu Sfântul Ioachim, și pe 25 iulie (Adormirea Sfintei Ana).",
+  "Ancuța": "Sfânta Ana se pomenește pe 9 septembrie, împreună cu Sfântul Ioachim, și pe 25 iulie (Adormirea Sfintei Ana).",
+  "Anuța": "Sfânta Ana se pomenește pe 9 septembrie, împreună cu Sfântul Ioachim, și pe 25 iulie (Adormirea Sfintei Ana).",
+  "Anica": "Sfânta Ana se pomenește pe 9 septembrie, împreună cu Sfântul Ioachim, și pe 25 iulie (Adormirea Sfintei Ana).",
+  "Gabriela": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
+  "Gavril": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
+  "Gavriil": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie."
+ }
+}

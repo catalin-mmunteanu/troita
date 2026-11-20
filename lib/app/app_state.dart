@@ -10,6 +10,7 @@ import '../core/data/day_repository.dart';
 import '../core/data/fast_journal_repository.dart';
 import '../core/data/feast_repository.dart';
 import '../core/data/local_church_repository.dart';
+import '../core/data/name_days_repository.dart';
 import '../core/models/church.dart';
 import '../core/native/troita_native.dart';
 import '../core/notifications/notification_planner.dart';
@@ -54,6 +55,9 @@ class AppState extends ChangeNotifier {
     if (repo == null) throw StateError('AppState.initialize() not awaited');
     return repo;
   }
+
+  /// Zile de nume, from a bundled asset: no database, loaded on first use.
+  final NameDaysRepository nameDays = NameDaysRepository();
 
   /// The calendar's view of a day: feasts, computed liturgics, published
   /// overrides and the bundled sinaxar text, assembled together.

@@ -36,7 +36,8 @@ void main() {
     });
   });
 
-  test('every day 2026–2030: fast level, period, glas, voscreasna', () {
+  test('every day 2026–2030: fast level, period, glas, voscreasna, weddings',
+      () {
     final List<String> misses = <String>[];
     for (final Object? raw in golden['days']! as List<Object?>) {
       final List<Object?> row = raw! as List<Object?>;
@@ -51,8 +52,10 @@ void main() {
         day.period?.kind.name,
         day.glas,
         day.voscreasna,
+        LiturgicalCalendar.cununie(date)?.name,
       ].join('|');
-      final String want = <Object?>[row[3], row[4], row[5], row[6]].join('|');
+      final String want =
+          <Object?>[row[3], row[4], row[5], row[6], row[7]].join('|');
       if (got != want) misses.add('${row[0]}: got $got, want $want');
     }
     expect(misses, isEmpty, reason: misses.take(20).join('\n'));

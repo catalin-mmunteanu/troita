@@ -231,3 +231,52 @@ def glas_for(d):
 def voscreasna_for(d):
     w = _weeks_since_thomas(d)
     return ((w + 4) % 11) + 1 if w is not None else None
+
+
+# --------------------------------------------------------------- weddings
+#
+# When the Church does not celebrate the Taina Cununiei. Checked against the
+# published 2027 calendar ("Nu se fac nunți"): 363 of 365 days identical, and
+# the two others are errors in the source (a note lost on 24 Dec, page script
+# in the note of 30 Sep). Same rules in liturgical_calendar.dart (cununie) and
+# troita-web's liturgical.ts (cununie). A civil wedding is not affected.
+
+# Fixed feasts whose eve and day have no weddings, as (month, day).
+_NO_WEDDING_DAYS = {
+    (2, 1), (2, 2),      # Întâmpinarea Domnului
+    (3, 24), (3, 25),    # Buna Vestire
+    (8, 15),             # Adormirea (its eve is in the Dormition fast)
+    (8, 29),             # Tăierea capului Sf. Ioan
+    (9, 7), (9, 8),      # Nașterea Maicii Domnului
+    (9, 14),             # Înălțarea Sfintei Cruci
+    (11, 20), (11, 21),  # Intrarea în Biserică (inside the Nativity fast)
+}
+
+WEDDING_REASONS = ('post', 'saptamanaBranzei', 'craciunBoboteaza',
+                   'saptamanaLuminata', 'praznic', 'miercuriVineri')
+
+
+def cununie(d):
+    """None when weddings are celebrated that day, else the reason they are not."""
+    y = d.year
+    p = pascha(y)
+    for _, s, e in great_fasts(y):
+        if s <= d <= e:
+            return 'post'
+    bs, be = branza(y)
+    if bs <= d <= be:
+        return 'saptamanaBranzei'
+    if d <= date(y, 1, 6) or d >= date(y, 12, 25):
+        return 'craciunBoboteaza'
+    if p <= d <= _off(p, 6):
+        return 'saptamanaLuminata'
+    if (d.month, d.day) in _NO_WEDDING_DAYS:
+        return 'praznic'
+    # Înălțarea and Rusaliile with their eves, and the Monday of Rusalii.
+    if d in (_off(p, 38), _off(p, 39), _off(p, 48), _off(p, 49), _off(p, 50)):
+        return 'praznic'
+    if d.weekday() in (2, 4):
+        in_harti = any(s <= d <= e for yy in (y - 1, y) for s, e in harti(yy))
+        if not in_harti:
+            return 'miercuriVineri'
+    return None

@@ -66,6 +66,16 @@ the site needs (or check troita-web).
     Holy Mon–Wed and the first two days of Lent are ajunare; Botezul Domnului
     never fasts.
   - The rules need a priest's review before anyone fasts by them.
+- **Weddings and baptism.** `LiturgicalCalendar.cununie()` returns why no
+  weddings are held (`WeddingBar`) or null; same rule in `engine_port.py` and
+  troita-web, golden column `cununie`; 2027 backtest 363/365 (the 2 misses are
+  source errors). Baptism has no forbidden days: the day screen mentions it only
+  on fast days (petrecerea, cu mâncare de post) and in Holy/Bright Week.
+- **Zile de nume.** `assets/data/name_days.json` (DGEP lists + saints named
+  like the name; several days per name allowed, `primary` + `notes`), checked
+  by `tool/check_name_days.py` in CI, read by `NameDays` /
+  `NameDaysRepository`. Shown on the day screen; calendar search finds names.
+  troita-web copies the file through its sync. Edit names here only.
 - **Rank names:** `praznic · cruce_rosie · cruce_albastra · simplu`. Say
   "cruce albastră", not "cruce neagră".
 - **Notes from the scraper:** junk (page JavaScript) is dropped and fixed-date

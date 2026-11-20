@@ -4,10 +4,12 @@ import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/app_scope.dart';
+import '../../app/app_state.dart';
 import '../../app/theme.dart';
 import '../../core/data/local_church_repository.dart';
 import '../../core/liturgical/fast_level.dart';
 import '../../core/models/feast.dart';
+import '../../core/models/name_days.dart';
 import 'day_detail_page.dart';
 
 /// "When is Sf. Parascheva?" — a saint's name to their next day.
@@ -30,15 +32,20 @@ class CalendarSearchPage extends StatefulWidget {
 }
 
 class _Hit {
-  const _Hit(this.feast, this.date);
-  final Feast feast;
+  const _Hit(this.title, this.date, this.rank);
+  final String title;
   final DateTime date;
+  final FeastRank rank;
 }
 
 class _CalendarSearchPageState extends State<CalendarSearchPage> {
   final TextEditingController _query = TextEditingController();
   List<Feast> _all = const <Feast>[];
   Map<Feast, List<String>> _folded = const <Feast, List<String>>{};
+
+  /// Zile de nume: "Andrei" finds 30 noiembrie, as "Ziua numelui Andrei".
+  List<NameFeast> _nameFeasts = const <NameFeast>[];
+  Map<String, String> _foldedNames = const <String, String>{};
   List<_Hit> _hits = const <_Hit>[];
   Timer? _debounce;
 
@@ -46,8 +53,20 @@ class _CalendarSearchPageState extends State<CalendarSearchPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final List<Feast> all = await AppScope.of(context).feasts.all();
+      final AppState state = AppScope.of(context);
+      final List<Feast> all = await state.feasts.all();
+      NameDays? nameDays;
+      try {
+        nameDays = await state.nameDays.load();
+      } catch (_) {}
       if (!mounted) return;
+      if (nameDays != null) {
+        _nameFeasts = nameDays.feasts;
+        _foldedNames = <String, String>{
+          for (final String n in nameDays.allNames)
+            n: LocalChurchRepository.foldForSearch(n),
+        };
+      }
       // Folded once: there are a few hundred, and keystrokes are frequent.
       setState(() {
         _all = all;
@@ -92,7 +111,26 @@ class _CalendarSearchPageState extends State<CalendarSearchPage> {
       DateTime? date = f.dateIn(today.year);
       if (date == null || date.isBefore(today)) date = f.dateIn(today.year + 1);
       if (date == null) continue;
-      hits.add(_Hit(f, date));
+      hits.add(_Hit(f.name, date, f.rank));
+    }
+    // A single word can also be a first name: every day that name is kept.
+    if (words.length == 1) {
+      final Set<String> names = <String>{
+        for (final MapEntry<String, String> e in _foldedNames.entries)
+          if (e.value.startsWith(words.first)) e.key,
+      };
+      for (final NameFeast f in _nameFeasts) {
+        final List<String> found =
+            f.names.where(names.contains).toList(growable: false);
+        if (found.isEmpty) continue;
+        DateTime? date = f.dateIn(today.year);
+        if (date == null || date.isBefore(today)) {
+          date = f.dateIn(today.year + 1);
+        }
+        if (date == null) continue;
+        hits.add(_Hit(
+            'Ziua numelui ${found.join(', ')} · ${f.saint}', date, FeastRank.simplu));
+      }
     }
     hits.sort((_Hit a, _Hit b) => a.date.compareTo(b.date));
     setState(() => _hits = hits.take(60).toList(growable: false));
@@ -115,7 +153,7 @@ class _CalendarSearchPageState extends State<CalendarSearchPage> {
           style: const TextStyle(fontSize: 17, color: TroitaColors.ink),
           decoration: const InputDecoration(
             border: InputBorder.none,
-            hintText: 'Caută un sfânt sau o sărbătoare',
+            hintText: 'Caută un sfânt, o sărbătoare sau un nume',
             hintStyle: TextStyle(fontSize: 16, color: TroitaColors.muted),
           ),
         ),
@@ -133,7 +171,7 @@ class _CalendarSearchPageState extends State<CalendarSearchPage> {
                       const Divider(height: 1, color: TroitaColors.border),
                   itemBuilder: (BuildContext context, int i) {
                     final _Hit h = _hits[i];
-                    final Color colour = feastRankColor(h.feast.rank);
+                    final Color colour = feastRankColor(h.rank);
                     return ListTile(
                       leading: SizedBox(
                         width: 44,
@@ -144,7 +182,7 @@ class _CalendarSearchPageState extends State<CalendarSearchPage> {
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w700,
-                                  color: h.feast.rank == FeastRank.simplu
+                                  color: h.rank == FeastRank.simplu
                                       ? TroitaColors.ink
                                       : colour,
                                   height: 1,
@@ -155,7 +193,7 @@ class _CalendarSearchPageState extends State<CalendarSearchPage> {
                           ],
                         ),
                       ),
-                      title: Text(h.feast.name,
+                      title: Text(h.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -185,7 +223,8 @@ class _Hint extends StatelessWidget {
         padding: EdgeInsets.all(TroitaSpacing.page * 1.5),
         child: Text(
           'Scrieți numele unui sfânt sau al unei sărbători, de exemplu '
-          '„Parascheva” sau „Buna Vestire”. Diacriticele nu contează, iar '
+          '„Parascheva” sau „Buna Vestire”, ori un prenume, de exemplu '
+          '„Andrei”, ca să aflați ziua numelui. Diacriticele nu contează, iar '
           'începutul numelui este de ajuns.',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 15, color: TroitaColors.muted, height: 1.4),

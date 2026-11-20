@@ -35,6 +35,8 @@ jobs:
           python-version: "3.12"
       - name: Static checks
         run: python tool/check_dart.py
+      - name: Name days
+        run: python tool/check_name_days.py
       - name: Golden vectors match the pipeline's engine
         run: |
           python tool/engine_golden.py --write
