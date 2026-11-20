@@ -14,6 +14,7 @@ class DayEntry {
     required this.liturgical,
     this.sinaxar,
     this.override,
+    this.computed = false,
   });
 
   final DateTime date;
@@ -21,6 +22,12 @@ class DayEntry {
   final LiturgicalDay liturgical;
   final Sinaxar? sinaxar;
   final DayOverride? override;
+
+  /// True when the year has no published calendar yet (2028–2030 today): the
+  /// fast level and the order of the day come from the engine alone, which
+  /// matches the published 2026–2027 calendars on 97% of days. The screens say
+  /// so; the official calendar replaces it when the pipeline scrapes it.
+  final bool computed;
 
   Feast? get primary => feasts.isEmpty ? null : feasts.first;
 
@@ -44,6 +51,26 @@ class DayRepository {
   final FeastRepository _feasts;
 
   final Map<String, Sinaxar?> _sinaxarCache = <String, Sinaxar?>{};
+  Set<int>? _publishedYears;
+
+  /// Years with a published calendar, from the seed's `meta.published_years`.
+  Future<Set<int>> publishedYears() async {
+    final Set<int>? cached = _publishedYears;
+    if (cached != null) return cached;
+    final List<Map<String, Object?>> rows = await _db.query(
+      'meta',
+      columns: <String>['value'],
+      where: 'key = ?',
+      whereArgs: <Object?>['published_years'],
+      limit: 1,
+    );
+    final String raw = rows.isEmpty ? '' : (rows.first['value'] as String? ?? '');
+    return _publishedYears = raw
+        .split(',')
+        .map((String y) => int.tryParse(y.trim()))
+        .whereType<int>()
+        .toSet();
+  }
   final Map<String, DayOverride?> _overrideCache = <String, DayOverride?>{};
 
   static String _key(DateTime d) =>
@@ -83,7 +110,8 @@ class DayRepository {
   /// Where a published value exists, use it; otherwise compute.
   static FastLevel? _parseLevel(String? raw) => switch (raw) {
         'none' => FastLevel.none,
-        'dairy' => FastLevel.dairy,
+        // Older seeds: Săptămâna Brânzei is shown as a day without fast.
+        'dairy' => FastLevel.none,
         'fish' => FastLevel.fish,
         'wineOil' => FastLevel.wineOil,
         'fast' => FastLevel.fast,
@@ -118,12 +146,17 @@ class DayRepository {
       );
     }
 
+    final Set<int> publishedYearSet = await publishedYears();
     return DayEntry(
       date: d,
       feasts: feasts,
       liturgical: day,
       sinaxar: withText ? await sinaxarFor(d) : null,
       override: override,
+      // An empty set means an old seed without the key: say nothing rather
+      // than flag every day.
+      computed: publishedYearSet.isNotEmpty &&
+          !publishedYearSet.contains(d.year),
     );
   }
 

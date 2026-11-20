@@ -63,7 +63,24 @@ class FeastCalendar {
     final month = int.tryParse(parts[0]);
     final day = int.tryParse(parts[1]);
     if (month == null || day == null) return null;
-    return DateTime(y, month, day);
+    return transferred(DateTime(y, month, day));
+  }
+
+  /// Where a fixed feast is actually kept in a given year.
+  ///
+  /// Sf. Mare Mucenic Gheorghe (23 April) is not celebrated in Holy Week or on
+  /// Pascha: from Florii to Pascha it moves to Bright Monday (2030: Holy
+  /// Tuesday → 29 April). Everything else stays on its date. The same rule is
+  /// in tool/engine_golden.py and the website's calendar.ts.
+  static DateTime transferred(DateTime date) {
+    if (date.month == 4 && date.day == 23) {
+      final p = pascha(date.year);
+      final florii = DateTime(p.year, p.month, p.day - 7);
+      if (!date.isBefore(florii) && !date.isAfter(p)) {
+        return DateTime(p.year, p.month, p.day + 1);
+      }
+    }
+    return date;
   }
 
   /// The next occurrence, rolling into next year if this year's has passed.

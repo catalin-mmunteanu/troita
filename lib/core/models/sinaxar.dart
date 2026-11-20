@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../data/note_text.dart';
 
 /// The full commemoration text for a fixed date, bundled from the scrape.
 class Sinaxar {
@@ -81,7 +82,7 @@ class DayOverride {
   factory DayOverride.fromRow(Map<String, Object?> row) => DayOverride(
         monthDay: row['month_day']! as String,
         fastLevel: row['fast_level'] as String?,
-        notes: row['notes'] as String?,
+        notes: cleanNote(row['notes'] as String?),
         glas: (row['glas'] as num?)?.toInt(),
         voscreasna: (row['voscreasna'] as num?)?.toInt(),
         sundayTitle: row['sunday_title'] as String?,

@@ -1,0 +1,139 @@
+# CLAUDE.md — troita (the Android app)
+
+Read this first. It records decisions made with the owner; follow them unless
+the owner says otherwise in the current conversation.
+
+## What this repo is
+
+The Troița app: a Romanian Orthodox calendar for Android (Flutter + a thin
+Kotlin layer). Tabs: Calendar · Posturi · Hartă · Profil. It also owns the data
+pipeline (`tool/`) that builds the seed database the app ships.
+
+It has a sister repo, **troita-web** (`catalin-mmunteanu/troita-web`, Next.js,
+www.troita.ro). The site is the app's portal *and* a free calendar in its own
+right. The two must stay cohesive: same data, same fasting rules, same design,
+same words. When you change something here that the site also shows, say what
+the site needs (or check troita-web).
+
+| | troita (this repo) | troita-web |
+|---|---|---|
+| Default branch | `master` | `main` |
+| Owns | the engine, the data pipeline, the seed DB, the golden test file, `strings`/labels | DESIGN.MD and `design/tokens.json` |
+| Deploy | Play Store release | Vercel on push to `main` |
+
+## Working rules
+
+- **Never commit to `master`.** Work on a feature branch; one branch per piece
+  of work, one PR. Don't split one task into many branches.
+- The owner pushes from their own terminal; Claude's sandbox may not be able to
+  push. If a push fails, give the exact commands instead of retrying.
+- Flutter may not be available in Claude's sandbox. If you can't run
+  `flutter analyze && flutter test`, say so plainly and ask the owner to run
+  them; `python3 tool/check_dart.py` is only a cheap static check.
+- The UI language is Romanian, with correct diacritics (ș ț with comma below).
+
+## Decisions (keep them)
+
+- **Five fast states, no "dezlegare la lactate".** `none · fish · wineOil ·
+  fast · strict`. The owner's position: there is no dairy dezlegare in
+  Orthodoxy. Săptămâna Brânzei is shown as a week without fast. Older seeds
+  with `'dairy'` are read as `none`. (The scraped published calendar does print
+  "Dezlegare la brânză, lapte și ouă" for that week — the decision stands.)
+- **Calendar years 2026–2030.** `CALENDAR_UNTIL = 2030` in
+  `tool/build_seed.py`. *Published* years (now 2026, 2027) carry the official
+  per-day values in `day_overrides`. *Computed* years (2028–2030) come from the
+  engine alone and the day screen says "Calculat după rânduiala Bisericii; se
+  confirmă când apare calendarul oficial". When the pipeline scrapes an official
+  year it becomes published; a year never goes back to computed.
+- **One engine, three copies, one test file.** `lib/core/liturgical/` (Dart,
+  the product), `tool/engine_port.py` (pipeline) and troita-web's
+  `src/lib/liturgical.ts`. All three are tested against
+  `test/golden/engine-2026-2030.json`. Any rule change goes into all three, then:
+  ```bash
+  python3 tool/engine_golden.py --backtest   # vs published 2026/2027 (now 97.0%)
+  python3 tool/engine_golden.py --write      # regenerate the golden file
+  ```
+  troita-web picks the new golden file up through its daily sync and fails its
+  tests if its port wasn't updated.
+- **Rules worth knowing** (all three engines):
+  - Postul Sf. Apostoli starts on the Tuesday after Rusalii when Pascha+57 would
+    leave < 7 days (2027: 22–28 June, matches the published calendar; 2030
+    computed as 18–28 June — confirm when the 2030 calendar appears).
+  - Sf. Gheorghe (23 April) moves to Bright Monday when it falls from Florii to
+    Pascha (2030 → 29 April); hram reminders move with it
+    (`FeastCalendar.transferred`).
+  - A saint with a cross (roșie/albastră) relaxes the fast a step inside fasts;
+    Holy Mon–Wed and the first two days of Lent are ajunare; Botezul Domnului
+    never fasts.
+  - The rules need a priest's review before anyone fasts by them.
+- **Rank names:** `praznic · cruce_rosie · cruce_albastra · simplu`. Say
+  "cruce albastră", not "cruce neagră".
+- **Notes from the scraper:** junk (page JavaScript) is dropped and fixed-date
+  feasts keep only date-invariant notes (Tedeum…). Same rule in
+  `tool/build_seed.py` and `lib/core/data/note_text.dart`.
+- **Ads:** planned, no date. No AdMob in the app yet. When AdMob ships, the
+  same release must flip `ADS.inApp` in troita-web so the privacy policy
+  matches (Google Play checks it).
+- **Sinaxar licensing — open blocker.** The bundled sinaxar texts and the 447
+  images in `assets/sinaxar/` are scraped from calendar-ortodox.ro (all rights
+  reserved). Decided: replace with OrthodoxWiki ro (GFDL / CC BY-SA 2.5+) and
+  ro.wikipedia (CC BY-SA 4.0) articles with attribution, original summaries for
+  the gaps, images only from Wikimedia Commons with a clear licence; then remove
+  the scraper step, or the monthly PR re-adds it. Don't add more scraped
+  copyrighted content.
+- **Contact:** `AppConfig.supportEmail` stays empty until the owner picks a
+  dedicated mailbox; never default it to a personal address.
+
+## Design (owned by troita-web)
+
+- The design spec is troita-web's `DESIGN.MD`; values live in
+  troita-web's `design/tokens.json`. `lib/app/design_tokens.dart` is
+  **generated** — don't edit it by hand:
+  ```bash
+  # in troita-web
+  node scripts/tokens.mjs --dart ../troita/lib/app/design_tokens.dart
+  ```
+- `lib/app/theme.dart` maps those tokens to app names (`TroitaColors.paper`,
+  `.feastRed`, …). Screens use the names, never hex literals.
+- Fonts: Literata (display), Plus Jakarta Sans (text), Alegreya Sans (UI),
+  JetBrains Mono (rubrics), bundled in `assets/fonts` (OFL). Geist and Fraunces
+  are banned/gone.
+- Radii 4px, 8px max; no pill shapes; gold is never a text colour; fast-state
+  colours = the site's badge text colours. Burgundy (`TroitaAppTokens.today`) is
+  app-only, for today's date.
+- Not done yet: app dark mode (the site has it).
+
+## App ↔ site links
+
+- One URL scheme, in `lib/app/site_links.dart`: a day is
+  `https://www.troita.ro/calendar-ortodox/<an>/<luna>#ziua-<zi>`; also `/azi`,
+  `/posturi/...`. Keep it in step with troita-web's routes.
+- Android App Links: autoVerify intent filter in `AndroidManifest.xml`; the site
+  serves `/.well-known/assetlinks.json`, which stays empty until the release
+  key's SHA-256 is put in troita-web's `SITE.appSigningSha256` (needs release
+  signing first).
+- Shared days carry their troita.ro link; Settings links to the site and the
+  privacy policy.
+
+## Data pipeline
+
+- **Update app data** (`.github/workflows/update-data.yml`), the only data
+  pipeline: 3rd of each month, rebuilds churches from OSM and rescrapes the
+  calendar (this year and next), opens/updates one PR on `data/auto-update`.
+  Never auto-merged. Guard rails refuse a DB that loses years, sinaxar days or
+  > 10% of churches.
+- The PR also carries `tool/changes.json` (added/removed/renamed/moved churches)
+  and the regenerated golden file.
+- Once merged into `master`, troita-web's daily `sync-app-data.yml` exports the
+  seed and opens a PR there. troita-web follows only `master`.
+- **Test** (`.github/workflows/test.yml`): flutter analyze + test, golden
+  freshness, backtest.
+
+## Open items
+
+Sinaxar replacement (above) · support mailbox · release signing (also unblocks
+App Links) · R8 · crash reporting · 20 unverified churches · priest review of
+the fasting rules · app dark mode · PR #1 (+80 churches) waiting to be merged.
+
+The full plan and status are in the claude.ai project "Troita-platform"
+(`claude/integration-plan.md`, `claude/implementation-status.md`).

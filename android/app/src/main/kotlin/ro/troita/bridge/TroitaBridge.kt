@@ -45,6 +45,10 @@ object TroitaBridge {
     @Volatile
     var pendingChurchId: String? = null
 
+    /** A troita.ro link (App Links) that opened the app, until Dart reads it. */
+    @Volatile
+    var pendingLink: String? = null
+
     fun attach(context: Context, engine: FlutterEngine) {
         val app = context.applicationContext
         channel = MethodChannel(engine.dartExecutor.binaryMessenger, METHOD_CHANNEL).apply {
@@ -60,6 +64,12 @@ object TroitaBridge {
     fun emitPendingChurch() {
         val id = pendingChurchId ?: return
         main.post { channel?.invokeMethod("onChurchOpened", id) }
+    }
+
+    fun emitPendingLink() {
+        val link = pendingLink ?: return
+        pendingLink = null
+        main.post { channel?.invokeMethod("onLinkOpened", link) }
     }
 
     // ------------------------------------------------------------------ calls
@@ -106,6 +116,8 @@ object TroitaBridge {
         }
 
         "consumePendingChurchId" -> pendingChurchId.also { pendingChurchId = null }
+
+        "consumePendingLink" -> pendingLink.also { pendingLink = null }
 
         // A geo:, mailto: or https: link, handed to whichever app the user has
         // for it. Through the bridge rather than a plugin: every plugin this

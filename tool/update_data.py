@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import os
 import shutil
 import sqlite3
@@ -50,6 +51,7 @@ SEED = os.path.join(HERE, "..", "android", "app", "src", "main", "assets", "seed
 DB = os.path.join(SEED, "churches.db")
 VERSION = os.path.join(SEED, "version.txt")
 PBF = os.path.join(HERE, "romania-latest.osm.pbf")
+CHANGES = os.path.join(HERE, "changes.json")
 ELEMENTS = os.path.join(HERE, ".pbf-elements.json")
 
 # Geofabrik rebuilds daily; anything older than this is re-downloaded. Long
@@ -104,10 +106,41 @@ def snapshot(path: str) -> dict:
             "sinaxar": q("SELECT COUNT(*) FROM sinaxar")[0][0],
             "years": sorted(int(y) for y in
                             (meta.get("published_years") or "").split(",") if y),
+            "computed": sorted(int(y) for y in
+                               (meta.get("computed_years") or "").split(",") if y),
             "version": meta.get("seed_version", "?"),
         }
     finally:
         db.close()
+
+
+def church_changes(old_path: str, new_path: str) -> dict:
+    """Which churches were added, removed, renamed or moved, by stable id.
+
+    Written to tool/changes.json with every data pull request. The website
+    uses it to redirect the pages of removed churches and to date the pages of
+    changed ones in its sitemap; later the app can sync from it instead of
+    waiting for a release."""
+    def rows(path):
+        if not os.path.exists(path):
+            return {}
+        db = sqlite3.connect(path)
+        try:
+            return {r[0]: r[1:] for r in db.execute(
+                "SELECT id, name, lat, lon, kind FROM churches WHERE deleted = 0")}
+        finally:
+            db.close()
+    old, new = rows(old_path), rows(new_path)
+    renamed = sorted(i for i in old.keys() & new.keys() if old[i][0] != new[i][0])
+    # ~50 m: below that a coordinate change is OSM tidying, not a move.
+    moved = sorted(i for i in old.keys() & new.keys()
+                   if abs(old[i][1] - new[i][1]) + abs(old[i][2] - new[i][2]) > 0.0005)
+    return {
+        "added": sorted(new.keys() - old.keys()),
+        "removed": sorted(old.keys() - new.keys()),
+        "renamed": renamed,
+        "moved": moved,
+    }
 
 
 def check(before: dict, after: dict) -> list[str]:
@@ -151,6 +184,8 @@ def summary(before: dict, after: dict, steps: dict[str, bool],
         f"| Zile de sinaxar | {delta('sinaxar')} |",
         f"| Ani cu calendar publicat | "
         f"{', '.join(map(str, after.get('years') or before.get('years', [])))} |",
+        f"| Ani calculați (până apare calendarul oficial) | "
+        f"{', '.join(map(str, after.get('computed') or before.get('computed', []))) or '—'} |",
         "",
         "Pași: " + " · ".join(f"{k} {'✓' if v else '✗'}" for k, v in steps.items()),
     ]
@@ -224,6 +259,17 @@ def main() -> int:
     problems = check(before, after) if steps["build"] else ["build_seed failed"]
     changed = bool(after) and after.get("hash") != before.get("hash")
 
+    # The golden vectors carry each day's feast rank, so they follow the data.
+    if changed and not problems:
+        steps["golden"] = run("engine golden", ["engine_golden.py", "--write"])
+
+    changes = church_changes(backup_db, DB) if changed and not problems else None
+    if changes is not None:
+        with open(CHANGES, "w", encoding="utf-8") as fh:
+            json.dump({"from": before.get("version"), "to": after.get("version"),
+                       **changes}, fh, ensure_ascii=False, indent=1)
+            fh.write("\n")
+
     if problems or not changed:
         # Put the previous files back: either the new build is worse, or it is
         # identical in content and only the timestamp moved.
@@ -237,6 +283,11 @@ def main() -> int:
             os.remove(path)
 
     text = summary(before, after or before, steps, problems, changed)
+    if changes is not None:
+        text += ("\nLăcașuri: " + ", ".join(
+            f"{label} {len(changes[key])}" for key, label in (
+                ("added", "noi"), ("removed", "șterse"),
+                ("renamed", "redenumite"), ("moved", "mutate"))) + "\n")
     _write_summary(args.summary, text)
     print("\n" + text)
 

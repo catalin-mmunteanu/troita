@@ -11,12 +11,12 @@ import '../core/data/fast_journal_repository.dart';
 import '../core/data/feast_repository.dart';
 import '../core/data/local_church_repository.dart';
 import '../core/models/church.dart';
-import '../core/models/fast_day.dart';
 import '../core/native/troita_native.dart';
 import '../core/notifications/notification_planner.dart';
 import '../core/notifications/notification_prefs.dart';
 import '../core/notifications/notification_service.dart';
 import '../core/permissions/permission_service.dart';
+import 'site_links.dart';
 import 'widget_feed.dart';
 
 /// Single app-wide store. Deliberately a plain [ChangeNotifier]: the app has
@@ -40,6 +40,7 @@ class AppState extends ChangeNotifier {
   FastJournalRepository? _journal;
   ChurchMarksRepository? _marks;
   StreamSubscription<String>? _openedSub;
+  StreamSubscription<String>? _linkSub;
 
   ChurchRepository get repository {
     final ChurchRepository? repo = _repository;
@@ -116,6 +117,10 @@ class AppState extends ChangeNotifier {
         notifyListeners();
       });
 
+      // troita.ro links: a day opens that day, anything else just the app.
+      _openLink(await _native.consumePendingLink());
+      _linkSub = _native.openedLink.listen(_openLink);
+
       await _initNotifications();
 
       ready = true;
@@ -146,6 +151,15 @@ class AppState extends ChangeNotifier {
     final DateTime? parsed = DateTime.tryParse(iso);
     if (parsed == null) return;
     pendingDate = DateTime(parsed.year, parsed.month, parsed.day);
+    notifyListeners();
+  }
+
+  void _openLink(String? link) {
+    if (link == null) return;
+    final Uri? uri = Uri.tryParse(link);
+    final DateTime? date = uri == null ? null : SiteLinks.dateOf(uri);
+    if (date == null) return;
+    pendingDate = date;
     notifyListeners();
   }
 
@@ -285,6 +299,7 @@ class AppState extends ChangeNotifier {
   @override
   void dispose() {
     unawaited(_openedSub?.cancel());
+    unawaited(_linkSub?.cancel());
     super.dispose();
   }
 }

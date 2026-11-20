@@ -23,17 +23,26 @@ void main() {
       expect(p.days, 21);
     });
 
-    test('Postul Apostolilor does not exist in late-Pascha years', () {
-      // Pascha 2024 was 5 May, which pushes the start past 28 June.
-      expect(LiturgicalCalendar.postulApostolilor(2024), isNull);
-      // A sanity check that the engine agrees across a long span.
-      final List<int> missing = <int>[
-        for (int y = 2020; y <= 2100; y++)
-          if (LiturgicalCalendar.postulApostolilor(y) == null) y,
-      ];
-      expect(missing, contains(2024));
-      expect(missing, contains(2040));
-      expect(missing.length, 10);
+    test('in late-Pascha years Postul Apostolilor starts after Rusalii', () {
+      // Pascha 2027 is 2 May: the Monday after All Saints would be 28 June,
+      // a fast of one day. The published 2027 calendar starts it on the
+      // Tuesday after Rusalii instead.
+      final FastingPeriod p2027 = LiturgicalCalendar.postulApostolilor(2027)!;
+      expect(p2027.start, DateTime(2027, 6, 22));
+      expect(p2027.end, DateTime(2027, 6, 28));
+      // Pascha 2024 was 5 May: 25–28 June.
+      expect(LiturgicalCalendar.postulApostolilor(2024)!.start,
+          DateTime(2024, 6, 25));
+      // With that rule the fast never disappears before 2100.
+      for (int y = 2020; y <= 2100; y++) {
+        expect(LiturgicalCalendar.postulApostolilor(y), isNotNull, reason: '$y');
+      }
+    });
+
+    test('the week after Rusalii ends where the Apostles\' fast begins', () {
+      // 2027: Rusalii 20 June, fast from 22 June. 21 June is still harți.
+      expect(levelOn(DateTime(2027, 6, 21)), FastLevel.none);
+      expect(levelOn(DateTime(2027, 6, 23)), FastLevel.fast); // Wednesday
     });
 
     test('the fixed fasts are fixed', () {
@@ -55,9 +64,23 @@ void main() {
   });
 
   group('Postul Mare', () {
-    test('first day and Great Friday are strict', () {
+    test('the first two days and Great Friday are strict', () {
       expect(levelOn(DateTime(2026, 2, 23)), FastLevel.strict);
+      expect(levelOn(DateTime(2026, 2, 24)), FastLevel.strict);
       expect(levelOn(DateTime(2026, 4, 10)), FastLevel.strict);
+    });
+
+    test('Holy Monday to Wednesday are strict', () {
+      expect(levelOn(DateTime(2026, 4, 6)), FastLevel.strict);
+      expect(levelOn(DateTime(2026, 4, 7)), FastLevel.strict);
+      expect(levelOn(DateTime(2026, 4, 8)), FastLevel.strict);
+      expect(levelOn(DateTime(2027, 4, 28)), FastLevel.strict);
+    });
+
+    test('a saint with a cross on a Lenten weekday allows oil and wine', () {
+      expect(levelOn(DateTime(2027, 4, 23), rank: FeastRank.cruceRosie),
+          FastLevel.wineOil); // Sf. Gheorghe, Friday
+      expect(levelOn(DateTime(2027, 4, 15)), FastLevel.wineOil); // Canonul
     });
 
     test('weekdays are a plain fast, weekends allow oil and wine', () {
@@ -119,6 +142,13 @@ void main() {
       expect(levelOn(DateTime(2026, 12, 16)), FastLevel.fast); // Wednesday
     });
 
+    test('a saint with a cross: fish on Mon/Tue/Thu, oil on Wed/Fri', () {
+      expect(levelOn(DateTime(2026, 12, 1), rank: FeastRank.cruceAlbastra),
+          FastLevel.fish); // Tuesday
+      expect(levelOn(DateTime(2026, 12, 4), rank: FeastRank.cruceAlbastra),
+          FastLevel.wineOil); // Friday
+    });
+
     test('named feasts inside the fast allow fish', () {
       expect(levelOn(DateTime(2026, 11, 21)), FastLevel.fish); // Intrarea
       expect(levelOn(DateTime(2026, 11, 30)), FastLevel.fish); // Sf. Andrei
@@ -149,9 +179,14 @@ void main() {
       expect(levelOn(DateTime(2026, 6, 3)), FastLevel.none); // Wednesday
     });
 
-    test('Săptămâna Brânzei permits dairy on Wednesday and Friday', () {
-      expect(levelOn(DateTime(2026, 2, 18)), FastLevel.dairy); // Wednesday
-      expect(levelOn(DateTime(2026, 2, 20)), FastLevel.dairy); // Friday
+    test('Săptămâna Brânzei is a week without fast', () {
+      expect(levelOn(DateTime(2026, 2, 18)), FastLevel.none); // Wednesday
+      expect(levelOn(DateTime(2026, 2, 20)), FastLevel.none); // Friday
+    });
+
+    test('Botezul Domnului has no fast, even on a Wednesday', () {
+      expect(levelOn(DateTime(2027, 1, 6), rank: FeastRank.praznic),
+          FastLevel.none);
     });
   });
 

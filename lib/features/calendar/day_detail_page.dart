@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
+import '../../app/site_links.dart';
 import '../../app/theme.dart';
 import '../../core/data/day_repository.dart';
 import '../../core/liturgical/fast_level.dart';
@@ -69,6 +70,9 @@ class _DayDetailPageState extends State<DayDetailPage> {
       if (entry.liturgical.isFasting) entry.liturgical.fastLevel.label,
       '',
       '— din calendarul Troița',
+      // A link, not just a name: anyone can open the day on troita.ro, and on
+      // a phone with the app it opens here (App Links).
+      SiteLinks.day(entry.date),
     ];
     await AppScope.of(context).native.shareText(lines.join('\n'));
   }
@@ -326,6 +330,14 @@ class _LiturgicalCard extends StatelessWidget {
               'Glasul ${entry.liturgical.glas}'
               '${entry.liturgical.voscreasna == null ? '' : ' · voscreasna ${entry.liturgical.voscreasna}'}',
               style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+          if (entry.computed) ...<Widget>[
+            const Divider(height: 22),
+            Text(
+              'Calculat după rânduiala Bisericii; se confirmă când apare '
+              'calendarul oficial pe ${entry.date.year}.',
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
           if (entry.override?.apostol != null ||

@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
+import '../../app/site_links.dart';
 import '../../app/theme.dart';
 import '../../core/notifications/notification_prefs.dart';
 import '../../core/notifications/notification_service.dart';
@@ -58,18 +59,25 @@ class _SettingsPageState extends State<SettingsPage> {
           }),
 
           const _Header('Notificarea zilnică'),
-          ...DailyNotificationMode.values.map(
-            (DailyNotificationMode mode) => RadioListTile<DailyNotificationMode>(
-              value: mode,
-              groupValue: prefs.mode,
-              onChanged: _busy
-                  ? null
-                  : (DailyNotificationMode? v) =>
-                      v == null ? null : _update(prefs.copyWith(mode: v)),
-              title: Text(mode.label),
-              subtitle: Text(mode.description,
-                  style: Theme.of(context).textTheme.bodySmall),
-              activeColor: TroitaColors.burgundy,
+          RadioGroup<DailyNotificationMode>(
+            groupValue: prefs.mode,
+            onChanged: (DailyNotificationMode? v) {
+              if (_busy || v == null) return;
+              _update(prefs.copyWith(mode: v));
+            },
+            child: Column(
+              children: <Widget>[
+                for (final DailyNotificationMode mode
+                    in DailyNotificationMode.values)
+                  RadioListTile<DailyNotificationMode>(
+                    value: mode,
+                    enabled: !_busy,
+                    title: Text(mode.label),
+                    subtitle: Text(mode.description,
+                        style: Theme.of(context).textTheme.bodySmall),
+                    activeColor: TroitaColors.burgundy,
+                  ),
+              ],
             ),
           ),
 
@@ -126,6 +134,19 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             title: const Text('Versiunea datelor'),
             trailing: Text(state.seed['seed_version'] ?? '—'),
+          ),
+          // The site carries the same calendar, the fasting guide and the
+          // privacy policy Google Play links to.
+          ListTile(
+            title: const Text('Calendarul pe troita.ro'),
+            subtitle: const Text('Același calendar, pe orice dispozitiv.'),
+            trailing: const Icon(Icons.open_in_new, size: 18),
+            onTap: () => state.native.openUri(SiteLinks.base),
+          ),
+          ListTile(
+            title: const Text('Politica de confidențialitate'),
+            trailing: const Icon(Icons.open_in_new, size: 18),
+            onTap: () => state.native.openUri(SiteLinks.privacy),
           ),
           // Required by the ODbL licence of the church data and map tiles.
           const Padding(

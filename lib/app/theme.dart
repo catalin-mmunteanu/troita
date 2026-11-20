@@ -1,41 +1,45 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../core/liturgical/fast_level.dart';
+import 'design_tokens.dart';
 
-/// Design tokens, taken from the Figma file rather than invented.
+/// The app's palette, named for what each colour does here.
 ///
-/// The file defines no Figma variables, so these are the raw fills lifted from
-/// `acasa-calendar` (2:112). Everything that follows is derived from them —
-/// screens should reference these names, never a hex literal.
+/// Every value comes from the tokens shared with the website (DESIGN.MD,
+/// troita-web/design/tokens.json → design_tokens.dart). Change a colour there,
+/// not here. Screens reference these names, never a hex literal.
 abstract final class TroitaColors {
-  /// Page background — warm off-white paper.
-  static const Color paper = Color(0xFFFCFAF2);
+  /// Page background — Parchment Light.
+  static const Color paper = TroitaTokens.parchment;
 
-  /// Cards, bottom nav, input fields.
-  static const Color surface = Color(0xFFF6F1E5);
+  /// Cards, bottom nav, input fields — Parchment Surface.
+  static const Color surface = TroitaTokens.surface;
 
-  /// A slightly lighter surface, used for inactive date badges.
-  static const Color surfaceSubtle = Color(0xFFFAF7EF);
+  /// Halfway between [paper] and [surface], for inactive date badges.
+  static const Color surfaceSubtle = Color(0xFFF9F5F1);
 
-  /// Hairline borders around every card and the top of the bottom nav.
-  static const Color border = Color(0xFFEADFC9);
+  /// Hairline borders around every card and the top of the bottom nav — Carved Oak.
+  static const Color border = TroitaTokens.oak;
 
   /// Highlighted surface — feast days, the fasting banner, active date badges.
-  static const Color accentSurface = Color(0xFFF5EFCF);
+  static const Color accentSurface = TroitaTokens.bNoneBg;
 
-  /// Gold, used only as a border or a marker. Never as a text colour.
-  static const Color gold = Color(0xFFC59B27);
+  /// Gold, used only as a border or a marker. Never as a text colour (2.0:1
+  /// on parchment).
+  static const Color gold = TroitaTokens.gold;
 
-  /// Byzantine burgundy. Primary, and the fill behind today's date.
-  static const Color burgundy = Color(0xFF5C1321);
+  /// Byzantine burgundy. Primary, and the fill behind today's date. App-only:
+  /// kept distinct from the liturgical red so red means one thing.
+  static const Color burgundy = TroitaAppTokens.today;
 
-  /// Body text.
-  static const Color ink = Color(0xFF261E14);
+  /// Body text — Deep Charcoal.
+  static const Color ink = TroitaTokens.ink;
 
-  /// Secondary text, inactive nav labels, days outside the current month.
-  static const Color muted = Color(0xFF6B5E4F);
+  /// Secondary text, inactive nav labels, days outside the current month —
+  /// Muted Umber.
+  static const Color muted = TroitaTokens.umber;
 
-  static const Color onBurgundy = Color(0xFFFFFFFF);
+  static const Color onBurgundy = TroitaAppTokens.onToday;
 
   // ---------------------------------------------------------------- calendar
   //
@@ -49,44 +53,50 @@ abstract final class TroitaColors {
 
   /// Feasts with a red cross, and every Sunday. The red of a printed calendar —
   /// deeper and less orange than a UI alert red.
-  static const Color feastRed = Color(0xFFC1272D);
+  static const Color feastRed = TroitaTokens.red;
 
   /// Ordinary weekday numerals.
-  static const Color calendarInk = Color(0xFF1B1B1B);
+  static const Color calendarInk = TroitaTokens.ink;
 
   /// Cruce albastră. Printed black in some calendars and blue in others; it is
   /// the same rank, so this is purely which convention we follow. Switch it to
   /// [calendarInk] to print black instead.
-  static const Color feastBlue = Color(0xFF1F4E8C);
+  static const Color feastBlue = TroitaTokens.blue;
 
-  /// Dezlegare la pește. Lighter than [feastBlue] so a fish day and a
-  /// blue-cross day never read as the same mark.
-  static const Color fishBlue = Color(0xFF2C6F9B);
+  /// Fasting states, the text colours of the website's fasting badges, so a
+  /// day reads the same in the app and on troita.ro. All pass 4.5:1.
+  ///
+  /// Dezlegare la pește — teal, never confused with a blue-cross day.
+  static const Color fishBlue = TroitaTokens.bFishFg;
 
-  /// Săptămâna Brânzei. Paler than [gold], which carries oil and wine.
-  static const Color dairyGold = Color(0xFFD9B54B);
+  /// Dezlegare la ulei și vin — olive. The gold marker cannot carry text.
+  static const Color wineOil = TroitaTokens.bOilFg;
 
-  /// Ajunare. Darker than [burgundy] so the two hardest days of the year are
-  /// visibly harder than the rest of the fast around them.
-  static const Color strictInk = Color(0xFF3A0A12);
+  /// Zi de post — the purple of Lent.
+  static const Color fastPurple = TroitaTokens.bPostFg;
+
+  /// Ajunare. Near-black, so the hardest days are visibly harder than the
+  /// fast around them.
+  static const Color strictInk = TroitaTokens.ink;
 
   /// Romanian saints. The source markup singles them out with `class="rom"`,
   /// and printed calendars usually set them apart too.
-  static const Color romanianSaint = Color(0xFF8C2F2A);
+  static const Color romanianSaint = TroitaTokens.red;
 }
 
+/// DESIGN.MD §5: 4px by default, 8px at most. No 16px+ rounded cards.
 abstract final class TroitaRadius {
   /// Day cells, icon buttons, date badges.
-  static const double small = 12;
+  static const double small = TroitaTokenRadius.sm;
 
   /// Feast cards, list rows.
-  static const double medium = 16;
+  static const double medium = TroitaTokenRadius.sm;
 
   /// The calendar card.
-  static const double large = 20;
+  static const double large = TroitaTokenRadius.md;
 
-  /// Sheets and the phone frame itself.
-  static const double xlarge = 32;
+  /// Sheets.
+  static const double xlarge = TroitaTokenRadius.max;
 
   static const BorderRadius smallAll = BorderRadius.all(Radius.circular(small));
   static const BorderRadius mediumAll =
@@ -103,26 +113,22 @@ abstract final class TroitaSpacing {
   static const double gridGap = 6;
 }
 
-/// Font families as named in Figma.
-///
-/// Both are OFL and available from Google Fonts. They are **not yet declared in
-/// pubspec.yaml** — see `assets/fonts/README.md`. Referencing an undeclared
-/// family is safe: Flutter falls back to the platform default and logs a
-/// warning rather than failing, so the app runs today and upgrades the moment
-/// the files are dropped in.
+/// Font families, the same four as the website (DESIGN.MD §3), bundled in
+/// assets/fonts (OFL, all with ă â î ș ț).
 abstract final class TroitaFonts {
-  /// Headings, and the calendar itself. Variable font, drawn in Figma with
-  /// SOFT 0 / WONK 1.
-  static const String display = 'Fraunces';
+  /// Headings, and the calendar itself — Literata.
+  static const String display = TroitaTokenFonts.display;
 
-  /// UI chrome — buttons, labels, settings, anything that reads as software.
-  static const String text = 'Geist';
+  /// Body text, saints' names, settings — Plus Jakarta Sans.
+  static const String text = TroitaTokenFonts.text;
 
-  /// Generic serif, resolved by the platform (Noto Serif on Android).
-  ///
-  /// This is what makes the serif calendar visible *today*, before anyone
-  /// downloads Fraunces: the family falls through to the platform serif rather
-  /// than to the default sans, and upgrades silently once the .ttf lands.
+  /// Buttons, navigation labels — Alegreya Sans.
+  static const String ui = TroitaTokenFonts.ui;
+
+  /// Rubrics: small uppercase labels and liturgical notes — JetBrains Mono.
+  static const String mono = TroitaTokenFonts.mono;
+
+  /// If a glyph is missing, the platform serif (Noto Serif on Android).
   static const List<String> serifFallback = <String>['serif', 'Georgia'];
 }
 
@@ -170,22 +176,21 @@ abstract final class TroitaCalendarText {
 
 /// Semantic colour for a day's fasting state — the calendar dots, the banner,
 /// and the Posturi rows all read from here so they cannot drift apart.
-/// One colour per level, all six distinct.
+/// One colour per level, all five distinct.
 ///
-/// These used to collapse: dairy, fish and wine-and-oil were all the same gold,
+/// These used to collapse: fish and wine-and-oil were all the same gold,
 /// which is fine on a single day's badge next to its written label and useless
 /// the moment a whole fast is drawn as a grid — the dezlegări are the thing a
 /// reader is looking for, and they were indistinguishable from each other.
 ///
-/// Read as a scale from relief to severity: grey is no fast at all, blue is
-/// fish (the fullest relief inside a fast), gold is oil and wine, burgundy is
-/// the fast itself, near-black is ajunare.
+/// Read as a scale from relief to severity: umber is no fast at all, teal is
+/// fish (the fullest relief inside a fast), olive is oil and wine, purple is
+/// the fast itself, near-black is ajunare. Same hues as the website's badges.
 Color fastLevelColor(FastLevel level) => switch (level) {
       FastLevel.none => TroitaColors.muted,
-      FastLevel.dairy => TroitaColors.dairyGold,
       FastLevel.fish => TroitaColors.fishBlue,
-      FastLevel.wineOil => TroitaColors.gold,
-      FastLevel.fast => TroitaColors.burgundy,
+      FastLevel.wineOil => TroitaColors.wineOil,
+      FastLevel.fast => TroitaColors.fastPurple,
       FastLevel.strict => TroitaColors.strictInk,
     };
 
@@ -197,7 +202,6 @@ Color fastLevelColor(FastLevel level) => switch (level) {
 /// and so should we.
 IconData fastLevelIcon(FastLevel level) => switch (level) {
       FastLevel.none => Icons.restaurant_outlined,
-      FastLevel.dairy => Icons.egg_outlined,
       FastLevel.fish => Icons.set_meal_outlined,
       FastLevel.wineOil => Icons.wine_bar_outlined,
       FastLevel.fast => Icons.spa_outlined,
@@ -292,7 +296,7 @@ class TroitaTheme {
       ),
 
       textTheme: const TextTheme(
-        // Fraunces — screen titles, "Noiembrie 2026".
+        // Literata — screen titles, "Noiembrie 2026".
         headlineMedium: TextStyle(
           fontFamily: TroitaFonts.display,
           fontFamilyFallback: TroitaFonts.serifFallback,
@@ -301,7 +305,7 @@ class TroitaTheme {
           height: 1.25,
           color: TroitaColors.burgundy,
         ),
-        // Fraunces — section headers, "Sărbători următoare".
+        // Literata — section headers, "Sărbători următoare".
         titleLarge: TextStyle(
           fontFamily: TroitaFonts.display,
           fontFamilyFallback: TroitaFonts.serifFallback,
@@ -309,47 +313,51 @@ class TroitaTheme {
           fontWeight: FontWeight.w700,
           color: TroitaColors.ink,
         ),
-        // Geist SemiBold — feast names, list row titles.
+        // Plus Jakarta Sans SemiBold — feast names, list row titles.
         titleMedium: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: TroitaColors.ink,
         ),
-        // Geist SemiBold 13 — the fasting banner.
+        // Plus Jakarta Sans SemiBold 13 — the fasting banner.
         titleSmall: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
           color: TroitaColors.ink,
         ),
-        // Geist Medium 14 — day numbers, body.
+        // Plus Jakarta Sans Medium 14 — day numbers, body.
         bodyMedium: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           height: 1.45,
           color: TroitaColors.ink,
         ),
-        // Geist 12 — secondary text.
+        // Plus Jakarta Sans 12 — secondary text.
         bodySmall: TextStyle(
           fontSize: 12,
           height: 1.4,
           color: TroitaColors.muted,
         ),
-        // Geist Bold 12 uppercase — "CALENDAR ORTODOX", "PRAZNIC ÎMPĂRĂTESC".
+        // JetBrains Mono 12 uppercase, the website's rubric — "CALENDAR
+        // ORTODOX", "PRAZNIC ÎMPĂRĂTESC".
         labelLarge: TextStyle(
+          fontFamily: TroitaFonts.mono,
           fontSize: 12,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.4,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.6,
           color: TroitaColors.muted,
         ),
-        // Geist 11 — bottom nav labels.
+        // Alegreya Sans 12 — bottom nav labels.
         labelMedium: TextStyle(
-          fontSize: 11,
+          fontFamily: TroitaFonts.ui,
+          fontSize: 12,
           fontWeight: FontWeight.w500,
           color: TroitaColors.muted,
         ),
-        // Geist 10 — the month in a date badge.
+        // Alegreya Sans 11 — the month in a date badge.
         labelSmall: TextStyle(
-          fontSize: 10,
+          fontFamily: TroitaFonts.ui,
+          fontSize: 11,
           color: TroitaColors.muted,
         ),
       ),
@@ -380,7 +388,8 @@ class TroitaTheme {
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (Set<WidgetState> states) => TextStyle(
-            fontSize: 11,
+            fontFamily: TroitaFonts.ui,
+            fontSize: 12,
             fontWeight: states.contains(WidgetState.selected)
                 ? FontWeight.w700
                 : FontWeight.w500,
@@ -400,8 +409,9 @@ class TroitaTheme {
             borderRadius: TroitaRadius.smallAll,
           ),
           textStyle: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+            fontFamily: TroitaFonts.ui,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
