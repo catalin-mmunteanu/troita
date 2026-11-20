@@ -25,7 +25,7 @@ class NameFeast {
   /// 'dgep' or 'calendar'.
   final String source;
 
-  /// 'MM-DD' or 'movable:<key>', the format [FeastCalendar.resolve] reads.
+  /// `MM-DD` or `movable:KEY`, the format [FeastCalendar.resolve] reads.
   final String feastDay;
   final List<String> male;
   final List<String> female;
