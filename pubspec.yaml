@@ -64,6 +64,8 @@ flutter:
     # Saint images from the sinaxar scrape. Flat, with a MM-DD prefix, because
     # Flutter does not recurse into subdirectories — one line instead of 293.
     - assets/sinaxar/
+    # Zile de nume, shared with troita.ro (tool/check_name_days.py checks it).
+    - assets/data/
 
   # The four families of the website (DESIGN.MD §3), static instances, OFL.
   # Licences in assets/fonts/OFL-*.txt.

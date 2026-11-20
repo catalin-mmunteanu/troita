@@ -6,9 +6,13 @@ import '../../app/app_state.dart';
 import '../../app/site_links.dart';
 import '../../app/theme.dart';
 import '../../core/data/day_repository.dart';
+import '../../core/liturgical/calendar_days.dart';
 import '../../core/liturgical/fast_level.dart';
+import '../../core/liturgical/liturgical_calendar.dart';
 import '../../core/models/feast.dart';
 import '../../core/models/fast_day.dart';
+import '../../core/models/feast_calendar.dart';
+import '../../core/models/name_days.dart';
 import '../../core/models/sinaxar.dart';
 import '../fasting/fast_day_editor.dart';
 import 'day_row.dart';
@@ -31,6 +35,7 @@ class DayDetailPage extends StatefulWidget {
 class _DayDetailPageState extends State<DayDetailPage> {
   DayEntry? _entry;
   bool _missing = false;
+  List<String> _names = const <String>[];
 
   /// Multiplier on top of the system text scale, not a replacement for it.
   double _scale = 1.0;
@@ -42,11 +47,19 @@ class _DayDetailPageState extends State<DayDetailPage> {
   }
 
   Future<void> _load() async {
+    final AppState state = AppScope.of(context);
     final DayEntry entry =
-        await AppScope.of(context).days.entryFor(widget.date, withText: true);
+        await state.days.entryFor(widget.date, withText: true);
+    // A missing or broken asset must not cost the user the whole day.
+    List<String> names = const <String>[];
+    try {
+      final NameDays nameDays = await state.nameDays.load();
+      names = nameDays.namesOn(widget.date);
+    } catch (_) {}
     if (!mounted) return;
     setState(() {
       _entry = entry;
+      _names = names;
       _missing = entry.sinaxar == null;
     });
   }
@@ -130,6 +143,7 @@ class _DayDetailPageState extends State<DayDetailPage> {
 
                 const SizedBox(height: 18),
                 _LiturgicalCard(entry: entry),
+                if (_names.isNotEmpty) _NameDaysCard(names: _names),
 
                 // Rating any past day, not just today — people fill these in
                 // after the fact, and refusing that makes the journal useless
@@ -324,6 +338,8 @@ class _LiturgicalCard extends StatelessWidget {
             Text(entry.liturgical.note!,
                 style: Theme.of(context).textTheme.bodySmall),
           ],
+          const Divider(height: 22),
+          _EventsNote(entry: entry),
           if (entry.liturgical.glas != null) ...<Widget>[
             const Divider(height: 22),
             Text(
@@ -350,6 +366,71 @@ class _LiturgicalCard extends StatelessWidget {
               Text('Ev. ${entry.override!.evanghelie}',
                   style: Theme.of(context).textTheme.bodySmall),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Weddings and, when it matters, baptisms on this day.
+///
+/// People ask both ways ("se fac nunți?", "când nu se fac nunți?"), so the
+/// line always says one or the other. Baptism has no forbidden days; it is
+/// mentioned only when something changes: the party on a fast day, the
+/// parish's programme in Holy Week and Bright Week. Same rules as troita.ro's
+/// /nunti and /botez pages.
+class _EventsNote extends StatelessWidget {
+  const _EventsNote({required this.entry});
+
+  final DayEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final WeddingBar? bar = LiturgicalCalendar.cununie(entry.date);
+    final DateTime p = FeastCalendar.pascha(entry.date.year);
+    final int fromPascha = calendarDaysBetween(p, entry.date);
+    final String? baptism = fromPascha >= -6 && fromPascha <= -1
+        ? 'Botez: în Săptămâna Mare, întrebați la parohie.'
+        : fromPascha >= 0 && fromPascha <= 6
+            ? 'Botez: se poate face; programați din timp la parohie.'
+            : entry.liturgical.isFasting
+                ? 'Botez: se poate face; petrecerea, cu mâncare de post.'
+                : null;
+    final TextStyle? style = Theme.of(context).textTheme.bodyMedium;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          bar == null ? 'Se pot face nunți.' : 'Nu se fac nunți: ${bar.label}.',
+          style: style,
+        ),
+        if (baptism != null) ...<Widget>[
+          const SizedBox(height: 4),
+          Text(baptism, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ],
+    );
+  }
+}
+
+/// "Zile de nume": the first names celebrated on the day.
+class _NameDaysCard extends StatelessWidget {
+  const _NameDaysCard({required this.names});
+
+  final List<String> names;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 14),
+      padding: const EdgeInsets.all(TroitaSpacing.card),
+      decoration: TroitaTheme.cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('Zile de nume', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 6),
+          Text(names.join(', '), style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     );

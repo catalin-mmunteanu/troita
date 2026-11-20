@@ -480,4 +480,73 @@ class LiturgicalCalendar {
     final int weeks = calendarDaysBetween(anchor, d) ~/ 7;
     return weeks < 0 ? null : weeks;
   }
+
+  // ------------------------------------------------------------- weddings
+
+  /// Fixed feasts whose eve and day have no weddings, as month * 100 + day.
+  static const Set<int> _noWeddingDays = <int>{
+    201, 202, // Întâmpinarea Domnului
+    324, 325, // Buna Vestire
+    815, // Adormirea (its eve is in the Dormition fast)
+    829, // Tăierea capului Sf. Ioan
+    907, 908, // Nașterea Maicii Domnului
+    914, // Înălțarea Sfintei Cruci
+    1120, 1121, // Intrarea în Biserică (inside the Nativity fast)
+  };
+
+  /// Null when the Church celebrates weddings on [date], else why it does not.
+  ///
+  /// Checked against the published 2027 calendar ("Nu se fac nunți"): 363 of
+  /// 365 days identical, and the two others are errors in the source. Same
+  /// rules in tool/engine_port.py and troita-web's liturgical.ts, all three
+  /// tested against test/golden/engine-2026-2030.json. A civil wedding is not
+  /// affected.
+  static WeddingBar? cununie(DateTime date) {
+    final DateTime d = DateTime(date.year, date.month, date.day);
+    final int y = d.year;
+    final DateTime pascha = FeastCalendar.pascha(y);
+    for (final FastingPeriod p in greatFasts(y)) {
+      if (p.contains(d)) return WeddingBar.post;
+    }
+    if (saptamanaBranzei(y).contains(d)) return WeddingBar.saptamanaBranzei;
+    if (!d.isAfter(_d(y, 1, 6)) || !d.isBefore(_d(y, 12, 25))) {
+      return WeddingBar.craciunBoboteaza;
+    }
+    if (!d.isBefore(pascha) && !d.isAfter(_offset(pascha, 6))) {
+      return WeddingBar.saptamanaLuminata;
+    }
+    if (_noWeddingDays.contains(d.month * 100 + d.day)) {
+      return WeddingBar.praznic;
+    }
+    // Înălțarea and Rusaliile with their eves, and the Monday of Rusalii.
+    for (final int offset in const <int>[38, 39, 48, 49, 50]) {
+      if (d == _offset(pascha, offset)) return WeddingBar.praznic;
+    }
+    if (d.weekday == DateTime.wednesday || d.weekday == DateTime.friday) {
+      final bool inHarti = <FastingPeriod>[...harti(y - 1), ...harti(y)]
+          .any((FastingPeriod p) => p.contains(d));
+      if (!inHarti) return WeddingBar.miercuriVineri;
+    }
+    return null;
+  }
+}
+
+/// Why the Church does not celebrate weddings on a day.
+enum WeddingBar {
+  post,
+  saptamanaBranzei,
+  craciunBoboteaza,
+  saptamanaLuminata,
+  praznic,
+  miercuriVineri;
+
+  /// Short reason, for the day screen: "Nu se fac nunți: {label}."
+  String get label => switch (this) {
+        WeddingBar.post => 'post',
+        WeddingBar.saptamanaBranzei => 'Săptămâna Brânzei',
+        WeddingBar.craciunBoboteaza => 'între Crăciun și Bobotează',
+        WeddingBar.saptamanaLuminata => 'Săptămâna Luminată',
+        WeddingBar.praznic => 'praznic sau ajunul lui',
+        WeddingBar.miercuriVineri => 'zi de post (miercuri sau vineri)',
+      };
 }

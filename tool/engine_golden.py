@@ -118,6 +118,20 @@ def backtest(db) -> int:
           f"{unknown} unmarked fast days skipped")
     for d, rank, got, want in misses:
         print(f"  {d} {d.strftime('%a')}  {rank:<15} engine {got:<8} published {want}")
+
+    # Weddings: only years whose published notes carry "Nu se fac nunți".
+    for y in years:
+        marked = {md for (yy, md), (_, n) in overrides.items()
+                  if yy == y and n and "Nu se fac nun" in n}
+        if not marked:
+            continue
+        misses = [d for d in days(y)
+                  if (E.cununie(d) is not None) != (f"{d.month:02d}-{d.day:02d}" in marked)]
+        n = sum(1 for _ in days(y))
+        print(f"weddings {y}: {n - len(misses)}/{n} days match the published "
+              f"\"Nu se fac nunți\"")
+        for d in misses:
+            print(f"  {d} {d.strftime('%a')}  engine {E.cununie(d)}")
     return 0
 
 
@@ -129,13 +143,15 @@ def write_golden(db) -> int:
             rank, dz = feasts_on(feasts, d)
             out = E.day_for(d, rank, dz)
             rows.append([d.isoformat(), rank, dz, out["fastLevel"], out["period"],
-                         out["glas"], out["voscreasna"]])
+                         out["glas"], out["voscreasna"], E.cununie(d)])
     payload = {
         "about": "Golden vectors for the fasting engine. Written by tool/engine_golden.py "
                  "from tool/engine_port.py; asserted by test/engine_golden_test.dart and by "
                  "troita-web's npm test. Inputs: date, rank, dezlegare. Outputs: fastLevel, "
-                 "period, glas, voscreasna.",
-        "columns": ["date", "rank", "dezlegare", "fastLevel", "period", "glas", "voscreasna"],
+                 "period, glas, voscreasna, cununie (null = weddings are celebrated, else the reason "
+                 "they are not).",
+        "columns": ["date", "rank", "dezlegare", "fastLevel", "period", "glas", "voscreasna",
+                    "cununie"],
         "pascha": {str(y): E.pascha(y).isoformat() for y in YEARS},
         "days": rows,
     }
