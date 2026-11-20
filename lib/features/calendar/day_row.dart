@@ -1,11 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../app/theme.dart';
 import '../../core/data/day_repository.dart';
 import '../../core/liturgical/fast_level.dart';
 import '../../core/models/fast_day.dart';
 import '../../core/models/feast.dart';
-import '../fasting/fast_day_editor.dart';
 
 /// One day, set like a line in a printed calendar.
 ///

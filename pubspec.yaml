@@ -35,6 +35,7 @@ dependencies:
   # pins NDK 28.1.13356709, which is why app/build.gradle.kts moved off 17.
   # Requires JDK 21 on the build machine.
   maplibre_gl: ^0.27.1
+  material_ui: ^0.0.1
 
   # Added with `flutter pub add` rather than pinned here by hand — see the
   # command in README. Listing a version I guessed at is how this project has

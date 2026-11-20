@@ -11,7 +11,6 @@ import '../core/data/fast_journal_repository.dart';
 import '../core/data/feast_repository.dart';
 import '../core/data/local_church_repository.dart';
 import '../core/models/church.dart';
-import '../core/models/fast_day.dart';
 import '../core/native/troita_native.dart';
 import '../core/notifications/notification_planner.dart';
 import '../core/notifications/notification_prefs.dart';

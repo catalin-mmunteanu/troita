@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
@@ -59,18 +59,25 @@ class _SettingsPageState extends State<SettingsPage> {
           }),
 
           const _Header('Notificarea zilnică'),
-          ...DailyNotificationMode.values.map(
-            (DailyNotificationMode mode) => RadioListTile<DailyNotificationMode>(
-              value: mode,
-              groupValue: prefs.mode,
-              onChanged: _busy
-                  ? null
-                  : (DailyNotificationMode? v) =>
-                      v == null ? null : _update(prefs.copyWith(mode: v)),
-              title: Text(mode.label),
-              subtitle: Text(mode.description,
-                  style: Theme.of(context).textTheme.bodySmall),
-              activeColor: TroitaColors.burgundy,
+          RadioGroup<DailyNotificationMode>(
+            groupValue: prefs.mode,
+            onChanged: (DailyNotificationMode? v) {
+              if (_busy || v == null) return;
+              _update(prefs.copyWith(mode: v));
+            },
+            child: Column(
+              children: <Widget>[
+                for (final DailyNotificationMode mode
+                    in DailyNotificationMode.values)
+                  RadioListTile<DailyNotificationMode>(
+                    value: mode,
+                    enabled: !_busy,
+                    title: Text(mode.label),
+                    subtitle: Text(mode.description,
+                        style: Theme.of(context).textTheme.bodySmall),
+                    activeColor: TroitaColors.burgundy,
+                  ),
+              ],
             ),
           ),
 
