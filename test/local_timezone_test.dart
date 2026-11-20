@@ -36,9 +36,13 @@ void main() {
 
     test('falls back to Bucharest rather than throwing', () {
       // No candidate is at +05:45 (Kathmandu), so the fallback must hold.
-      final DateTime odd =
-          DateTime.utc(2026, 3, 1, 12).add(const Duration(minutes: 345));
-      expect(LocalTimezone.resolve(now: odd.toUtc()), LocalTimezone.fallback);
+      // A TZDateTime carries its zone's offset; a plain DateTime.utc() would
+      // report +00:00 however many minutes are added, and match London.
+      final DateTime odd = tz.TZDateTime(
+        tz.getLocation('Asia/Kathmandu'), 2026, 3, 1, 12,
+      );
+      expect(odd.timeZoneOffset, const Duration(hours: 5, minutes: 45));
+      expect(LocalTimezone.resolve(now: odd), LocalTimezone.fallback);
     });
 
     test('apply() sets tz.local and returns the name', () {
