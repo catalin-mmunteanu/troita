@@ -8,6 +8,9 @@
 - diacritics are the comma-below ș ț, never the cedilla ş ţ;
 - every "primary" date is a feast that actually lists the name;
 - every note belongs to a name that exists;
+- a name's main day is never a movable Sunday taken from the calendar alone
+  (Duminica Tomii is not Sf. Toma's feast: that is 6 October). Movable days
+  are main days only where the DGEP lists say so (Florii).
 - sources are 'dgep' (with a sourceUrl) or 'calendar'.
 """
 import json
@@ -60,6 +63,11 @@ def main() -> int:
     for name in doc.get("notes", {}):
         if name not in by_name:
             problems.append(f"note for unknown name {name}")
+    movable_calendar = {f["id"] for f in doc["feasts"] if "movable" in f and f["source"] == "calendar"}
+    for name, fids in by_name.items():
+        main = doc.get("primary", {}).get(name) or (next(iter(fids)) if len(fids) == 1 else None)
+        if main in movable_calendar:
+            problems.append(f"{name}: main day is the movable {main}; give it the saint's fixed day")
     multi = sum(1 for v in by_name.values() if len(v) > 1)
     if problems:
         print("name_days.json:\n  " + "\n  ".join(problems))

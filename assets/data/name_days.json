@@ -260,6 +260,17 @@
    ]
   },
   {
+   "id": "07-01",
+   "saint": "Sfinții Mucenici Cosma și Damian, cei din Roma",
+   "source": "calendar",
+   "date": "07-01",
+   "m": [
+    "Cosma",
+    "Damian"
+   ],
+   "f": []
+  },
+  {
    "id": "07-13",
    "saint": "Soborul Sfântului Arhanghel Gavriil",
    "source": "calendar",
@@ -401,10 +412,12 @@
   },
   {
    "id": "09-05",
-   "saint": "Sfânta Elisabeta",
+   "saint": "Sfântul Proroc Zaharia și Dreapta Elisabeta",
    "source": "calendar",
    "date": "09-05",
-   "m": [],
+   "m": [
+    "Zaharia"
+   ],
    "f": [
     "Elisabeta",
     "Eliza",
@@ -463,6 +476,18 @@
    ]
   },
   {
+   "id": "10-06",
+   "saint": "Sfântul Apostol Toma",
+   "source": "calendar",
+   "date": "10-06",
+   "m": [
+    "Toma",
+    "Tomiță",
+    "Tomi"
+   ],
+   "f": []
+  },
+  {
    "id": "10-14",
    "saint": "Sfânta Cuvioasă Parascheva",
    "source": "dgep",
@@ -515,7 +540,7 @@
   },
   {
    "id": "11-01",
-   "saint": "Sfinții Doctori fără de arginți Cosma și Damian",
+   "saint": "Sfinții Doctori fără de arginți Cosma și Damian, cei din Asia",
    "source": "calendar",
    "date": "11-01",
    "m": [
@@ -772,7 +797,7 @@
   },
   {
    "id": "mov:thomas_sunday",
-   "saint": "Duminica Sfântului Apostol Toma",
+   "saint": "Duminica Tomii",
    "source": "calendar",
    "movable": "thomas_sunday",
    "m": [
@@ -811,7 +836,11 @@
   "Gavril": "11-08",
   "Gavriil": "11-08",
   "Cristina": "12-25",
-  "Cosmin": "05-21"
+  "Cosmin": "05-21",
+  "Toma": "10-06",
+  "Tomiță": "10-06",
+  "Cosma": "11-01",
+  "Damian": "11-01"
  },
  "notes": {
   "Maria": "Se sărbătorește de Adormirea Maicii Domnului (Sfânta Maria Mare, 15 august) și de Nașterea Maicii Domnului (Sfânta Maria Mică, 8 septembrie). Cei mai mulți își serbează numele pe 15 august.",
@@ -843,6 +872,10 @@
   "Anica": "Sfânta Ana se pomenește pe 9 septembrie, împreună cu Sfântul Ioachim, și pe 25 iulie (Adormirea Sfintei Ana).",
   "Gabriela": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
   "Gavril": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
-  "Gavriil": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie."
+  "Gavriil": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
+  "Toma": "Sfântul Apostol Toma se pomenește pe 6 octombrie. E amintit și în Duminica Tomii, prima duminică după Paști, când unii își serbează numele.",
+  "Tomiță": "Sfântul Apostol Toma se pomenește pe 6 octombrie. E amintit și în Duminica Tomii, prima duminică după Paști, când unii își serbează numele.",
+  "Cosma": "În calendar sunt două perechi de Sfinți Cosma și Damian: cei din Roma (1 iulie) și cei din Asia (1 noiembrie).",
+  "Damian": "În calendar sunt două perechi de Sfinți Cosma și Damian: cei din Roma (1 iulie) și cei din Asia (1 noiembrie)."
  }
 }
