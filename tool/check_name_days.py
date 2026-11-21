@@ -9,7 +9,7 @@
 - every "primary" date is a feast that actually lists the name;
 - every note belongs to a name that exists;
 - a name's main day is never a movable Sunday taken from the calendar alone
-  (Duminica Tomii is not Sf. Toma's feast: that is 6 October). Movable days
+  (Duminica Tomii is not a name day: Sf. Toma is on 6 October). Movable days
   are main days only where the DGEP lists say so (Florii).
 - sources are 'dgep' (with a sourceUrl) or 'calendar'.
 """

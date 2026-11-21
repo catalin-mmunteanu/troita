@@ -30,10 +30,13 @@ void main() {
         isTrue);
   });
 
-  test('Toma is on 6 October, Duminica Tomii second', () {
+  test('Toma is on 6 October only (Duminica Tomii is not a name day)', () {
     final List<NameFeast> f = nd.feastsFor('Toma');
-    expect(f.first.dateIn(2027), DateTime(2027, 10, 6));
-    expect(f.any((NameFeast x) => x.feastDay == 'movable:thomas_sunday'), isTrue);
+    expect(f.single.dateIn(2027), DateTime(2027, 10, 6));
+  });
+
+  test('Isaia is on 9 May', () {
+    expect(nd.namesOn(DateTime(2027, 5, 9)), contains('Isaia'));
   });
 
   test('no cedilla diacritics', () {
