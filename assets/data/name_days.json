@@ -172,6 +172,16 @@
    ]
   },
   {
+   "id": "05-09",
+   "saint": "Sfântul Proroc Isaia",
+   "source": "calendar",
+   "date": "05-09",
+   "m": [
+    "Isaia"
+   ],
+   "f": []
+  },
+  {
    "id": "05-21",
    "saint": "Sfinții Împărați Constantin și Elena",
    "source": "dgep",
@@ -794,17 +804,6 @@
     "Iris",
     "Roza"
    ]
-  },
-  {
-   "id": "mov:thomas_sunday",
-   "saint": "Duminica Tomii",
-   "source": "calendar",
-   "movable": "thomas_sunday",
-   "m": [
-    "Toma",
-    "Tomiță"
-   ],
-   "f": []
   }
  ],
  "primary": {
@@ -837,8 +836,6 @@
   "Gavriil": "11-08",
   "Cristina": "12-25",
   "Cosmin": "05-21",
-  "Toma": "10-06",
-  "Tomiță": "10-06",
   "Cosma": "11-01",
   "Damian": "11-01"
  },
@@ -873,8 +870,6 @@
   "Gabriela": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
   "Gavril": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
   "Gavriil": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
-  "Toma": "Sfântul Apostol Toma se pomenește pe 6 octombrie. E amintit și în Duminica Tomii, prima duminică după Paști, când unii își serbează numele.",
-  "Tomiță": "Sfântul Apostol Toma se pomenește pe 6 octombrie. E amintit și în Duminica Tomii, prima duminică după Paști, când unii își serbează numele.",
   "Cosma": "În calendar sunt două perechi de Sfinți Cosma și Damian: cei din Roma (1 iulie) și cei din Asia (1 noiembrie).",
   "Damian": "În calendar sunt două perechi de Sfinți Cosma și Damian: cei din Roma (1 iulie) și cei din Asia (1 noiembrie)."
  }
