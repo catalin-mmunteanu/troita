@@ -30,6 +30,12 @@ void main() {
         isTrue);
   });
 
+  test('Toma is on 6 October, Duminica Tomii second', () {
+    final List<NameFeast> f = nd.feastsFor('Toma');
+    expect(f.first.dateIn(2027), DateTime(2027, 10, 6));
+    expect(f.any((NameFeast x) => x.feastDay == 'movable:thomas_sunday'), isTrue);
+  });
+
   test('no cedilla diacritics', () {
     for (final String n in nd.allNames) {
       expect(n.contains(RegExp('[şţŞŢ]')), isFalse, reason: n);

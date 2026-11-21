@@ -463,6 +463,18 @@
    ]
   },
   {
+   "id": "10-06",
+   "saint": "Sfântul Apostol Toma",
+   "source": "calendar",
+   "date": "10-06",
+   "m": [
+    "Toma",
+    "Tomiță",
+    "Tomi"
+   ],
+   "f": []
+  },
+  {
    "id": "10-14",
    "saint": "Sfânta Cuvioasă Parascheva",
    "source": "dgep",
@@ -772,7 +784,7 @@
   },
   {
    "id": "mov:thomas_sunday",
-   "saint": "Duminica Sfântului Apostol Toma",
+   "saint": "Duminica Tomii",
    "source": "calendar",
    "movable": "thomas_sunday",
    "m": [
@@ -811,7 +823,9 @@
   "Gavril": "11-08",
   "Gavriil": "11-08",
   "Cristina": "12-25",
-  "Cosmin": "05-21"
+  "Cosmin": "05-21",
+  "Toma": "10-06",
+  "Tomiță": "10-06"
  },
  "notes": {
   "Maria": "Se sărbătorește de Adormirea Maicii Domnului (Sfânta Maria Mare, 15 august) și de Nașterea Maicii Domnului (Sfânta Maria Mică, 8 septembrie). Cei mai mulți își serbează numele pe 15 august.",
@@ -843,6 +857,8 @@
   "Anica": "Sfânta Ana se pomenește pe 9 septembrie, împreună cu Sfântul Ioachim, și pe 25 iulie (Adormirea Sfintei Ana).",
   "Gabriela": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
   "Gavril": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
-  "Gavriil": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie."
+  "Gavriil": "Arhanghelul Gavriil se sărbătorește pe 8 noiembrie, împreună cu Arhanghelul Mihail, și are încă două soboare: 26 martie și 13 iulie.",
+  "Toma": "Sfântul Apostol Toma se pomenește pe 6 octombrie. E amintit și în Duminica Tomii, prima duminică după Paști, când unii își serbează numele.",
+  "Tomiță": "Sfântul Apostol Toma se pomenește pe 6 octombrie. E amintit și în Duminica Tomii, prima duminică după Paști, când unii își serbează numele."
  }
 }
