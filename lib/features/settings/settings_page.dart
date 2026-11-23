@@ -43,6 +43,17 @@ class _SettingsPageState extends State<SettingsPage> {
     await _update(prefs.copyWith(hour: picked.hour, minute: picked.minute));
   }
 
+  Future<void> _pickGospelTime(NotificationPrefs prefs) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: prefs.gospelHour, minute: prefs.gospelMinute),
+      helpText: 'Ora Evangheliei zilei',
+    );
+    if (picked == null) return;
+    await _update(
+        prefs.copyWith(gospelHour: picked.hour, gospelMinute: picked.minute));
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppState state = AppScope.of(context);
@@ -102,6 +113,29 @@ class _SettingsPageState extends State<SettingsPage> {
 
             ),
           ],
+
+          const _Header('Evanghelia zilei'),
+          SwitchListTile(
+            value: prefs.gospel,
+            onChanged:
+                _busy ? null : (bool v) => _update(prefs.copyWith(gospel: v)),
+            title: const Text('Evanghelia zilei'),
+            subtitle: const Text(
+                'Evanghelia de la Liturghie, în fiecare dimineață. Nu vine în '
+                'zilele fără Liturghie din Postul Mare.'),
+          ),
+          if (prefs.gospel)
+            ListTile(
+              title: const Text('Ora'),
+              trailing: Text(
+                prefs.gospelTimeLabel,
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(fontSize: 22),
+              ),
+              onTap: _busy ? null : () => _pickGospelTime(prefs),
+            ),
 
           const _Header('Posturi'),
           SwitchListTile(

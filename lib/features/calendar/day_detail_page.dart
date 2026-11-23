@@ -12,6 +12,7 @@ import '../../core/liturgical/liturgical_calendar.dart';
 import '../../core/models/feast.dart';
 import '../../core/models/fast_day.dart';
 import '../../core/models/feast_calendar.dart';
+import '../../core/models/lecturi.dart';
 import '../../core/models/name_days.dart';
 import '../../core/models/sinaxar.dart';
 import '../fasting/fast_day_editor.dart';
@@ -36,6 +37,8 @@ class _DayDetailPageState extends State<DayDetailPage> {
   DayEntry? _entry;
   bool _missing = false;
   List<String> _names = const <String>[];
+  LecturaZi? _lectura;
+  BibliaNT? _biblia;
 
   /// Multiplier on top of the system text scale, not a replacement for it.
   double _scale = 1.0;
@@ -56,10 +59,18 @@ class _DayDetailPageState extends State<DayDetailPage> {
       final NameDays nameDays = await state.nameDays.load();
       names = nameDays.namesOn(widget.date);
     } catch (_) {}
+    LecturaZi? lectura;
+    BibliaNT? biblia;
+    try {
+      lectura = (await state.lecturi.lecturi()).on(widget.date);
+      biblia = await state.lecturi.biblia();
+    } catch (_) {}
     if (!mounted) return;
     setState(() {
       _entry = entry;
       _names = names;
+      _lectura = lectura;
+      _biblia = biblia;
       _missing = entry.sinaxar == null;
     });
   }
@@ -144,6 +155,9 @@ class _DayDetailPageState extends State<DayDetailPage> {
                 const SizedBox(height: 18),
                 _LiturgicalCard(entry: entry),
                 if (_names.isNotEmpty) _NameDaysCard(names: _names),
+                if (_lectura != null && _biblia != null)
+                  _ReadingsCard(
+                      lectura: _lectura!, biblia: _biblia!, scale: _scale),
 
                 // Rating any past day, not just today — people fill these in
                 // after the fact, and refusing that makes the journal useless
@@ -356,16 +370,6 @@ class _LiturgicalCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
-          if (entry.override?.apostol != null ||
-              entry.override?.evanghelie != null) ...<Widget>[
-            const SizedBox(height: 6),
-            if (entry.override?.apostol != null)
-              Text('Ap. ${entry.override!.apostol}',
-                  style: Theme.of(context).textTheme.bodySmall),
-            if (entry.override?.evanghelie != null)
-              Text('Ev. ${entry.override!.evanghelie}',
-                  style: Theme.of(context).textTheme.bodySmall),
-          ],
         ],
       ),
     );
@@ -409,6 +413,89 @@ class _EventsNote extends StatelessWidget {
           Text(baptism, style: Theme.of(context).textTheme.bodySmall),
         ],
       ],
+    );
+  }
+}
+
+/// "Apostolul și Evanghelia": the Liturgy readings of the day, in full.
+///
+/// From assets/data/lecturi.json (which pericope) and biblia_nt.json (the
+/// text of the 1988 Synodal edition), the same files troita.ro reads. Follows
+/// the page's text-size control, like the sinaxar.
+class _ReadingsCard extends StatelessWidget {
+  const _ReadingsCard({
+    required this.lectura,
+    required this.biblia,
+    required this.scale,
+  });
+
+  final LecturaZi lectura;
+  final BibliaNT biblia;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    return Container(
+      margin: const EdgeInsets.only(top: 14),
+      padding: const EdgeInsets.all(TroitaSpacing.card),
+      decoration: TroitaTheme.cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('Apostolul și Evanghelia', style: text.titleMedium),
+          if (lectura.title != null) ...<Widget>[
+            const SizedBox(height: 2),
+            Text(lectura.title!, style: text.bodySmall),
+          ],
+          if (lectura.none != null) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(lectura.none!, style: text.bodyMedium),
+          ] else ...<Widget>[
+            if (lectura.apostolCite != null)
+              _reading(context, 'Apostolul', lectura.apostolCite!,
+                  biblia.text(lectura.apostol)),
+            if (lectura.evanghelieCite != null)
+              _reading(context, 'Evanghelia', lectura.evanghelieCite!,
+                  biblia.text(lectura.evanghelie)),
+            const SizedBox(height: 4),
+            Text(biblia.source, style: text.bodySmall),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _reading(
+      BuildContext context, String label, String cite, List<Verse> verses) {
+    final TextTheme text = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('$label · $cite',
+              style: text.titleSmall?.copyWith(color: TroitaColors.burgundy)),
+          const SizedBox(height: 6),
+          Text.rich(
+            TextSpan(children: <InlineSpan>[
+              for (final Verse v in verses) ...<InlineSpan>[
+                TextSpan(
+                  text: '${v.number} ',
+                  style: TextStyle(
+                      fontSize: 12 * scale, color: TroitaColors.muted),
+                ),
+                TextSpan(text: '${v.text} '),
+              ],
+            ]),
+            style: TroitaCalendarText.commemoration.copyWith(
+              fontSize: 16.5 * scale,
+              height: 1.65,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

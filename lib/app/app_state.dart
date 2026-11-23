@@ -9,6 +9,7 @@ import '../core/data/church_repository.dart';
 import '../core/data/day_repository.dart';
 import '../core/data/fast_journal_repository.dart';
 import '../core/data/feast_repository.dart';
+import '../core/data/lecturi_repository.dart';
 import '../core/data/local_church_repository.dart';
 import '../core/data/name_days_repository.dart';
 import '../core/models/church.dart';
@@ -58,6 +59,9 @@ class AppState extends ChangeNotifier {
 
   /// Zile de nume, from a bundled asset: no database, loaded on first use.
   final NameDaysRepository nameDays = NameDaysRepository();
+
+  /// Apostolul și Evanghelia zilei, and the New Testament text.
+  final LecturiRepository lecturi = LecturiRepository();
 
   /// The calendar's view of a day: feasts, computed liturgics, published
   /// overrides and the bundled sinaxar text, assembled together.
@@ -200,6 +204,7 @@ class AppState extends ChangeNotifier {
       TroitaNotifications.instance,
       churches: _repository,
       marks: _marks,
+      lecturi: lecturi,
     ).reschedule(notificationPrefs);
     notifyListeners();
     await _refreshWidget();
