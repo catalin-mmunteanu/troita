@@ -1,8 +1,12 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../../app/app_scope.dart';
+import '../../app/app_state.dart';
 import '../../app/text_size.dart';
 import '../../app/theme.dart';
 import '../../app/troita_icons.dart';
+import '../../core/models/church.dart';
+import '../onboarding/onboarding_steps.dart';
 import '../settings/settings_page.dart';
 import '../map/churches_map_page.dart';
 import 'my_churches_page.dart';
@@ -32,6 +36,7 @@ class ProfilePage extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium),
           ),
           const TextSizeCard(),
+          const _ParishRow(),
           _Row(
             icon: Icons.star_border,
             title: 'Bisericile mele',
@@ -66,6 +71,48 @@ class ProfilePage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Biserica mea: the chosen church, or the search to choose it. Both open
+/// the same screen, where the church can be opened or changed.
+class _ParishRow extends StatelessWidget {
+  const _ParishRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final AppState state = AppScope.of(context);
+    final String? id = state.parishId;
+    void pick() => Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (_) => const ParishPickerPage(),
+        ));
+    if (id == null) {
+      return _Row(
+        icon: Icons.church_outlined,
+        title: 'Biserica mea',
+        subtitle: 'Alegeți biserica la care mergeți',
+        onTap: pick,
+      );
+    }
+    return FutureBuilder<Church?>(
+      // Keyed on the id, so a new choice is looked up again.
+      key: ValueKey<String>(id),
+      future: state.church(id),
+      builder: (BuildContext context, AsyncSnapshot<Church?> snap) {
+        final Church? c = snap.data;
+        return _Row(
+          icon: Icons.church,
+          title: c?.name ?? 'Biserica mea',
+          subtitle: c == null
+              ? 'Biserica mea'
+              : <String>[
+                  'Biserica mea',
+                  if (c.patron != null && c.patron!.isNotEmpty) 'Hram: ${c.patron}',
+                ].join(' · '),
+          onTap: pick,
+        );
+      },
     );
   }
 }

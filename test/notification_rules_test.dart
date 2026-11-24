@@ -71,6 +71,29 @@ void main() {
       expect(const NotificationPrefs().activeCount, 4);
     });
 
+    test('onboarding presets', () {
+      const NotificationPrefs p = NotificationPrefs();
+      final NotificationPrefs all =
+          p.applyPreset(NotifPreset.all, gospel: false);
+      expect(all.level(NotifKind.mosi), NotifLevel.all);
+      expect(all.level(NotifKind.gospel), NotifLevel.off);
+      expect(all.preset, NotifPreset.all);
+
+      final NotificationPrefs important =
+          all.applyPreset(NotifPreset.important, gospel: true);
+      expect(important.level(NotifKind.mosi), NotifLevel.off);
+      expect(important.level(NotifKind.saint), NotifLevel.important);
+      expect(important.level(NotifKind.gospel), NotifLevel.all);
+      expect(important.preset, NotifPreset.important);
+
+      final NotificationPrefs none =
+          important.applyPreset(NotifPreset.none, gospel: true);
+      expect(none.enabled, isFalse);
+      expect(none.level(NotifKind.gospel), NotifLevel.all); // kept
+      expect(none.preset, NotifPreset.none);
+      expect(p.preset, NotifPreset.important);
+    });
+
     test('every level of every kind but Oprit says what it means', () {
       for (final NotifKind k in NotifKind.values) {
         expect(k.describe(NotifLevel.all), isNotNull, reason: k.name);

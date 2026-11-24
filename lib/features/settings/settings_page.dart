@@ -10,6 +10,7 @@ import '../../core/models/saved_name.dart';
 import '../../core/notifications/notification_prefs.dart';
 import '../../core/notifications/notification_service.dart';
 import '../profile/saved_names_page.dart';
+import '../onboarding/onboarding_page.dart';
 import 'notifications_page.dart';
 import 'settings_widgets.dart';
 import 'text_size_page.dart';
@@ -54,6 +55,14 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         padding: const EdgeInsets.only(top: 8, bottom: 40),
         children: <Widget>[
+          SettingsTile(
+            icon: Icons.auto_awesome_outlined,
+            title: 'Configurare rapidă',
+            value: 'Textul, notificările, numele, biserica, pas cu pas',
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => const OnboardingPage(rerun: true),
+            )),
+          ),
           SettingsTile(
             icon: TroitaIcons.bell,
             title: 'Notificări',

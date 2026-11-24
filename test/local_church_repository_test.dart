@@ -41,6 +41,8 @@ Future<Database> _seed() async {
   await add('c:cernica', 'Cernica', 44.42306, 26.28306, feast: '12-06');
   await add('c:snagov', 'Snagov', 44.70500, 26.17694);
   await add('c:sters', 'Demolată', 44.43300, 26.10240, deleted: 1);
+  // Far from Bucharest, so the nearby tests do not see it.
+  await add('c:iasi', 'Sfântul Nicolae Domnesc Iași', 47.16222, 27.58889);
   return db;
 }
 
@@ -80,6 +82,12 @@ void main() {
     final List<Church> dec6 = await repo.feastsOn(DateTime(2026, 12, 6));
     expect(dec6.map((Church c) => c.id), <String>['c:cernica']);
     expect(await repo.feastsOn(DateTime(2026, 12, 7)), isEmpty);
+  });
+
+  test('search matches each word, in any order', () async {
+    expect((await repo.search('nicolae iasi')).single.id, 'c:iasi');
+    expect((await repo.search('iasi  nicolae')).single.id, 'c:iasi');
+    expect(await repo.search('nicolae bucuresti'), isEmpty);
   });
 
   test('nearby respects the limit', () async {

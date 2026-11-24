@@ -112,6 +112,19 @@ class NameDays {
     return list;
   }
 
+  /// The next day of [name]'s primary feast, [from] included; null for a
+  /// name not in the list.
+  DateTime? nextDay(String name, DateTime from) {
+    final List<NameFeast> list = feastsFor(name);
+    if (list.isEmpty) return null;
+    final DateTime day = DateTime(from.year, from.month, from.day);
+    for (final int y in <int>[day.year, day.year + 1]) {
+      final DateTime? d = list.first.dateIn(y);
+      if (d != null && !d.isBefore(day)) return d;
+    }
+    return null;
+  }
+
   /// Every distinct name, for search.
   late final List<String> allNames = <String>{
     for (final NameFeast f in feasts) ...f.names,
