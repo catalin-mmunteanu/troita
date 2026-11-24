@@ -5,20 +5,26 @@ import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
 import '../../app/site_links.dart';
 import '../../app/theme.dart';
+import '../../app/troita_icons.dart';
 import '../../core/data/day_repository.dart';
 import '../../core/liturgical/calendar_days.dart';
 import '../../core/liturgical/fast_level.dart';
 import '../../core/liturgical/liturgical_calendar.dart';
+import '../../core/models/church.dart';
 import '../../core/models/feast.dart';
 import '../../core/models/fast_day.dart';
 import '../../core/models/feast_calendar.dart';
 import '../../core/models/lecturi.dart';
 import '../../core/models/name_days.dart';
-import '../../core/models/sinaxar.dart';
 import '../fasting/fast_day_editor.dart';
+import '../lecturi/lecturi_page.dart';
+import '../map/churches_map_page.dart';
 import 'day_row.dart';
 
-/// The saint of the day, at length.
+/// One day of the calendar: commemorations, fasting, weddings, name days.
+///
+/// The long texts (the sinaxar, the Apostol and the Gospel) are read on the
+/// Lecturi screen; the two buttons under the name days open it on this day.
 ///
 /// Carries its own text-size control. The published calendars all have an
 /// A+ / A− pair for a reason: this is long-form reading for an audience whose
@@ -35,10 +41,9 @@ class DayDetailPage extends StatefulWidget {
 
 class _DayDetailPageState extends State<DayDetailPage> {
   DayEntry? _entry;
-  bool _missing = false;
   List<String> _names = const <String>[];
   LecturaZi? _lectura;
-  BibliaNT? _biblia;
+  List<Church> _hramuri = const <Church>[];
 
   /// Multiplier on top of the system text scale, not a replacement for it.
   double _scale = 1.0;
@@ -60,18 +65,19 @@ class _DayDetailPageState extends State<DayDetailPage> {
       names = nameDays.namesOn(widget.date);
     } catch (_) {}
     LecturaZi? lectura;
-    BibliaNT? biblia;
     try {
       lectura = (await state.lecturi.lecturi()).on(widget.date);
-      biblia = await state.lecturi.biblia();
+    } catch (_) {}
+    List<Church> hramuri = const <Church>[];
+    try {
+      hramuri = await state.repository.feastsOn(widget.date);
     } catch (_) {}
     if (!mounted) return;
     setState(() {
       _entry = entry;
       _names = names;
       _lectura = lectura;
-      _biblia = biblia;
-      _missing = entry.sinaxar == null;
+      _hramuri = hramuri;
     });
   }
 
@@ -155,9 +161,8 @@ class _DayDetailPageState extends State<DayDetailPage> {
                 const SizedBox(height: 18),
                 _LiturgicalCard(entry: entry),
                 if (_names.isNotEmpty) _NameDaysCard(names: _names),
-                if (_lectura != null && _biblia != null)
-                  _ReadingsCard(
-                      lectura: _lectura!, biblia: _biblia!, scale: _scale),
+                _ReadingButtons(date: widget.date, lectura: _lectura),
+                if (_hramuri.isNotEmpty) _HramuriAzi(churches: _hramuri),
 
                 // Rating any past day, not just today — people fill these in
                 // after the fact, and refusing that makes the journal useless
@@ -167,54 +172,9 @@ class _DayDetailPageState extends State<DayDetailPage> {
                     !widget.date.isAfter(DateTime.now()))
                   _DayRating(date: widget.date),
 
-                if (entry.sinaxar != null && !entry.sinaxar!.isEmpty) ...<Widget>[
-                  const SizedBox(height: 24),
-                  const _Ornament(),
-                  const SizedBox(height: 20),
-                  if (entry.sinaxar!.images.isNotEmpty) ...<Widget>[
-                    _SaintImages(names: entry.sinaxar!.images),
-                    const SizedBox(height: 20),
-                  ],
-                  ..._sections(entry.sinaxar!),
-                  const SizedBox(height: 12),
-                ] else if (_missing) ...<Widget>[
-                  const SizedBox(height: 24),
-                  const _Ornament(),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Sinaxarul pentru această zi nu este încă inclus.\n\n'
-                    'Rulați scriptul de colectare (tool/scrape_calendar.py) '
-                    'pentru a adăuga textele pentru tot anul.',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(fontSize: 15 * _scale, height: 1.6),
-                  ),
-                ],
               ],
             ),
     );
-  }
-
-  List<Widget> _sections(Sinaxar sinaxar) {
-    final List<String> parts =
-        sinaxar.sections.isEmpty ? <String>[sinaxar.text] : sinaxar.sections;
-    return <Widget>[
-      for (final String part in parts)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 18),
-          child: Text(
-            part,
-            textAlign: TextAlign.justify,
-            style: TroitaCalendarText.commemoration.copyWith(
-              fontSize: 16.5 * _scale,
-              // Generous leading: this is long-form reading, not a UI label.
-              height: 1.65,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-    ];
   }
 }
 
@@ -417,25 +377,116 @@ class _EventsNote extends StatelessWidget {
   }
 }
 
-/// "Apostolul și Evanghelia": the Liturgy readings of the day, in full.
-///
-/// From assets/data/lecturi.json (which pericope) and biblia_nt.json (the
-/// text of the 1988 Synodal edition), the same files troita.ro reads. Follows
-/// the page's text-size control, like the sinaxar.
-class _ReadingsCard extends StatelessWidget {
-  const _ReadingsCard({
-    required this.lectura,
-    required this.biblia,
-    required this.scale,
+/// "Evanghelia" and "Sinaxar": open the reading screen on this day.
+class _ReadingButtons extends StatelessWidget {
+  const _ReadingButtons({required this.date, required this.lectura});
+
+  final DateTime date;
+  final LecturaZi? lectura;
+
+  void _open(BuildContext context, ReadingTab tab) => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => LecturiPage(date: date, tab: tab),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final String? cite = lectura?.hasGospel == true ? lectura!.evanghelieCite : null;
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: _BigButton(
+              icon: Icons.menu_book_outlined,
+              label: 'Evanghelia',
+              detail: cite ?? (lectura?.none != null ? 'fără Liturghie' : null),
+              onTap: () => _open(context, ReadingTab.evanghelie),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _BigButton(
+              icon: Icons.auto_stories_outlined,
+              label: 'Sinaxar',
+              detail: 'Viețile sfinților zilei',
+              onTap: () => _open(context, ReadingTab.sinaxar),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A large, two-line button: a 48dp target at any text size.
+class _BigButton extends StatelessWidget {
+  const _BigButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.detail,
   });
 
-  final LecturaZi lectura;
-  final BibliaNT biblia;
-  final double scale;
+  final IconData icon;
+  final String label;
+  final String? detail;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: TroitaRadius.mediumAll,
+        onTap: onTap,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: TroitaTheme.cardDecoration(radius: TroitaRadius.medium),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Row(children: <Widget>[
+                  Icon(icon, size: 20, color: TroitaColors.burgundy),
+                  const SizedBox(width: 8),
+                  Flexible(child: Text(label, style: text.titleMedium)),
+                ]),
+                if (detail != null) ...<Widget>[
+                  const SizedBox(height: 4),
+                  Text(detail!, style: text.bodySmall),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "Hramuri azi: 254 de biserici · Vezi pe hartă", only when there are some.
+class _HramuriAzi extends StatelessWidget {
+  const _HramuriAzi({required this.churches});
+
+  final List<Church> churches;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    final int n = churches.length;
+    final String count = n == 1
+        ? 'o biserică'
+        : n < 20
+            ? '$n biserici'
+            : '$n de biserici';
+    final List<String> names =
+        churches.take(3).map((Church c) => c.name).toList();
     return Container(
       margin: const EdgeInsets.only(top: 14),
       padding: const EdgeInsets.all(TroitaSpacing.card),
@@ -443,56 +494,19 @@ class _ReadingsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text('Apostolul și Evanghelia', style: text.titleMedium),
-          if (lectura.title != null) ...<Widget>[
-            const SizedBox(height: 2),
-            Text(lectura.title!, style: text.bodySmall),
-          ],
-          if (lectura.none != null) ...<Widget>[
-            const SizedBox(height: 8),
-            Text(lectura.none!, style: text.bodyMedium),
-          ] else ...<Widget>[
-            if (lectura.apostolCite != null)
-              _reading(context, 'Apostolul', lectura.apostolCite!,
-                  biblia.text(lectura.apostol)),
-            if (lectura.evanghelieCite != null)
-              _reading(context, 'Evanghelia', lectura.evanghelieCite!,
-                  biblia.text(lectura.evanghelie)),
-            const SizedBox(height: 4),
-            Text(biblia.source, style: text.bodySmall),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _reading(
-      BuildContext context, String label, String cite, List<Verse> verses) {
-    final TextTheme text = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.only(top: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text('$label · $cite',
-              style: text.titleSmall?.copyWith(color: TroitaColors.burgundy)),
+          Text('Hramuri: $count', style: text.titleMedium),
           const SizedBox(height: 6),
-          Text.rich(
-            TextSpan(children: <InlineSpan>[
-              for (final Verse v in verses) ...<InlineSpan>[
-                TextSpan(
-                  text: '${v.number} ',
-                  style: TextStyle(
-                      fontSize: 12 * scale, color: TroitaColors.muted),
-                ),
-                TextSpan(text: '${v.text} '),
-              ],
-            ]),
-            style: TroitaCalendarText.commemoration.copyWith(
-              fontSize: 16.5 * scale,
-              height: 1.65,
-              fontWeight: FontWeight.w400,
+          Text(
+            names.join(', ') + (n > names.length ? ' și altele' : ''),
+            style: text.bodyMedium,
+          ),
+          const SizedBox(height: 6),
+          TextButton.icon(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const ChurchesMapPage()),
             ),
+            icon: const Icon(TroitaIcons.map),
+            label: const Text('Vezi pe hartă'),
           ),
         ],
       ),
@@ -523,79 +537,3 @@ class _NameDaysCard extends StatelessWidget {
     );
   }
 }
-
-/// Saint icons bundled from the sinaxar scrape.
-///
-/// Sized to their natural aspect ratio rather than cropped to a fixed box —
-/// these are icons, and cutting a saint's head off to fit a 16:9 card is not a
-/// design choice anyone should make. One image fills the column; several
-/// scroll horizontally.
-///
-/// [errorBuilder] matters more than usual here: 293 of 366 days have images,
-/// the filenames come from a scrape, and a missing file must degrade to blank
-/// space rather than a red error box in the middle of someone's morning
-/// reading.
-class _SaintImages extends StatelessWidget {
-  const _SaintImages({required this.names});
-
-  final List<String> names;
-
-  @override
-  Widget build(BuildContext context) {
-    if (names.length == 1) {
-      return Center(child: _SaintImage(name: names.first, maxHeight: 320));
-    }
-    return SizedBox(
-      height: 240,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: names.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (BuildContext context, int i) =>
-            _SaintImage(name: names[i], maxHeight: 240),
-      ),
-    );
-  }
-}
-
-class _SaintImage extends StatelessWidget {
-  const _SaintImage({required this.name, required this.maxHeight});
-
-  final String name;
-  final double maxHeight;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: TroitaRadius.mediumAll,
-      child: Container(
-        decoration: TroitaTheme.cardDecoration(radius: TroitaRadius.medium),
-        constraints: BoxConstraints(maxHeight: maxHeight),
-        child: Image.asset(
-          'assets/sinaxar/$name',
-          fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-        ),
-      ),
-    );
-  }
-}
-
-/// The little rule-dot-rule from `byzantine-ornament` (2:275).
-class _Ornament extends StatelessWidget {
-  const _Ornament();
-
-  @override
-  Widget build(BuildContext context) => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(width: 40, height: 1, color: TroitaColors.border),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Icon(Icons.add, size: 14, color: TroitaColors.gold),
-          ),
-          Container(width: 40, height: 1, color: TroitaColors.border),
-        ],
-      );
-}
-

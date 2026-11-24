@@ -152,6 +152,23 @@ class LocalChurchRepository implements ChurchRepository {
     return soon.take(limit).toList(growable: false);
   }
 
+  @override
+  Future<List<Church>> feastsOn(DateTime date) async {
+    final List<Map<String, Object?>> rows = await _db.query(
+      'churches',
+      columns: _cols.split(', '),
+      where: 'deleted = 0 AND feast_day IS NOT NULL',
+    );
+    final List<Church> out = rows.map(Church.fromRow).where((Church c) {
+      final DateTime? d = FeastCalendar.resolve(c.feastDay, year: date.year);
+      return d != null &&
+          d.month == date.month &&
+          d.day == date.day;
+    }).toList()
+      ..sort((Church a, Church b) => b.priority.compareTo(a.priority));
+    return out;
+  }
+
   Future<Map<String, String>> meta() async {
     final List<Map<String, Object?>> rows = await _db.query('meta');
     return <String, String>{

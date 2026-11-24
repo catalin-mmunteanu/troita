@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../app/theme.dart';
 import '../../app/troita_icons.dart';
 import '../settings/settings_page.dart';
+import '../map/churches_map_page.dart';
 import 'my_churches_page.dart';
 
 /// `profil` (2:430), minus the account header — there are no accounts yet, so a
@@ -31,6 +32,14 @@ class ProfilePage extends StatelessWidget {
             subtitle: 'Favorite și locuri vizitate',
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const MyChurchesPage()),
+            ),
+          ),
+          _Row(
+            icon: TroitaIcons.map,
+            title: 'Biserici și hartă',
+            subtitle: 'Bisericile, mănăstirile și troițele din toată țara',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const ChurchesMapPage()),
             ),
           ),
           _Row(

@@ -139,3 +139,6 @@ class BibliaNT {
     return out;
   }
 }
+
+/// The sub-tabs of Lecturi. Rugăciuni will come third; it has no date.
+enum ReadingTab { sinaxar, evanghelie }

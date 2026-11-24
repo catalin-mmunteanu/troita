@@ -265,7 +265,8 @@ class TroitaNotifications {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      payload: _iso(date),
+      // "ev:" opens the reading itself, not the day.
+      payload: 'ev:${_iso(date)}',
     );
     return true;
   }

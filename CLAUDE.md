@@ -6,7 +6,8 @@ the owner says otherwise in the current conversation.
 ## What this repo is
 
 The Troița app: a Romanian Orthodox calendar for Android (Flutter + a thin
-Kotlin layer). Tabs: Calendar · Posturi · Hartă · Profil. It also owns the data
+Kotlin layer). Tabs: Calendar · Posturi · Lecturi · Profil (the map opens
+from Profil and from a day's Hramuri card: `ChurchesMapPage`). It also owns the data
 pipeline (`tool/`) that builds the seed database the app ships.
 
 It has a sister repo, **troita-web** (`catalin-mmunteanu/troita-web`, Next.js,
@@ -87,8 +88,10 @@ the site needs (or check troita-web).
   to use the 1988 text; show the source under it. No readings (and no
   notification) on Great Lent weekdays, Cheese Week Wed/Fri, Holy Friday.
   Notification: opt-in `NotificationPrefs.gospel`, default 07:00, channel
-  `troita_evanghelie_v1`, ids 4,000,000 + yymmdd. Day screen:
-  `_ReadingsCard`. When extending past 2030, regenerate both golden and
+  `troita_evanghelie_v1`, ids 4,000,000 + yymmdd, payload `ev:YYYY-MM-DD`
+  (opens Lecturi on Evanghelie). Text is read in `LecturiPage` (sub-tabs
+  Sinaxar · Evanghelie; shared widgets in `lib/features/lecturi/
+  reading_widgets.dart`); the day screen only links to it. When extending past 2030, regenerate both golden and
   lecturi. troita-web copies both JSON files.
 - **Rank names:** `praznic · cruce_rosie · cruce_albastra · simplu`. Say
   "cruce albastră", not "cruce neagră".

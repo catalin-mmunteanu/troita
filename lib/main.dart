@@ -6,9 +6,11 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'app/app_scope.dart';
 import 'app/app_state.dart';
 import 'app/theme.dart';
+import 'core/models/lecturi.dart' show ReadingTab;
 import 'features/calendar/day_detail_page.dart';
 import 'features/church_detail/church_detail_page.dart';
 import 'features/home/home_page.dart';
+import 'features/lecturi/lecturi_page.dart';
 import 'features/onboarding/onboarding_page.dart';
 
 Future<void> main() async {
@@ -77,11 +79,16 @@ class _RootState extends State<_Root> {
     if (state.ready && state.pendingDate != null && !_routing) {
       _routing = true;
       final DateTime date = state.pendingDate!;
+      final ReadingTab? tab = state.pendingReadingTab;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         state.consumePendingDate();
         if (!mounted) return;
         await Navigator.of(context).push(
-          MaterialPageRoute<void>(builder: (_) => DayDetailPage(date: date)),
+          MaterialPageRoute<void>(
+            builder: (_) => tab == null
+                ? DayDetailPage(date: date)
+                : LecturiPage(date: date, tab: tab),
+          ),
         );
         _routing = false;
       });
