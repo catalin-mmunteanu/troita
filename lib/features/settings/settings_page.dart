@@ -190,6 +190,16 @@ class _SettingsPageState extends State<SettingsPage> {
               style: TextStyle(fontSize: 12.5, color: TroitaColors.muted),
             ),
           ),
+          // The source of the readings, once here rather than under each
+          // one. Same words as `source` in assets/data/biblia_nt.json.
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 6, 20, 0),
+            child: Text(
+              'Textul Apostolului și al Evangheliei: Biblia, ediția Sfântului '
+              'Sinod, IBMBOR, 1988.',
+              style: TextStyle(fontSize: 12.5, color: TroitaColors.muted),
+            ),
+          ),
         ],
       ),
     );

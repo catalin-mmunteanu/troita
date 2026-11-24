@@ -28,6 +28,16 @@ class FastingPage extends StatefulWidget {
 }
 
 class _FastingPageState extends State<FastingPage> {
+  /// How many years of coming fasts the list goes to.
+  static const int _yearsAhead = 4;
+
+  /// Years the user opened or closed by hand. Absent: the default, which is
+  /// open for this year and the next, closed after.
+  final Map<int, bool> _expanded = <int, bool>{};
+
+  bool _isOpen(int year, int thisYear) =>
+      _expanded[year] ?? year <= thisYear + 1;
+
   @override
   Widget build(BuildContext context) {
     final AppState state = AppScope.of(context);
@@ -37,7 +47,8 @@ class _FastingPageState extends State<FastingPage> {
     final List<FastingPeriod> all = <FastingPeriod>[
       ...LiturgicalCalendar.greatFasts(today.year - 1),
       ...LiturgicalCalendar.greatFasts(today.year),
-      ...LiturgicalCalendar.greatFasts(today.year + 1),
+      for (int y = today.year + 1; y <= today.year + _yearsAhead; y++)
+        ...LiturgicalCalendar.greatFasts(y),
     ]..sort((FastingPeriod a, FastingPeriod b) => a.start.compareTo(b.start));
 
     // Not `.firstOrNull` — that is a package:collection extension, not core.
@@ -46,8 +57,12 @@ class _FastingPageState extends State<FastingPage> {
     final FastingPeriod? active = current.isEmpty ? null : current.first;
     final List<FastingPeriod> upcoming = all
         .where((FastingPeriod p) => p.start.isAfter(today))
-        .take(4)
         .toList();
+    // Coming fasts by the year they begin in.
+    final Map<int, List<FastingPeriod>> byYear = <int, List<FastingPeriod>>{};
+    for (final FastingPeriod p in upcoming) {
+      (byYear[p.start.year] ??= <FastingPeriod>[]).add(p);
+    }
     final List<FastingPeriod> past = all.reversed
         .where((FastingPeriod p) => p.end.isBefore(today))
         .take(3)
@@ -87,8 +102,8 @@ class _FastingPageState extends State<FastingPage> {
                 today: today),
 
           const _SectionHeader('Următoarele posturi'),
-          ...upcoming.map((FastingPeriod p) =>
-              _PeriodCard(period: p, today: today, status: PeriodStatus.upcoming)),
+          for (final MapEntry<int, List<FastingPeriod>> e in byYear.entries)
+            ..._yearGroup(e.key, e.value, today),
 
           if (past.isNotEmpty) ...<Widget>[
             const _SectionHeader('Posturi încheiate'),
@@ -96,14 +111,117 @@ class _FastingPageState extends State<FastingPage> {
                 period: p, today: today, status: PeriodStatus.finished)),
           ],
 
+          // The tallies go last: the page is first a guide to the fasts,
+          // and the journal is something some people keep.
           if (state.journalEnabled) ...<Widget>[
-            const _SectionHeader('Total'),
+            const _SectionHeader('Zile ținute'),
+            if (active != null) _KeptCard(period: active),
+            ...past.map((FastingPeriod p) => _KeptCard(period: p)),
             const _AllTimeCard(),
           ],
         ],
       ),
     );
   }
+
+  /// A year's heading, which opens and closes it, and its fasts when open.
+  /// The fasts of a year the user had to open show their dates only: a
+  /// count of days that far ahead says nothing.
+  List<Widget> _yearGroup(int year, List<FastingPeriod> fasts, DateTime today) {
+    final bool open = _isOpen(year, today.year);
+    final bool byDefault = year <= today.year + 1;
+    return <Widget>[
+      _YearHeader(
+        year: year,
+        count: fasts.length,
+        open: open,
+        onTap: () => setState(() => _expanded[year] = !open),
+      ),
+      if (open)
+        ...fasts.map((FastingPeriod p) => _PeriodCard(
+              period: p,
+              today: today,
+              status: PeriodStatus.upcoming,
+              showCountdown: byDefault,
+            )),
+    ];
+  }
+}
+
+/// "2027 · 4 posturi" with a chevron; a button for screen readers.
+class _YearHeader extends StatelessWidget {
+  const _YearHeader({
+    required this.year,
+    required this.count,
+    required this.open,
+    required this.onTap,
+  });
+
+  final int year;
+  final int count;
+  final bool open;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        expanded: open,
+        child: InkWell(
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: TroitaSpacing.page, vertical: 6),
+              child: Row(
+                children: <Widget>[
+                  Text('$year',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: TroitaColors.burgundy,
+                          )),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      count == 1 ? 'un post' : '$count posturi',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                  Icon(open ? Icons.expand_less : Icons.expand_more,
+                      color: TroitaColors.burgundy),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+}
+
+/// A fast's tally at the bottom of the page: its name, then the days kept.
+class _KeptCard extends StatelessWidget {
+  const _KeptCard({required this.period});
+
+  final FastingPeriod period;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        margin: const EdgeInsets.fromLTRB(
+          TroitaSpacing.page, 0, TroitaSpacing.page, TroitaSpacing.gap,
+        ),
+        padding: const EdgeInsets.all(TroitaSpacing.card),
+        decoration: TroitaTheme.cardDecoration(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              '${period.label} ${period.start.year}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 6),
+            _PeriodStats(period: period, compact: true),
+          ],
+        ),
+      );
+
 }
 
 /// The card for a fast that is running now: how far in, how much left, today's
@@ -151,8 +269,6 @@ class _ActiveFastCard extends StatelessWidget {
                 onKept: (bool k) => state.setFastKept(today, k),
               ),
             ),
-            const Divider(height: 26),
-            _PeriodStats(period: period),
           ],
 
           // An explicit row rather than making the whole card tappable: this
@@ -223,11 +339,15 @@ class _PeriodCard extends StatelessWidget {
     required this.period,
     required this.today,
     required this.status,
+    this.showCountdown = true,
   });
 
   final FastingPeriod period;
   final DateTime today;
   final PeriodStatus status;
+
+  /// For a coming fast: the days left to it, in place of a status chip.
+  final bool showCountdown;
 
   @override
   Widget build(BuildContext context) {
@@ -235,9 +355,8 @@ class _PeriodCard extends StatelessWidget {
         '${DateFormat('d MMM', 'ro').format(period.start)} – '
         '${DateFormat('d MMM yyyy', 'ro').format(period.end)}';
 
-    final String when = status == PeriodStatus.upcoming
-        ? 'Începe ${ro.inDays(calendarDaysBetween(today, period.start))}'
-        : 'Încheiat ${DateFormat('MMMM yyyy', 'ro').format(period.end)}';
+    final bool upcoming = status == PeriodStatus.upcoming;
+    final int until = calendarDaysBetween(today, period.start);
 
     return Container(
       margin: const EdgeInsets.fromLTRB(
@@ -260,7 +379,10 @@ class _PeriodCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleLarge),
               ),
               const SizedBox(width: 8),
-              _StatusChip(status: status),
+              if (!upcoming)
+                _StatusChip(label: status.label, status: status)
+              else if (showCountdown)
+                _StatusChip(label: ro.inDays(until), status: status),
               const SizedBox(width: 4),
               const Icon(Icons.chevron_right,
                   size: 18, color: TroitaColors.muted),
@@ -278,16 +400,14 @@ class _PeriodCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(when,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
-          if (status == PeriodStatus.finished &&
-              AppScope.of(context).journalEnabled) ...<Widget>[
-            const Divider(height: 22),
-            _PeriodStats(period: period, compact: true),
+          if (!upcoming) ...<Widget>[
+            const SizedBox(height: 4),
+            Text(
+                'Încheiat ${DateFormat('MMMM yyyy', 'ro').format(period.end)}',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.w600)),
           ],
         ],
       ),
@@ -448,8 +568,9 @@ class _Progress extends StatelessWidget {
 }
 
 class _StatusChip extends StatelessWidget {
-  const _StatusChip({required this.status});
+  const _StatusChip({required this.label, required this.status});
 
+  final String label;
   final PeriodStatus status;
 
   @override
@@ -481,7 +602,7 @@ class _StatusChip extends StatelessWidget {
         border: borderColor == null ? null : Border.all(color: borderColor),
       ),
       child: Text(
-        status.label,
+        label,
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
