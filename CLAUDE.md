@@ -90,7 +90,7 @@ the site needs (or check troita-web).
   Notification: opt-in `NotificationPrefs.gospel`, default 07:00, channel
   `troita_evanghelie_v1`, ids 4,000,000 + yymmdd, payload `ev:YYYY-MM-DD`
   (opens Lecturi on Evanghelie). Text is read in `LecturiPage` (sub-tabs
-  Sinaxar · Evanghelie; shared widgets in `lib/features/lecturi/
+  Evanghelie · Sinaxar; shared widgets in `lib/features/lecturi/
   reading_widgets.dart`); the day screen only links to it. When extending past 2030, regenerate both golden and
   lecturi. troita-web copies both JSON files.
 - **Rank names:** `praznic · cruce_rosie · cruce_albastra · simplu`. Say

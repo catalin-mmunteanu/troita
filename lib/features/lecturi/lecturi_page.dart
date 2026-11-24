@@ -16,11 +16,11 @@ import 'reading_widgets.dart';
 /// The third tab opens it on today. A day's "Evanghelia" and "Sinaxar"
 /// buttons and the morning notifications open the same screen on their day
 /// and sub-tab. Days move with the arrows under the tabs, not by swiping: a
-/// horizontal swipe already switches Sinaxar and Evanghelie. The text size
+/// horizontal swipe already switches Evanghelie and Sinaxar. The text size
 /// is kept between visits, because the people who need it larger need it
 /// larger every time.
 class LecturiPage extends StatefulWidget {
-  const LecturiPage({super.key, this.date, this.tab = ReadingTab.sinaxar});
+  const LecturiPage({super.key, this.date, this.tab = ReadingTab.evanghelie});
 
   /// The day to open on; today when null.
   final DateTime? date;
@@ -116,7 +116,7 @@ class _LecturiPageState extends State<LecturiPage>
         ],
         bottom: TabBar(
           controller: _tabs,
-          tabs: const <Widget>[Tab(text: 'Sinaxar'), Tab(text: 'Evanghelie')],
+          tabs: const <Widget>[Tab(text: 'Evanghelie'), Tab(text: 'Sinaxar')],
         ),
       ),
       body: Column(
@@ -134,7 +134,7 @@ class _LecturiPageState extends State<LecturiPage>
                 ? const Center(child: CircularProgressIndicator())
                 : TabBarView(
                     controller: _tabs,
-                    children: <Widget>[_sinaxar(context), _gospel(context)],
+                    children: <Widget>[_gospel(context), _sinaxar(context)],
                   ),
           ),
         ],
