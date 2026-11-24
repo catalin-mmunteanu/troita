@@ -37,6 +37,18 @@ class TroitaApp extends StatelessWidget {
         title: 'Troița',
         debugShowCheckedModeBanner: false,
         theme: TroitaTheme.light(),
+        // The app's text size multiplies the phone's, everywhere at once.
+        builder: (BuildContext context, Widget? child) {
+          final MediaQueryData mq = MediaQuery.of(context);
+          final double phone = mq.textScaler.scale(16) / 16;
+          return MediaQuery(
+            data: mq.copyWith(
+              textScaler: TextScaler.linear(
+                  (phone * AppScope.of(context).textScale).clamp(0.8, 2.4)),
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
         home: const _Root(),
       ),
     );

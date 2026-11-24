@@ -12,14 +12,17 @@ import '../core/data/feast_repository.dart';
 import '../core/data/lecturi_repository.dart';
 import '../core/data/local_church_repository.dart';
 import '../core/data/name_days_repository.dart';
+import '../core/data/saved_names_repository.dart';
 import '../core/models/church.dart';
 import '../core/models/lecturi.dart' show ReadingTab;
+import '../core/models/saved_name.dart';
 import '../core/native/troita_native.dart';
 import '../core/notifications/notification_planner.dart';
 import '../core/notifications/notification_prefs.dart';
 import '../core/notifications/notification_service.dart';
 import '../core/permissions/permission_service.dart';
 import 'site_links.dart';
+import 'text_size.dart';
 import 'widget_feed.dart';
 
 /// Single app-wide store. Deliberately a plain [ChangeNotifier]: the app has
@@ -60,6 +63,26 @@ class AppState extends ChangeNotifier {
 
   /// Zile de nume, from a bundled asset: no database, loaded on first use.
   final NameDaysRepository nameDays = NameDaysRepository();
+
+  /// The names whose name day the user wants to hear about, in the order
+  /// added.
+  List<SavedName> savedNames = const <SavedName>[];
+  final SavedNamesRepository _savedNamesRepo = SavedNamesRepository();
+
+  Future<void> addSavedName(SavedName name) async {
+    if (savedNames.contains(name)) return;
+    savedNames = <SavedName>[...savedNames, name];
+    await _savedNamesRepo.save(savedNames);
+    notifyListeners();
+    await rescheduleNotifications();
+  }
+
+  Future<void> removeSavedName(SavedName name) async {
+    savedNames = savedNames.where((SavedName n) => n != name).toList();
+    await _savedNamesRepo.save(savedNames);
+    notifyListeners();
+    await rescheduleNotifications();
+  }
 
   /// Apostolul și Evanghelia zilei, and the New Testament text.
   final LecturiRepository lecturi = LecturiRepository();
@@ -119,8 +142,11 @@ class AppState extends ChangeNotifier {
       _days = DayRepository(shared, _feasts!);
       _journal = await FastJournalRepository.open();
       _marks = await ChurchMarksRepository.open();
-      journalEnabled =
-          (await SharedPreferences.getInstance()).getBool(_kJournal) ?? false;
+      final SharedPreferences sp = await SharedPreferences.getInstance();
+      journalEnabled = sp.getBool(_kJournal) ?? false;
+      // Lecturi used to keep a size of its own; it seeds the shared one.
+      textScale = TextSize.clamp(
+          sp.getDouble(_kTextScale) ?? sp.getDouble('reading_scale') ?? 1.0);
       seed = init.seed;
       status = init.status;
       pendingChurchId = await _native.consumePendingChurchId();
@@ -154,6 +180,7 @@ class AppState extends ChangeNotifier {
     _openDay(await notifications.launchPayload());
 
     notificationPrefs = await NotificationPrefs.load();
+    savedNames = await _savedNamesRepo.load();
     // Fire and forget: scheduling 60 days walks the database, and the first
     // frame should not wait for it.
     unawaited(rescheduleNotifications());
@@ -221,6 +248,9 @@ class AppState extends ChangeNotifier {
       churches: _repository,
       marks: _marks,
       lecturi: lecturi,
+      nameDays: nameDays,
+      savedNames: savedNames,
+      journal: journalEnabled,
     ).reschedule(notificationPrefs);
     notifyListeners();
     await _refreshWidget();
@@ -261,6 +291,19 @@ class AppState extends ChangeNotifier {
 
   static const String _kJournal = 'journal_enabled';
 
+  /// The app's own text size, on top of the phone's: one setting for every
+  /// screen, changed with A−/A+ in Profil, Setări, Lecturi and a day's
+  /// screen. For people who see poorly and need it larger everywhere.
+  double textScale = 1.0;
+  static const String _kTextScale = 'text_scale';
+
+  Future<void> setTextScale(double value) async {
+    textScale = TextSize.clamp(value);
+    notifyListeners();
+    final SharedPreferences p = await SharedPreferences.getInstance();
+    await p.setDouble(_kTextScale, textScale);
+  }
+
   Future<void> setJournalEnabled(bool on) async {
     journalEnabled = on;
     final SharedPreferences p = await SharedPreferences.getInstance();
@@ -268,6 +311,8 @@ class AppState extends ChangeNotifier {
     // Every screen that shows journal data already rebuilds on this.
     journalRevision++;
     notifyListeners();
+    // "Ați ținut postul azi?" only reaches those who keep the journal.
+    await rescheduleNotifications();
   }
 
   /// Bumped whenever a day is marked, so every screen showing the journal

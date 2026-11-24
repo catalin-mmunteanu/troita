@@ -88,12 +88,31 @@ the site needs (or check troita-web).
   to use the 1988 text; its source is shown once, in Setări → Despre (and on
   troita.ro/despre), not under each reading. No readings (and no
   notification) on Great Lent weekdays, Cheese Week Wed/Fri, Holy Friday.
-  Notification: opt-in `NotificationPrefs.gospel`, default 07:00, channel
+  Notification: `NotifKind.gospel` (off by default), at its own hour (07:00), channel
   `troita_evanghelie_v1`, ids 4,000,000 + yymmdd, payload `ev:YYYY-MM-DD`
   (opens Lecturi on Evanghelie). Text is read in `LecturiPage` (sub-tabs
   Evanghelie · Sinaxar; shared widgets in `lib/features/lecturi/
   reading_widgets.dart`); the day screen only links to it. When extending past 2030, regenerate both golden and
   lecturi. troita-web copies both JSON files.
+- **Notificări.** One `NotifLevel` (Toate · Doar importante · Oprit) per
+  `NotifKind` in `notification_prefs.dart`; `NotifKind.describe` is the
+  meaning of each level, shown in Setări, and `NotificationPlanner` follows
+  it. Kinds: sfântul zilei, Evanghelia, dezlegări, zile de nume (names the
+  user saved in Profil → Zile de nume, primary feast only), hram, posturi,
+  ajunuri, Moșii (from the published notes; computed years only −57/+48 and
+  the Lent Saturdays), sărbători legale (Codul muncii art. 139), jurnal.
+  Two shared hours: morning (today) and evening (tomorrow); the Gospel keeps
+  its own. 60-day window, one channel and one id million per kind (see
+  `TroitaNotifications`); old switches migrate in `NotificationPrefs.fromStore`.
+  Setări is an overview (each row shows its value); notifications have their
+  own screen (`notifications_page.dart`) with a main switch
+  (`NotificationPrefs.enabled`, keeps the levels) and the shared pieces in
+  `settings_widgets.dart`.
+- **Text size.** One app-wide `AppState.textScale` (85–160 %, steps of 15,
+  `lib/app/text_size.dart`), multiplied with the phone's in `main.dart`'s
+  `MaterialApp.builder`. Set from Profil and Setări (`TextSizeCard`) and the
+  app bars of Lecturi and the day screen (`TextSizeButtons`). Don't add
+  per-screen scales; the bottom bar clamps at 130 %.
 - **Rank names:** `praznic · cruce_rosie · cruce_albastra · simplu`. Say
   "cruce albastră", not "cruce neagră".
 - **Notes from the scraper:** junk (page JavaScript) is dropped and fixed-date

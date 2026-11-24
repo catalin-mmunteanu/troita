@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
 import '../../app/site_links.dart';
+import '../../app/text_size.dart';
 import '../../app/theme.dart';
 import '../../app/troita_icons.dart';
 import '../../core/data/day_repository.dart';
@@ -26,10 +27,11 @@ import 'day_row.dart';
 /// The long texts (the sinaxar, the Apostol and the Gospel) are read on the
 /// Lecturi screen; the two buttons under the name days open it on this day.
 ///
-/// Carries its own text-size control. The published calendars all have an
-/// A+ / A− pair for a reason: this is long-form reading for an audience whose
-/// eyesight varies, and sending them to Android's global font setting is worse
-/// than giving them a control where they are reading.
+/// Carries the text-size control (`TextSizeButtons`). The published calendars
+/// all have an A+ / A− pair for a reason: an audience whose eyesight varies,
+/// and sending them to Android's global font setting is worse than giving
+/// them a control where they are reading. The size is the app's one setting,
+/// so it holds on every screen.
 class DayDetailPage extends StatefulWidget {
   const DayDetailPage({required this.date, super.key});
 
@@ -44,9 +46,6 @@ class _DayDetailPageState extends State<DayDetailPage> {
   List<String> _names = const <String>[];
   LecturaZi? _lectura;
   List<Church> _hramuri = const <Church>[];
-
-  /// Multiplier on top of the system text scale, not a replacement for it.
-  double _scale = 1.0;
 
   @override
   void initState() {
@@ -119,20 +118,7 @@ class _DayDetailPageState extends State<DayDetailPage> {
       appBar: AppBar(
         title: Text(DateFormat('d MMMM', 'ro').format(widget.date)),
         actions: <Widget>[
-          IconButton(
-            tooltip: 'Text mai mic',
-            onPressed: _scale <= 0.85
-                ? null
-                : () => setState(() => _scale -= 0.15),
-            icon: const Text('A−', style: TextStyle(fontSize: 15)),
-          ),
-          IconButton(
-            tooltip: 'Text mai mare',
-            onPressed: _scale >= 1.75
-                ? null
-                : () => setState(() => _scale += 0.15),
-            icon: const Text('A+', style: TextStyle(fontSize: 19)),
-          ),
+          const TextSizeButtons(),
           IconButton(
             tooltip: 'Trimite',
             onPressed: entry == null ? null : () => _share(entry),
@@ -150,10 +136,7 @@ class _DayDetailPageState extends State<DayDetailPage> {
                 const SizedBox(height: 10),
 
                 // Commemorations, largest first.
-                ...entry.feasts.map((Feast f) => _Commemoration(
-                      feast: f,
-                      scale: _scale,
-                    )),
+                ...entry.feasts.map((Feast f) => _Commemoration(feast: f)),
                 if (entry.feasts.isEmpty)
                   Text('Pomenirea zilei',
                       style: Theme.of(context).textTheme.headlineMedium),
@@ -229,10 +212,9 @@ class _DayRatingState extends State<_DayRating> {
 }
 
 class _Commemoration extends StatelessWidget {
-  const _Commemoration({required this.feast, required this.scale});
+  const _Commemoration({required this.feast});
 
   final Feast feast;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +250,7 @@ class _Commemoration extends StatelessWidget {
           Text(
             feast.name,
             style: TroitaCalendarText.commemoration.copyWith(
-              fontSize: (major ? 23 : 19) * scale,
+              fontSize: major ? 23 : 19,
               height: 1.3,
               fontWeight: major ? FontWeight.w700 : FontWeight.w600,
               color: feast.kind == 'romanesc'

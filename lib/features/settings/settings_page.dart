@@ -3,9 +3,16 @@ import 'package:material_ui/material_ui.dart';
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
 import '../../app/site_links.dart';
+import '../../app/text_size.dart';
 import '../../app/theme.dart';
+import '../../app/troita_icons.dart';
+import '../../core/models/saved_name.dart';
 import '../../core/notifications/notification_prefs.dart';
 import '../../core/notifications/notification_service.dart';
+import '../profile/saved_names_page.dart';
+import 'notifications_page.dart';
+import 'settings_widgets.dart';
+import 'text_size_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -14,8 +21,10 @@ class SettingsPage extends StatefulWidget {
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
+/// Setări: an overview, after Android's settings guidelines. Each row says
+/// what it is set to, so the screen can be read at a glance; the many
+/// choices of notifications live on a screen of their own.
 class _SettingsPageState extends State<SettingsPage> {
-  bool _busy = false;
   bool? _permitted;
 
   @override
@@ -27,237 +36,95 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-  Future<void> _update(NotificationPrefs next) async {
-    setState(() => _busy = true);
-    await AppScope.of(context).setNotificationPrefs(next);
-    if (mounted) setState(() => _busy = false);
-  }
-
-  Future<void> _pickTime(NotificationPrefs prefs) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(hour: prefs.hour, minute: prefs.minute),
-      helpText: 'Ora notificării zilnice',
-    );
-    if (picked == null) return;
-    await _update(prefs.copyWith(hour: picked.hour, minute: picked.minute));
-  }
-
-  Future<void> _pickGospelTime(NotificationPrefs prefs) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(hour: prefs.gospelHour, minute: prefs.gospelMinute),
-      helpText: 'Ora Evangheliei zilei',
-    );
-    if (picked == null) return;
-    await _update(
-        prefs.copyWith(gospelHour: picked.hour, gospelMinute: picked.minute));
+  String _notificationsValue(NotificationPrefs prefs) {
+    if (_permitted == false) return 'Nepermise de telefon';
+    if (!prefs.enabled) return 'Oprite';
+    return '${prefs.activeCount} din ${NotifKind.values.length} pornite · '
+        'dimineața ${prefs.timeLabel}, seara ${prefs.eveningTimeLabel}';
   }
 
   @override
   Widget build(BuildContext context) {
     final AppState state = AppScope.of(context);
     final NotificationPrefs prefs = state.notificationPrefs;
+    final int names = state.savedNames.length;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Setări')),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: const EdgeInsets.only(top: 8, bottom: 40),
         children: <Widget>[
-          if (_permitted == false) _PermissionCard(onGrant: () async {
-            final bool ok = await state.requestNotificationPermission();
-            if (mounted) setState(() => _permitted = ok);
-          }),
-
-          const _Header('Notificarea zilnică'),
-          RadioGroup<DailyNotificationMode>(
-            groupValue: prefs.mode,
-            onChanged: (DailyNotificationMode? v) {
-              if (_busy || v == null) return;
-              _update(prefs.copyWith(mode: v));
+          SettingsTile(
+            icon: TroitaIcons.bell,
+            title: 'Notificări',
+            value: _notificationsValue(prefs),
+            onTap: () async {
+              await Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => const NotificationsPage(),
+              ));
+              final bool ok = await TroitaNotifications.instance.areEnabled();
+              if (mounted) setState(() => _permitted = ok);
             },
-            child: Column(
-              children: <Widget>[
-                for (final DailyNotificationMode mode
-                    in DailyNotificationMode.values)
-                  RadioListTile<DailyNotificationMode>(
-                    value: mode,
-                    enabled: !_busy,
-                    title: Text(mode.label),
-                    subtitle: Text(mode.description,
-                        style: Theme.of(context).textTheme.bodySmall),
-                    activeColor: TroitaColors.burgundy,
-                  ),
-              ],
-            ),
           ),
-
-          if (prefs.mode != DailyNotificationMode.off) ...<Widget>[
-            ListTile(
-              title: const Text('Ora'),
-                trailing: Text(
-                prefs.timeLabel,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(fontSize: 22),
-              ),
-              onTap: _busy ? null : () => _pickTime(prefs),
-            ),
-            SwitchListTile(
-              value: prefs.sound,
-              onChanged: _busy
-                  ? null
-                  : (bool v) => _update(prefs.copyWith(sound: v)),
-              title: const Text('Sunet la sărbătorile mari'),
-
-            ),
-          ],
-
-          const _Header('Evanghelia zilei'),
+          SettingsTile(
+            icon: Icons.format_size,
+            title: 'Mărimea textului',
+            value: TextSize.label(state.textScale),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => const TextSizePage(),
+            )),
+          ),
+          SettingsTile(
+            icon: Icons.cake_outlined,
+            title: 'Zile de nume',
+            value: names == 0
+                ? 'Niciun nume salvat'
+                : state.savedNames.map((SavedName n) => n.display).join(', '),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => const SavedNamesPage(),
+            )),
+          ),
           SwitchListTile(
-            value: prefs.gospel,
-            onChanged:
-                _busy ? null : (bool v) => _update(prefs.copyWith(gospel: v)),
-            title: const Text('Evanghelia zilei'),
+            value: state.journalEnabled,
+            onChanged: (bool v) => state.setJournalEnabled(v),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+            secondary: const Icon(Icons.edit_calendar_outlined,
+                color: TroitaColors.burgundy, size: 26),
+            title: const Text('Jurnal de post', style: TextStyle(fontSize: 17)),
             subtitle: const Text(
-                'Evanghelia de la Liturghie, în fiecare dimineață. Nu vine în '
-                'zilele fără Liturghie din Postul Mare.'),
-          ),
-          if (prefs.gospel)
-            ListTile(
-              title: const Text('Ora'),
-              trailing: Text(
-                prefs.gospelTimeLabel,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(fontSize: 22),
-              ),
-              onTap: _busy ? null : () => _pickGospelTime(prefs),
+              'Întrebarea „Ați ținut postul?” și zilele însemnate',
+              style: TextStyle(fontSize: 15, color: TroitaColors.muted),
             ),
-
-          const _Header('Posturi'),
-          SwitchListTile(
-            value: prefs.fastReminders,
-            onChanged:
-                _busy ? null : (bool v) => _update(prefs.copyWith(fastReminders: v)),
-            title: const Text('Anunț cu o zi înainte'),
-            subtitle: const Text('Pentru cele patru posturi mari.'),
           ),
 
-          const _Header('Jurnal de post'),
-          SwitchListTile(
-            value: AppScope.of(context).journalEnabled,
-            onChanged: (bool v) => AppScope.of(context).setJournalEnabled(v),
-            title: const Text('Întrebarea „Ați ținut postul?”'),
-            subtitle: const Text('Notați zilele în care ați ținut postul.'),
-          ),
-
-          const _Header('Hramuri'),
-          SwitchListTile(
-            value: prefs.hramReminders,
-            onChanged: _busy
-                ? null
-                : (bool v) => _update(prefs.copyWith(hramReminders: v)),
-            title: const Text('Hramul bisericilor favorite'),
-            subtitle: const Text('Cu o seară înainte.'),
-          ),
-
-          const _Header('Despre aplicație'),
-          ListTile(
-            title: const Text('Versiunea datelor'),
-            trailing: Text(state.seed['seed_version'] ?? '—'),
-          ),
+          const SectionHeader('Despre aplicație'),
           // The site carries the same calendar, the fasting guide and the
           // privacy policy Google Play links to.
-          ListTile(
-            title: const Text('Calendarul pe troita.ro'),
-            subtitle: const Text('Același calendar, pe orice dispozitiv.'),
-            trailing: const Icon(Icons.open_in_new, size: 18),
+          SettingsTile(
+            title: 'Calendarul pe troita.ro',
+            value: 'Același calendar, pe orice dispozitiv',
+            external: true,
             onTap: () => state.native.openUri(SiteLinks.base),
           ),
-          ListTile(
-            title: const Text('Politica de confidențialitate'),
-            trailing: const Icon(Icons.open_in_new, size: 18),
+          SettingsTile(
+            title: 'Politica de confidențialitate',
+            external: true,
             onTap: () => state.native.openUri(SiteLinks.privacy),
           ),
-          // Required by the ODbL licence of the church data and map tiles.
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 4, 20, 0),
-            child: Text(
-              'Date despre biserici și hartă: © contributorii OpenStreetMap.',
-              style: TextStyle(fontSize: 12.5, color: TroitaColors.muted),
-            ),
+          SettingsTile(
+            title: 'Versiunea datelor',
+            value: state.seed['seed_version'] ?? '—',
           ),
+          // Required by the ODbL licence of the church data and map tiles.
+          const Footnote(
+              'Date despre biserici și hartă: © contributorii OpenStreetMap.'),
           // The source of the readings, once here rather than under each
           // one. Same words as `source` in assets/data/biblia_nt.json.
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 6, 20, 0),
-            child: Text(
-              'Textul Apostolului și al Evangheliei: Biblia, ediția Sfântului '
-              'Sinod, IBMBOR, 1988.',
-              style: TextStyle(fontSize: 12.5, color: TroitaColors.muted),
-            ),
-          ),
+          const Footnote('Textul Apostolului și al Evangheliei: Biblia, '
+              'ediția Sfântului Sinod, IBMBOR, 1988.'),
         ],
       ),
     );
   }
-}
-
-class _PermissionCard extends StatelessWidget {
-  const _PermissionCard({required this.onGrant});
-
-  final VoidCallback onGrant;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-        padding: const EdgeInsets.all(TroitaSpacing.card),
-        decoration: TroitaTheme.cardDecoration(
-          color: TroitaColors.accentSurface,
-          borderColor: TroitaColors.gold,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text('Notificările sunt oprite',
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 4),
-            Text(
-              'Permiteți-le pentru a primi notificări.',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            const SizedBox(height: 12),
-            FilledButton(
-              onPressed: onGrant,
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(44),
-              ),
-              child: const Text('Permite notificările'),
-            ),
-          ],
-        ),
-      );
-}
-
-class _Header extends StatelessWidget {
-  const _Header(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 6),
-        child: Text(
-          text.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 11,
-            letterSpacing: 1.2,
-            fontWeight: FontWeight.w700,
-            color: TroitaColors.muted,
-          ),
-        ),
-      );
 }
