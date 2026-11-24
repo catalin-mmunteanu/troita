@@ -58,8 +58,6 @@ class ReadingsCard extends StatelessWidget {
             Text(lectura.none!, style: text.bodyMedium),
           ] else ...<Widget>[
             ...(gospelFirst ? readings.reversed : readings),
-            const SizedBox(height: 4),
-            Text(biblia.source, style: text.bodySmall),
           ],
         ],
       ),

@@ -85,7 +85,8 @@ the site needs (or check troita-web).
   BOR Sunday in `tool/scraped`. Text: `assets/data/biblia_nt.json`, the NT of
   the 1988 Synodal Bible, extracted by `tool/extract_bible_nt.py` from
   `docs/Biblia Ortodoxa Sinodala 1988.pdf` (not in git). We have the right
-  to use the 1988 text; show the source under it. No readings (and no
+  to use the 1988 text; its source is shown once, in Setări → Despre (and on
+  troita.ro/despre), not under each reading. No readings (and no
   notification) on Great Lent weekdays, Cheese Week Wed/Fri, Holy Friday.
   Notification: opt-in `NotificationPrefs.gospel`, default 07:00, channel
   `troita_evanghelie_v1`, ids 4,000,000 + yymmdd, payload `ev:YYYY-MM-DD`
