@@ -5,6 +5,7 @@ import '../../app/troita_icons.dart';
 import '../settings/settings_page.dart';
 import '../map/churches_map_page.dart';
 import 'my_churches_page.dart';
+import 'saved_names_page.dart';
 
 /// `profil` (2:430), minus the account header — there are no accounts yet, so a
 /// name and an avatar would be a lie.
@@ -40,6 +41,14 @@ class ProfilePage extends StatelessWidget {
             subtitle: 'Bisericile, mănăstirile și troițele din toată țara',
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const ChurchesMapPage()),
+            ),
+          ),
+          _Row(
+            icon: Icons.cake_outlined,
+            title: 'Zile de nume',
+            subtitle: 'Numele celor dragi și ziua lor',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const SavedNamesPage()),
             ),
           ),
           _Row(

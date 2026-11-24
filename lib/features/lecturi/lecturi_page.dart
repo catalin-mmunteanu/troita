@@ -193,17 +193,17 @@ class _LecturiPageState extends State<LecturiPage>
             child: Text('Pentru această zi nu avem lecturile.'),
           ),
         if (lectura?.none != null) _NextSunday(from: _date, onGo: _go),
-        if (!prefs.gospel)
+        if (!prefs.on(NotifKind.gospel))
           Container(
             margin: const EdgeInsets.only(top: 14),
             decoration: TroitaTheme.cardDecoration(),
             child: SwitchListTile(
               value: false,
-              onChanged: (bool v) => state.setNotificationPrefs(
-                  prefs.copyWith(gospel: v)),
+              onChanged: (bool v) => state.setNotificationPrefs(prefs
+                  .withLevel(NotifKind.gospel, v ? NotifLevel.all : NotifLevel.off)),
               title: const Text('Primiți Evanghelia în fiecare dimineață'),
               subtitle: Text('La ora ${prefs.gospelTimeLabel}. Ora se '
-                  'schimbă din Profil → Setări.'),
+                  'schimbă din Profil → Setări → Ore.'),
             ),
           ),
       ],

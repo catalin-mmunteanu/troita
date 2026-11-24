@@ -4,8 +4,10 @@ import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
 import '../../app/site_links.dart';
 import '../../app/theme.dart';
+import '../../core/models/saved_name.dart';
 import '../../core/notifications/notification_prefs.dart';
 import '../../core/notifications/notification_service.dart';
+import '../profile/saved_names_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -37,10 +39,22 @@ class _SettingsPageState extends State<SettingsPage> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: prefs.hour, minute: prefs.minute),
-      helpText: 'Ora notificării zilnice',
+      helpText: 'Ora notificărilor de dimineață',
     );
     if (picked == null) return;
     await _update(prefs.copyWith(hour: picked.hour, minute: picked.minute));
+  }
+
+  Future<void> _pickEveningTime(NotificationPrefs prefs) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime:
+          TimeOfDay(hour: prefs.eveningHour, minute: prefs.eveningMinute),
+      helpText: 'Ora notificărilor de seară',
+    );
+    if (picked == null) return;
+    await _update(prefs.copyWith(
+        eveningHour: picked.hour, eveningMinute: picked.minute));
   }
 
   Future<void> _pickGospelTime(NotificationPrefs prefs) async {
@@ -69,100 +83,123 @@ class _SettingsPageState extends State<SettingsPage> {
             if (mounted) setState(() => _permitted = ok);
           }),
 
-          const _Header('Notificarea zilnică'),
-          RadioGroup<DailyNotificationMode>(
-            groupValue: prefs.mode,
-            onChanged: (DailyNotificationMode? v) {
-              if (_busy || v == null) return;
-              _update(prefs.copyWith(mode: v));
-            },
-            child: Column(
-              children: <Widget>[
-                for (final DailyNotificationMode mode
-                    in DailyNotificationMode.values)
-                  RadioListTile<DailyNotificationMode>(
-                    value: mode,
-                    enabled: !_busy,
-                    title: Text(mode.label),
-                    subtitle: Text(mode.description,
-                        style: Theme.of(context).textTheme.bodySmall),
-                    activeColor: TroitaColors.burgundy,
-                  ),
+          const _Header('Notificări'),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
+            child: SegmentedButton<NotifLevel>(
+              segments: const <ButtonSegment<NotifLevel>>[
+                ButtonSegment<NotifLevel>(
+                    value: NotifLevel.all, label: Text('Toate')),
+                ButtonSegment<NotifLevel>(
+                    value: NotifLevel.important, label: Text('Importante')),
+                ButtonSegment<NotifLevel>(
+                    value: NotifLevel.off, label: Text('Oprite')),
               ],
-            ),
-          ),
-
-          if (prefs.mode != DailyNotificationMode.off) ...<Widget>[
-            ListTile(
-              title: const Text('Ora'),
-                trailing: Text(
-                prefs.timeLabel,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(fontSize: 22),
-              ),
-              onTap: _busy ? null : () => _pickTime(prefs),
-            ),
-            SwitchListTile(
-              value: prefs.sound,
-              onChanged: _busy
+              // Nothing selected when the rows differ.
+              selected: <NotifLevel>{
+                if (prefs.common != null) prefs.common!,
+              },
+              emptySelectionAllowed: true,
+              showSelectedIcon: false,
+              onSelectionChanged: _busy
                   ? null
-                  : (bool v) => _update(prefs.copyWith(sound: v)),
-              title: const Text('Sunet la sărbătorile mari'),
-
+                  : (Set<NotifLevel> v) {
+                      if (v.isNotEmpty) _update(prefs.withAll(v.first));
+                    },
             ),
-          ],
-
-          const _Header('Evanghelia zilei'),
-          SwitchListTile(
-            value: prefs.gospel,
-            onChanged:
-                _busy ? null : (bool v) => _update(prefs.copyWith(gospel: v)),
-            title: const Text('Evanghelia zilei'),
-            subtitle: const Text(
-                'Evanghelia de la Liturghie, în fiecare dimineață. Nu vine în '
-                'zilele fără Liturghie din Postul Mare.'),
           ),
-          if (prefs.gospel)
-            ListTile(
-              title: const Text('Ora'),
-              trailing: Text(
-                prefs.gospelTimeLabel,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(fontSize: 22),
-              ),
-              onTap: _busy ? null : () => _pickGospelTime(prefs),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
+            child: Text(
+              'Schimbă toate rândurile de mai jos deodată. Fiecare rând se '
+              'poate alege și separat.',
+              style: Theme.of(context).textTheme.bodySmall,
             ),
+          ),
 
-          const _Header('Posturi'),
+          const _Header('În fiecare zi'),
+          for (final NotifKind k in const <NotifKind>[
+            NotifKind.saint,
+            NotifKind.gospel,
+            NotifKind.dezlegari,
+          ])
+            _LevelRow(kind: k, prefs: prefs, busy: _busy, onChanged: _update),
+
+          const _Header('Sărbători și zile de nume'),
+          for (final NotifKind k in const <NotifKind>[
+            NotifKind.nameDays,
+            NotifKind.hram,
+            NotifKind.fasts,
+            NotifKind.ajun,
+            NotifKind.mosi,
+            NotifKind.legale,
+          ])
+            _LevelRow(
+              kind: k,
+              prefs: prefs,
+              busy: _busy,
+              onChanged: _update,
+              note: k == NotifKind.nameDays && state.savedNames.isEmpty
+                  ? 'Niciun nume salvat încă.'
+                  : null,
+            ),
+          ListTile(
+            leading: const Icon(Icons.badge_outlined),
+            title: const Text('Numele salvate'),
+            subtitle: Text(state.savedNames.isEmpty
+                ? 'Adăugați numele celor dragi.'
+                : state.savedNames
+                    .map((SavedName n) => n.display)
+                    .join(', ')),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => const SavedNamesPage(),
+            )),
+          ),
+
+          const _Header('Ore'),
+          _TimeRow(
+            title: 'Dimineața',
+            subtitle: 'Ce este azi: sfântul, dezlegările, zilele de nume, '
+                'hramurile, ajunurile.',
+            label: prefs.timeLabel,
+            onTap: _busy ? null : () => _pickTime(prefs),
+          ),
+          _TimeRow(
+            title: 'Evanghelia zilei',
+            subtitle: 'Are ora ei.',
+            label: prefs.gospelTimeLabel,
+            onTap: _busy ? null : () => _pickGospelTime(prefs),
+          ),
+          _TimeRow(
+            title: 'Seara',
+            subtitle: 'Ce este mâine: posturile, hramurile, zilele de nume, '
+                'Moșii, zilele libere.',
+            label: prefs.eveningTimeLabel,
+            onTap: _busy ? null : () => _pickEveningTime(prefs),
+          ),
           SwitchListTile(
-            value: prefs.fastReminders,
+            value: prefs.sound,
             onChanged:
-                _busy ? null : (bool v) => _update(prefs.copyWith(fastReminders: v)),
-            title: const Text('Anunț cu o zi înainte'),
-            subtitle: const Text('Pentru cele patru posturi mari.'),
+                _busy ? null : (bool v) => _update(prefs.copyWith(sound: v)),
+            title: const Text('Sunet la sărbătorile mari'),
+            subtitle: const Text('Celelalte notificări vin fără sunet.'),
           ),
 
           const _Header('Jurnal de post'),
           SwitchListTile(
-            value: AppScope.of(context).journalEnabled,
-            onChanged: (bool v) => AppScope.of(context).setJournalEnabled(v),
+            value: state.journalEnabled,
+            onChanged: (bool v) => state.setJournalEnabled(v),
             title: const Text('Întrebarea „Ați ținut postul?”'),
             subtitle: const Text('Notați zilele în care ați ținut postul.'),
           ),
-
-          const _Header('Hramuri'),
-          SwitchListTile(
-            value: prefs.hramReminders,
-            onChanged: _busy
-                ? null
-                : (bool v) => _update(prefs.copyWith(hramReminders: v)),
-            title: const Text('Hramul bisericilor favorite'),
-            subtitle: const Text('Cu o seară înainte.'),
-          ),
+          if (state.journalEnabled)
+            _LevelRow(
+              kind: NotifKind.jurnal,
+              prefs: prefs,
+              busy: _busy,
+              onChanged: _update,
+            ),
 
           const _Header('Despre aplicație'),
           ListTile(
@@ -239,6 +276,113 @@ class _PermissionCard extends StatelessWidget {
             ),
           ],
         ),
+      );
+}
+
+/// One kind of notification: its name, what its level means, and a sheet to
+/// choose Toate · Doar importante · Oprit.
+class _LevelRow extends StatelessWidget {
+  const _LevelRow({
+    required this.kind,
+    required this.prefs,
+    required this.busy,
+    required this.onChanged,
+    this.note,
+  });
+
+  final NotifKind kind;
+  final NotificationPrefs prefs;
+  final bool busy;
+  final ValueChanged<NotificationPrefs> onChanged;
+
+  /// Shown under the description, for a row that cannot do anything yet.
+  final String? note;
+
+  @override
+  Widget build(BuildContext context) {
+    final NotifLevel level = prefs.level(kind);
+    final String? what = kind.describe(level);
+    return ListTile(
+      title: Text(kind.title),
+      subtitle: Text(<String>[
+        if (what != null) what else 'Nicio notificare.',
+        if (note != null && level != NotifLevel.off) note!,
+      ].join(' ')),
+      trailing: Text(
+        level.label,
+        style: TextStyle(
+          fontWeight: FontWeight.w700,
+          color: level == NotifLevel.off
+              ? TroitaColors.muted
+              : TroitaColors.burgundy,
+        ),
+      ),
+      onTap: busy ? null : () => _choose(context, level),
+    );
+  }
+
+  Future<void> _choose(BuildContext context, NotifLevel current) async {
+    final NotifLevel? picked = await showModalBottomSheet<NotifLevel>(
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext context) => SafeArea(
+        child: RadioGroup<NotifLevel>(
+          groupValue: current,
+          onChanged: (NotifLevel? v) => Navigator.of(context).pop(v),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                child: Text(kind.title,
+                    style: Theme.of(context).textTheme.titleMedium),
+              ),
+              for (final NotifLevel l in NotifLevel.values)
+                RadioListTile<NotifLevel>(
+                  value: l,
+                  activeColor: TroitaColors.burgundy,
+                  title: Text(l.label),
+                  subtitle: Text(kind.describe(l) ?? 'Nicio notificare.',
+                      style: Theme.of(context).textTheme.bodySmall),
+                ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (picked != null && picked != current) {
+      onChanged(prefs.withLevel(kind, picked));
+    }
+  }
+}
+
+class _TimeRow extends StatelessWidget {
+  const _TimeRow({
+    required this.title,
+    required this.subtitle,
+    required this.label,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: Text(
+          label,
+          style: Theme.of(context)
+              .textTheme
+              .headlineMedium
+              ?.copyWith(fontSize: 22),
+        ),
+        onTap: onTap,
       );
 }
 

@@ -9,7 +9,7 @@ import 'notification_prefs.dart';
 
 /// Everything scheduled by the app, and the channels they land in.
 ///
-/// Four channels rather than one, because Android only lets the user tune
+/// A channel per kind rather than one, because Android only lets the user tune
 /// interruption per channel. Somebody who wants to know about Sfântul Nicolae
 /// but not about every ordinary commemoration needs two switches in system
 /// settings, and one channel cannot give them that.
@@ -40,6 +40,14 @@ class TroitaNotifications {
   /// settings without touching the saint of the day.
   static const String channelGospel = 'troita_evanghelie_v1';
 
+  // One channel per kind added with the levels, for the same reason.
+  static const String channelNames = 'troita_nume_v1';
+  static const String channelDezlegari = 'troita_dezlegari_v1';
+  static const String channelAjun = 'troita_ajun_v1';
+  static const String channelMosi = 'troita_mosi_v1';
+  static const String channelLegale = 'troita_legale_v1';
+  static const String channelJurnal = 'troita_jurnal_v1';
+
   /// Notification id ranges, so cancelling one kind never touches another.
   // Each kind gets its own million. The per-date key is yymmdd, at most
   // 991231, so the ranges cannot meet. They used to be 100000 and 200000,
@@ -55,6 +63,22 @@ class TroitaNotifications {
   static const int _hramBase = 3000000;
   // Evanghelia zilei, date-keyed like the daily one.
   static const int _gospelBase = 4000000;
+  // The kinds added with the levels. Date-keyed by the day they fire on,
+  // except hram-in-the-day, which is per church like [_hramBase].
+  static const int nameDayBase = 5000000;
+  static const int nameEveBase = 6000000;
+  static const int _hramDayBase = 7000000;
+  static const int mosiBase = 8000000;
+  static const int dezlegariBase = 9000000;
+  static const int ajunBase = 10000000;
+  static const int jurnalBase = 11000000;
+  static const int legaleBase = 12000000;
+
+  /// Ranges whose ids come from a church, not a date.
+  static bool _hashed(int id) {
+    final int base = id - id % 1000000;
+    return base == _hramBase || base == _hramDayBase;
+  }
 
   /// Called when the user taps a notification; carries an ISO date.
   ValueChanged<String>? onOpenDay;
@@ -142,7 +166,7 @@ class TroitaNotifications {
     DateTime? soonest;
     String? title;
     for (final PendingNotificationRequest r in queue) {
-      if (r.id >= _hramBase && r.id < _gospelBase) continue; // not date-keyed
+      if (_hashed(r.id)) continue; // not date-keyed
       final int key = r.id % 1000000;
       final int year = 2000 + key ~/ 10000;
       final int month = (key % 10000) ~/ 100;
@@ -277,13 +301,16 @@ class TroitaNotifications {
     required DateTime fastStart,
     required String periodLabel,
     required String body,
+    required NotificationPrefs prefs,
+    String? title,
   }) async {
-    final tz.TZDateTime when = _at(eveningBefore, 18, 0);
+    final tz.TZDateTime when =
+        _at(eveningBefore, prefs.eveningHour, prefs.eveningMinute);
     if (when.isBefore(tz.TZDateTime.now(tz.local))) return false;
 
     await _plugin.zonedSchedule(
       id: _fastBase + _key(fastStart),
-      title: 'Mâine începe $periodLabel',
+      title: title ?? 'Mâine începe $periodLabel',
       body: body,
       scheduledDate: when,
       notificationDetails: NotificationDetails(
@@ -300,17 +327,21 @@ class TroitaNotifications {
     );    return true;
   }
 
-  /// The evening before a favourite church's hram, at 18:00 like the fast
-  /// reminders. Returns false when that evening has already passed.
+  /// A favourite church's hram: the evening before at the evening hour, or,
+  /// with [onTheDay], that morning. Returns false when the moment has passed.
   Future<bool> scheduleHramReminder({
     required String churchId,
     required String churchName,
     required String? patron,
     required DateTime feastDay,
+    required NotificationPrefs prefs,
+    bool onTheDay = false,
   }) async {
     final DateTime eve =
         DateTime(feastDay.year, feastDay.month, feastDay.day - 1);
-    final tz.TZDateTime when = _at(eve, 18, 0);
+    final tz.TZDateTime when = onTheDay
+        ? _at(feastDay, prefs.hour, prefs.minute)
+        : _at(eve, prefs.eveningHour, prefs.eveningMinute);
     if (when.isBefore(tz.TZDateTime.now(tz.local))) return false;
 
     final String body = <String>[
@@ -319,8 +350,10 @@ class TroitaNotifications {
     ].join(' · ');
 
     await _plugin.zonedSchedule(
-      id: _hramBase + _stableHash(churchId),
-      title: 'Mâine este hramul: $churchName',
+      id: (onTheDay ? _hramDayBase : _hramBase) + _stableHash(churchId),
+      title: onTheDay
+          ? 'Azi este hramul: $churchName'
+          : 'Mâine este hramul: $churchName',
       body: body,
       scheduledDate: when,
       notificationDetails: NotificationDetails(
@@ -334,6 +367,42 @@ class TroitaNotifications {
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: _iso(feastDay),
+    );
+    return true;
+  }
+
+  /// Everything else: one notification on [day] at [hour]:[minute], quiet
+  /// unless [sound], id [base] + the day. Returns false when it has passed.
+  Future<bool> scheduleSimple({
+    required int base,
+    required DateTime day,
+    required int hour,
+    required int minute,
+    required String channelId,
+    required String channelName,
+    required String title,
+    required String body,
+    required DateTime opens,
+    bool sound = false,
+  }) async {
+    final tz.TZDateTime when = _at(day, hour, minute);
+    if (when.isBefore(tz.TZDateTime.now(tz.local))) return false;
+    await _plugin.zonedSchedule(
+      id: base + _key(day),
+      title: title,
+      body: body,
+      scheduledDate: when,
+      notificationDetails: NotificationDetails(
+        android: _details(
+          channelId: channelId,
+          channelName: channelName,
+          importance: Importance.defaultImportance,
+          sound: sound,
+          bigText: body,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      payload: _iso(opens),
     );
     return true;
   }

@@ -12,8 +12,10 @@ import '../core/data/feast_repository.dart';
 import '../core/data/lecturi_repository.dart';
 import '../core/data/local_church_repository.dart';
 import '../core/data/name_days_repository.dart';
+import '../core/data/saved_names_repository.dart';
 import '../core/models/church.dart';
 import '../core/models/lecturi.dart' show ReadingTab;
+import '../core/models/saved_name.dart';
 import '../core/native/troita_native.dart';
 import '../core/notifications/notification_planner.dart';
 import '../core/notifications/notification_prefs.dart';
@@ -60,6 +62,26 @@ class AppState extends ChangeNotifier {
 
   /// Zile de nume, from a bundled asset: no database, loaded on first use.
   final NameDaysRepository nameDays = NameDaysRepository();
+
+  /// The names whose name day the user wants to hear about, in the order
+  /// added.
+  List<SavedName> savedNames = const <SavedName>[];
+  final SavedNamesRepository _savedNamesRepo = SavedNamesRepository();
+
+  Future<void> addSavedName(SavedName name) async {
+    if (savedNames.contains(name)) return;
+    savedNames = <SavedName>[...savedNames, name];
+    await _savedNamesRepo.save(savedNames);
+    notifyListeners();
+    await rescheduleNotifications();
+  }
+
+  Future<void> removeSavedName(SavedName name) async {
+    savedNames = savedNames.where((SavedName n) => n != name).toList();
+    await _savedNamesRepo.save(savedNames);
+    notifyListeners();
+    await rescheduleNotifications();
+  }
 
   /// Apostolul și Evanghelia zilei, and the New Testament text.
   final LecturiRepository lecturi = LecturiRepository();
@@ -154,6 +176,7 @@ class AppState extends ChangeNotifier {
     _openDay(await notifications.launchPayload());
 
     notificationPrefs = await NotificationPrefs.load();
+    savedNames = await _savedNamesRepo.load();
     // Fire and forget: scheduling 60 days walks the database, and the first
     // frame should not wait for it.
     unawaited(rescheduleNotifications());
@@ -221,6 +244,9 @@ class AppState extends ChangeNotifier {
       churches: _repository,
       marks: _marks,
       lecturi: lecturi,
+      nameDays: nameDays,
+      savedNames: savedNames,
+      journal: journalEnabled,
     ).reschedule(notificationPrefs);
     notifyListeners();
     await _refreshWidget();
@@ -268,6 +294,8 @@ class AppState extends ChangeNotifier {
     // Every screen that shows journal data already rebuilds on this.
     journalRevision++;
     notifyListeners();
+    // "Ați ținut postul azi?" only reaches those who keep the journal.
+    await rescheduleNotifications();
   }
 
   /// Bumped whenever a day is marked, so every screen showing the journal
