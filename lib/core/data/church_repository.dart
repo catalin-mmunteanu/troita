@@ -28,6 +28,10 @@ abstract interface class ChurchRepository {
   /// Churches whose hram falls within [days] — the "hram în apropiere" feed.
   Future<List<Church>> upcomingFeasts({int days = 14, int limit = 50});
 
+  /// Churches whose hram falls on [date] (movable hramuri resolved for its
+  /// year), monasteries and higher priority first.
+  Future<List<Church>> feastsOn(DateTime date);
+
   /// Every church as a GeoJSON `FeatureCollection`, for the map.
   ///
   /// A decoded map rather than a JSON string, and that distinction is

@@ -1,12 +1,14 @@
 import '../data/church_marks_repository.dart';
 import '../data/church_repository.dart';
 import '../data/day_repository.dart';
+import '../data/lecturi_repository.dart';
 import '../liturgical/fast_level.dart';
 import '../liturgical/fasting_period.dart';
 import '../liturgical/liturgical_calendar.dart';
 import '../models/church.dart';
 import '../models/feast.dart';
 import '../models/feast_calendar.dart';
+import '../models/lecturi.dart';
 import 'notification_prefs.dart';
 import 'notification_service.dart';
 
@@ -23,13 +25,16 @@ class NotificationPlanner {
     this._notifications, {
     ChurchRepository? churches,
     ChurchMarksRepository? marks,
+    LecturiRepository? lecturi,
   })  : _churches = churches,
-        _marks = marks;
+        _marks = marks,
+        _lecturi = lecturi;
 
   final DayRepository _days;
   final TroitaNotifications _notifications;
   final ChurchRepository? _churches;
   final ChurchMarksRepository? _marks;
+  final LecturiRepository? _lecturi;
 
   /// Days ahead to schedule. 60 keeps us far under Android's pending-alarm
   /// ceiling while surviving a long gap between openings.
@@ -60,7 +65,52 @@ class NotificationPlanner {
       hram = await _scheduleHramReminders(today);
     }
 
-    return PlanResult(daily: daily, fasts: fasts + hram, blocked: false);
+    int gospel = 0;
+    if (prefs.gospel && _lecturi != null) {
+      gospel = await _scheduleGospel(today, prefs);
+    }
+
+    return PlanResult(
+        daily: daily + gospel, fasts: fasts + hram, blocked: false);
+  }
+
+  /// Evanghelia zilei: the reference as title, the first verse as text. Days
+  /// without Liturgy (Great Lent weekdays, Holy Friday) get nothing.
+  Future<int> _scheduleGospel(DateTime today, NotificationPrefs prefs) async {
+    final LecturiRepository repo = _lecturi!;
+    final Lecturi lecturi;
+    final BibliaNT biblia;
+    try {
+      lecturi = await repo.lecturi();
+      biblia = await repo.biblia();
+    } catch (_) {
+      return 0; // a broken asset must not cost the other notifications
+    }
+    int count = 0;
+    for (int offset = 0; offset < windowDays; offset++) {
+      final DateTime date =
+          DateTime(today.year, today.month, today.day + offset);
+      final LecturaZi? day = lecturi.on(date);
+      if (day == null || !day.hasGospel) continue;
+      final List<Verse> verses = biblia.text(day.evanghelie);
+      final String body =
+          verses.isEmpty ? day.evanghelieCite! : _firstWords(verses.first.text);
+      final bool queued = await _notifications.scheduleGospel(
+        date: date,
+        title: 'Evanghelia zilei · ${day.evanghelieCite}',
+        body: body,
+        prefs: prefs,
+      );
+      if (queued) count++;
+    }
+    return count;
+  }
+
+  /// The opening of the pericope, cut at a word, for the notification line.
+  static String _firstWords(String text, {int max = 160}) {
+    if (text.length <= max) return text;
+    final int cut = text.lastIndexOf(' ', max);
+    return '${text.substring(0, cut > 0 ? cut : max)}…';
   }
 
   Future<int> _scheduleDaily(DateTime today, NotificationPrefs prefs) async {

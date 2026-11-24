@@ -76,6 +76,12 @@ void main() {
     expect(found.map((Church c) => c.id), isNot(contains('c:sters')));
   });
 
+  test('feastsOn finds the churches whose hram falls on that day', () async {
+    final List<Church> dec6 = await repo.feastsOn(DateTime(2026, 12, 6));
+    expect(dec6.map((Church c) => c.id), <String>['c:cernica']);
+    expect(await repo.feastsOn(DateTime(2026, 12, 7)), isEmpty);
+  });
+
   test('nearby respects the limit', () async {
     final List<Church> found = await repo.nearby(
       lat: 44.4325, lon: 26.1039, radiusM: 50000, limit: 2,

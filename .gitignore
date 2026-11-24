@@ -151,3 +151,6 @@ coverage/
 test/failures/
 /scratch/
 /tmp/
+
+# Source PDFs (copyrighted, large); only the extracted text is versioned.
+docs/*.pdf

@@ -9,9 +9,11 @@ import '../core/data/church_repository.dart';
 import '../core/data/day_repository.dart';
 import '../core/data/fast_journal_repository.dart';
 import '../core/data/feast_repository.dart';
+import '../core/data/lecturi_repository.dart';
 import '../core/data/local_church_repository.dart';
 import '../core/data/name_days_repository.dart';
 import '../core/models/church.dart';
+import '../core/models/lecturi.dart' show ReadingTab;
 import '../core/native/troita_native.dart';
 import '../core/notifications/notification_planner.dart';
 import '../core/notifications/notification_prefs.dart';
@@ -59,6 +61,9 @@ class AppState extends ChangeNotifier {
   /// Zile de nume, from a bundled asset: no database, loaded on first use.
   final NameDaysRepository nameDays = NameDaysRepository();
 
+  /// Apostolul și Evanghelia zilei, and the New Testament text.
+  final LecturiRepository lecturi = LecturiRepository();
+
   /// The calendar's view of a day: feasts, computed liturgics, published
   /// overrides and the bundled sinaxar text, assembled together.
   DayRepository get days {
@@ -97,6 +102,10 @@ class AppState extends ChangeNotifier {
 
   /// Date from a calendar notification tap that still needs routing.
   DateTime? pendingDate;
+
+  /// Set with [pendingDate] when the tap should open Lecturi on that tab
+  /// rather than the day screen.
+  ReadingTab? pendingReadingTab;
 
   Future<void> initialize() async {
     try {
@@ -150,11 +159,20 @@ class AppState extends ChangeNotifier {
     unawaited(rescheduleNotifications());
   }
 
-  void _openDay(String? iso) {
-    if (iso == null || iso.isEmpty) return;
+  /// A notification payload: an ISO date opens that day; "ev:" before it
+  /// opens that day's Gospel.
+  void _openDay(String? payload) {
+    if (payload == null || payload.isEmpty) return;
+    ReadingTab? tab;
+    String iso = payload;
+    if (payload.startsWith('ev:')) {
+      tab = ReadingTab.evanghelie;
+      iso = payload.substring(3);
+    }
     final DateTime? parsed = DateTime.tryParse(iso);
     if (parsed == null) return;
     pendingDate = DateTime(parsed.year, parsed.month, parsed.day);
+    pendingReadingTab = tab;
     notifyListeners();
   }
 
@@ -164,11 +182,13 @@ class AppState extends ChangeNotifier {
     final DateTime? date = uri == null ? null : SiteLinks.dateOf(uri);
     if (date == null) return;
     pendingDate = date;
+    pendingReadingTab = null;
     notifyListeners();
   }
 
   void consumePendingDate() {
     pendingDate = null;
+    pendingReadingTab = null;
     notifyListeners();
   }
 
@@ -200,6 +220,7 @@ class AppState extends ChangeNotifier {
       TroitaNotifications.instance,
       churches: _repository,
       marks: _marks,
+      lecturi: lecturi,
     ).reschedule(notificationPrefs);
     notifyListeners();
     await _refreshWidget();

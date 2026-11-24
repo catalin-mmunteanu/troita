@@ -37,6 +37,8 @@ jobs:
         run: python tool/check_dart.py
       - name: Name days
         run: python tool/check_name_days.py
+      - name: Lecturi (Apostol, Evanghelie)
+        run: python tool/lectionary.py --check
       - name: Golden vectors match the pipeline's engine
         run: |
           python tool/engine_golden.py --write

@@ -5,19 +5,20 @@ import '../../app/app_state.dart';
 import '../../app/troita_icons.dart';
 import '../calendar/calendar_page.dart';
 import '../fasting/fasting_page.dart';
-import '../map/map_page.dart';
+import '../lecturi/lecturi_page.dart';
 import '../profile/profile_page.dart';
 
-/// Four tabs, matching `bottom-nav` (2:239): Calendar · Posturi · Hartă · Profil.
+/// Four tabs: Calendar · Posturi · Lecturi · Profil.
 ///
-/// An [IndexedStack] keeps a tab's state when you leave it, which the map
-/// needs — re-creating it means re-downloading its style and re-sending
-/// thirteen thousand places. But an IndexedStack also *builds* every child on
-/// the first frame, so the map used to start at launch for every user, opened
-/// or not: a request to tiles.openfreemap.org on each start (an IP address
-/// handed to a third party by someone who only wanted today's saint), and the
-/// whole country's GeoJSON built alongside the calendar's first frame. So the
-/// map is built the first time its tab is chosen, and kept from then on.
+/// Lecturi took the map's place: reading the day's sinaxar and Gospel is
+/// what people come back for each day; the map is a thing looked up now and
+/// then. It opens from Profil and from a day's "Hramuri" card, as
+/// `ChurchesMapPage`, built only then, so no request reaches
+/// tiles.openfreemap.org from someone who never asked for the map.
+///
+/// An [IndexedStack] keeps a tab's state when you leave it, and builds a tab
+/// the first time it is chosen, so Lecturi does not load the sinaxar and
+/// the Bible alongside the calendar's first frame.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -30,8 +31,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Tabs that have been opened at least once. Only these are built.
   final Set<int> _opened = <int>{0};
-
-  static const int _mapTab = 2;
 
   @override
   void initState() {
@@ -65,12 +64,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         index: _tab,
         children: <Widget>[
           const CalendarPage(),
-          const FastingPage(),
-          if (_opened.contains(_mapTab))
-            const MapPage()
-          else
-            const SizedBox.shrink(),
-          const ProfilePage(),
+          if (_opened.contains(1)) const FastingPage() else const SizedBox.shrink(),
+          if (_opened.contains(2)) const LecturiPage() else const SizedBox.shrink(),
+          if (_opened.contains(3)) const ProfilePage() else const SizedBox.shrink(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -90,9 +86,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             label: 'Posturi',
           ),
           NavigationDestination(
-            icon: Icon(TroitaIcons.map),
-            selectedIcon: Icon(TroitaIcons.mapFilled),
-            label: 'Harta',
+            icon: Icon(TroitaIcons.book),
+            selectedIcon: Icon(Icons.menu_book),
+            label: 'Lecturi',
           ),
           NavigationDestination(
             icon: Icon(TroitaIcons.profile),

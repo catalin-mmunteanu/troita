@@ -36,6 +36,10 @@ class TroitaNotifications {
   /// reminder fires (createNotification sets up the channel from its details).
   static const String channelHram = 'troita_hram_v1';
 
+  /// Evanghelia zilei: its own channel, so it can be silenced in the system
+  /// settings without touching the saint of the day.
+  static const String channelGospel = 'troita_evanghelie_v1';
+
   /// Notification id ranges, so cancelling one kind never touches another.
   // Each kind gets its own million. The per-date key is yymmdd, at most
   // 991231, so the ranges cannot meet. They used to be 100000 and 200000,
@@ -49,6 +53,8 @@ class TroitaNotifications {
   // feast day — so their ids come from the church id instead. Kept in a range
   // of their own, and excluded from the date decoding in [nextScheduled].
   static const int _hramBase = 3000000;
+  // Evanghelia zilei, date-keyed like the daily one.
+  static const int _gospelBase = 4000000;
 
   /// Called when the user taps a notification; carries an ISO date.
   ValueChanged<String>? onOpenDay;
@@ -136,7 +142,7 @@ class TroitaNotifications {
     DateTime? soonest;
     String? title;
     for (final PendingNotificationRequest r in queue) {
-      if (r.id >= _hramBase) continue; // not date-keyed
+      if (r.id >= _hramBase && r.id < _gospelBase) continue; // not date-keyed
       final int key = r.id % 1000000;
       final int year = 2000 + key ~/ 10000;
       final int month = (key % 10000) ~/ 100;
@@ -233,6 +239,36 @@ class TroitaNotifications {
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: _iso(date),
     );    return true;
+  }
+
+  /// Evanghelia zilei, at its own hour. Quiet: a reading, not an alarm.
+  Future<bool> scheduleGospel({
+    required DateTime date,
+    required String title,
+    required String body,
+    required NotificationPrefs prefs,
+  }) async {
+    final tz.TZDateTime when = _at(date, prefs.gospelHour, prefs.gospelMinute);
+    if (when.isBefore(tz.TZDateTime.now(tz.local))) return false;
+    await _plugin.zonedSchedule(
+      id: _gospelBase + _key(date),
+      title: title,
+      body: body,
+      scheduledDate: when,
+      notificationDetails: NotificationDetails(
+        android: _details(
+          channelId: channelGospel,
+          channelName: 'Evanghelia zilei',
+          importance: Importance.defaultImportance,
+          sound: false,
+          bigText: body,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      // "ev:" opens the reading itself, not the day.
+      payload: 'ev:${_iso(date)}',
+    );
+    return true;
   }
 
   /// The evening before a great fast begins.
