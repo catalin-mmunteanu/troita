@@ -177,10 +177,12 @@ class _LecturiPageState extends State<LecturiPage>
             child: SwitchListTile(
               value: false,
               onChanged: (bool v) => state.setNotificationPrefs(prefs
-                  .withLevel(NotifKind.gospel, v ? NotifLevel.all : NotifLevel.off)),
+                  .withLevel(
+                      NotifKind.gospel, v ? NotifLevel.all : NotifLevel.off)
+                  .copyWith(enabled: v || prefs.enabled)),
               title: const Text('Primiți Evanghelia în fiecare dimineață'),
               subtitle: Text('La ora ${prefs.gospelTimeLabel}. Ora se '
-                  'schimbă din Profil → Setări → Ore.'),
+                  'schimbă din Setări → Notificări.'),
             ),
           ),
       ],

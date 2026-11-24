@@ -102,6 +102,7 @@ enum NotifKind {
 /// for settings would undo the point of keeping it narrow.
 class NotificationPrefs {
   const NotificationPrefs({
+    this.enabled = true,
     this.levels = const <NotifKind, NotifLevel>{},
     this.hour = 8,
     this.minute = 0,
@@ -111,6 +112,10 @@ class NotificationPrefs {
     this.gospelHour = 7,
     this.gospelMinute = 0,
   });
+
+  /// The main switch. Off silences everything and keeps every row's level,
+  /// so switching back on returns to the same choices.
+  final bool enabled;
 
   /// Only the kinds set by the user; the rest use [NotifKind.defaultLevel].
   final Map<NotifKind, NotifLevel> levels;
@@ -133,7 +138,12 @@ class NotificationPrefs {
 
   NotifLevel level(NotifKind kind) => levels[kind] ?? kind.defaultLevel;
 
-  bool on(NotifKind kind) => level(kind) != NotifLevel.off;
+  /// Whether [kind] sends anything: its level, under the main switch.
+  bool on(NotifKind kind) => enabled && level(kind) != NotifLevel.off;
+
+  /// How many kinds are not Oprit.
+  int get activeCount =>
+      NotifKind.values.where((NotifKind k) => level(k) != NotifLevel.off).length;
 
   /// The level every kind shares, or null when they differ.
   NotifLevel? get common {
@@ -149,6 +159,7 @@ class NotificationPrefs {
         for (final NotifKind k in NotifKind.values) k: value,
       });
 
+  static const String _kEnabled = 'notif_enabled';
   static const String _kHour = 'notif_hour';
   static const String _kMinute = 'notif_minute';
   static const String _kEveningHour = 'notif_evening_hour';
@@ -165,6 +176,7 @@ class NotificationPrefs {
   static const String _kOldGospel = 'notif_gospel';
 
   NotificationPrefs copyWith({
+    bool? enabled,
     Map<NotifKind, NotifLevel>? levels,
     int? hour,
     int? minute,
@@ -175,6 +187,7 @@ class NotificationPrefs {
     int? gospelMinute,
   }) =>
       NotificationPrefs(
+        enabled: enabled ?? this.enabled,
         levels: levels ?? this.levels,
         hour: hour ?? this.hour,
         minute: minute ?? this.minute,
@@ -207,6 +220,7 @@ class NotificationPrefs {
       if (chosen != null) levels[k] = chosen;
     }
     return NotificationPrefs(
+      enabled: getBool(_kEnabled) ?? true,
       levels: levels,
       hour: (getInt(_kHour) ?? 8).clamp(0, 23),
       minute: (getInt(_kMinute) ?? 0).clamp(0, 59),
@@ -251,6 +265,7 @@ class NotificationPrefs {
 
   Future<void> save() async {
     final SharedPreferences p = await SharedPreferences.getInstance();
+    await p.setBool(_kEnabled, enabled);
     for (final NotifKind k in NotifKind.values) {
       await p.setString(_kLevel(k), level(k).name);
     }

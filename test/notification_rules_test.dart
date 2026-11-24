@@ -58,6 +58,19 @@ void main() {
           isNull);
     });
 
+    test('the main switch silences without losing the rows', () {
+      final NotificationPrefs p = _store(<String, Object>{
+        'notif_enabled': false,
+        'notif_level_gospel': 'all',
+      });
+      expect(p.enabled, isFalse);
+      expect(p.on(NotifKind.gospel), isFalse);
+      expect(p.level(NotifKind.gospel), NotifLevel.all);
+      expect(p.copyWith(enabled: true).on(NotifKind.gospel), isTrue);
+      // Defaults: saint, names, fasts, hram.
+      expect(const NotificationPrefs().activeCount, 4);
+    });
+
     test('every level of every kind but Oprit says what it means', () {
       for (final NotifKind k in NotifKind.values) {
         expect(k.describe(NotifLevel.all), isNotNull, reason: k.name);

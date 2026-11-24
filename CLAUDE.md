@@ -104,6 +104,10 @@ the site needs (or check troita-web).
   Two shared hours: morning (today) and evening (tomorrow); the Gospel keeps
   its own. 60-day window, one channel and one id million per kind (see
   `TroitaNotifications`); old switches migrate in `NotificationPrefs.fromStore`.
+  Setări is an overview (each row shows its value); notifications have their
+  own screen (`notifications_page.dart`) with a main switch
+  (`NotificationPrefs.enabled`, keeps the levels) and the shared pieces in
+  `settings_widgets.dart`.
 - **Text size.** One app-wide `AppState.textScale` (85–160 %, steps of 15,
   `lib/app/text_size.dart`), multiplied with the phone's in `main.dart`'s
   `MaterialApp.builder`. Set from Profil and Setări (`TextSizeCard`) and the

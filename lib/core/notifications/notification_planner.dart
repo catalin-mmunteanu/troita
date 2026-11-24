@@ -66,6 +66,10 @@ class NotificationPlanner {
       return const PlanResult(daily: 0, fasts: 0, blocked: true);
     }
 
+    if (!prefs.enabled) {
+      return const PlanResult(daily: 0, fasts: 0, blocked: false);
+    }
+
     final DateTime now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
 
@@ -82,7 +86,7 @@ class NotificationPlanner {
     Future<int> guarded(
         NotifKind kind, Future<int> Function(NotifLevel) run) async {
       final NotifLevel level = prefs.level(kind);
-      if (level == NotifLevel.off) return 0;
+      if (!prefs.on(kind)) return 0;
       try {
         return await run(level);
       } catch (_) {

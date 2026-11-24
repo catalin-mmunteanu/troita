@@ -59,7 +59,7 @@ class ProfilePage extends StatelessWidget {
           _Row(
             icon: TroitaIcons.bell,
             title: 'Setări',
-            subtitle: 'Notificări și date',
+            subtitle: 'Notificări, mărimea textului, jurnal',
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const SettingsPage()),
             ),
