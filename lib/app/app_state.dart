@@ -22,6 +22,7 @@ import '../core/notifications/notification_prefs.dart';
 import '../core/notifications/notification_service.dart';
 import '../core/permissions/permission_service.dart';
 import 'site_links.dart';
+import 'text_size.dart';
 import 'widget_feed.dart';
 
 /// Single app-wide store. Deliberately a plain [ChangeNotifier]: the app has
@@ -141,8 +142,11 @@ class AppState extends ChangeNotifier {
       _days = DayRepository(shared, _feasts!);
       _journal = await FastJournalRepository.open();
       _marks = await ChurchMarksRepository.open();
-      journalEnabled =
-          (await SharedPreferences.getInstance()).getBool(_kJournal) ?? false;
+      final SharedPreferences sp = await SharedPreferences.getInstance();
+      journalEnabled = sp.getBool(_kJournal) ?? false;
+      // Lecturi used to keep a size of its own; it seeds the shared one.
+      textScale = TextSize.clamp(
+          sp.getDouble(_kTextScale) ?? sp.getDouble('reading_scale') ?? 1.0);
       seed = init.seed;
       status = init.status;
       pendingChurchId = await _native.consumePendingChurchId();
@@ -286,6 +290,19 @@ class AppState extends ChangeNotifier {
   bool journalEnabled = false;
 
   static const String _kJournal = 'journal_enabled';
+
+  /// The app's own text size, on top of the phone's: one setting for every
+  /// screen, changed with A−/A+ in Profil, Setări, Lecturi and a day's
+  /// screen. For people who see poorly and need it larger everywhere.
+  double textScale = 1.0;
+  static const String _kTextScale = 'text_scale';
+
+  Future<void> setTextScale(double value) async {
+    textScale = TextSize.clamp(value);
+    notifyListeners();
+    final SharedPreferences p = await SharedPreferences.getInstance();
+    await p.setDouble(_kTextScale, textScale);
+  }
 
   Future<void> setJournalEnabled(bool on) async {
     journalEnabled = on;

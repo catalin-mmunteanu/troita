@@ -1,9 +1,9 @@
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
+import '../../app/text_size.dart';
 import '../../app/theme.dart';
 import '../../core/data/day_repository.dart';
 import '../../core/models/feast.dart';
@@ -16,9 +16,9 @@ import 'reading_widgets.dart';
 /// The third tab opens it on today. A day's "Evanghelia" and "Sinaxar"
 /// buttons and the morning notifications open the same screen on their day
 /// and sub-tab. Days move with the arrows under the tabs, not by swiping: a
-/// horizontal swipe already switches Evanghelie and Sinaxar. The text size
-/// is kept between visits, because the people who need it larger need it
-/// larger every time.
+/// horizontal swipe already switches Evanghelie and Sinaxar. A−/A+ change
+/// the app's one text size, kept between visits, because the people who
+/// need it larger need it larger every time, and everywhere.
 class LecturiPage extends StatefulWidget {
   const LecturiPage({super.key, this.date, this.tab = ReadingTab.evanghelie});
 
@@ -32,12 +32,9 @@ class LecturiPage extends StatefulWidget {
 
 class _LecturiPageState extends State<LecturiPage>
     with SingleTickerProviderStateMixin {
-  static const String _kScale = 'reading_scale';
-
   late final TabController _tabs = TabController(
       length: ReadingTab.values.length, vsync: this, initialIndex: widget.tab.index);
   late DateTime _date = _dayOf(widget.date ?? DateTime.now());
-  double _scale = 1.0;
   DayEntry? _entry;
   LecturaZi? _lectura;
   BibliaNT? _biblia;
@@ -48,10 +45,6 @@ class _LecturiPageState extends State<LecturiPage>
   @override
   void initState() {
     super.initState();
-    SharedPreferences.getInstance().then((SharedPreferences p) {
-      final double? s = p.getDouble(_kScale);
-      if (s != null && mounted) setState(() => _scale = s.clamp(0.85, 1.75));
-    });
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
@@ -89,12 +82,6 @@ class _LecturiPageState extends State<LecturiPage>
     _load();
   }
 
-  Future<void> _setScale(double s) async {
-    setState(() => _scale = s);
-    final SharedPreferences p = await SharedPreferences.getInstance();
-    await p.setDouble(_kScale, s);
-  }
-
   @override
   Widget build(BuildContext context) {
     final bool isToday = _date == _dayOf(DateTime.now());
@@ -102,16 +89,7 @@ class _LecturiPageState extends State<LecturiPage>
       appBar: AppBar(
         title: const Text('Lecturi'),
         actions: <Widget>[
-          IconButton(
-            tooltip: 'Text mai mic',
-            onPressed: _scale <= 0.85 ? null : () => _setScale(_scale - 0.15),
-            icon: const Text('A−', style: TextStyle(fontSize: 15)),
-          ),
-          IconButton(
-            tooltip: 'Text mai mare',
-            onPressed: _scale >= 1.75 ? null : () => _setScale(_scale + 0.15),
-            icon: const Text('A+', style: TextStyle(fontSize: 19)),
-          ),
+          const TextSizeButtons(),
           const SizedBox(width: 4),
         ],
         bottom: TabBar(
@@ -155,7 +133,7 @@ class _LecturiPageState extends State<LecturiPage>
             child: Text(
               f.name,
               style: TroitaCalendarText.commemoration.copyWith(
-                fontSize: 21 * _scale,
+                fontSize: 21,
                 height: 1.3,
                 fontWeight: FontWeight.w700,
               ),
@@ -163,11 +141,11 @@ class _LecturiPageState extends State<LecturiPage>
           ),
         const SizedBox(height: 12),
         if (entry?.sinaxar != null && !entry!.sinaxar!.isEmpty)
-          SinaxarText(sinaxar: entry.sinaxar!, scale: _scale)
+          SinaxarText(sinaxar: entry.sinaxar!)
         else
           Text(
             'Sinaxarul pentru această zi nu este încă inclus.',
-            style: text.bodyMedium?.copyWith(fontSize: 15 * _scale, height: 1.6),
+            style: text.bodyMedium?.copyWith(fontSize: 15, height: 1.6),
           ),
       ],
     );
@@ -184,7 +162,6 @@ class _LecturiPageState extends State<LecturiPage>
           ReadingsCard(
             lectura: lectura,
             biblia: _biblia!,
-            scale: _scale,
             gospelFirst: true,
           )
         else

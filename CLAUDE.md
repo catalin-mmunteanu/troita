@@ -104,6 +104,11 @@ the site needs (or check troita-web).
   Two shared hours: morning (today) and evening (tomorrow); the Gospel keeps
   its own. 60-day window, one channel and one id million per kind (see
   `TroitaNotifications`); old switches migrate in `NotificationPrefs.fromStore`.
+- **Text size.** One app-wide `AppState.textScale` (85–160 %, steps of 15,
+  `lib/app/text_size.dart`), multiplied with the phone's in `main.dart`'s
+  `MaterialApp.builder`. Set from Profil and Setări (`TextSizeCard`) and the
+  app bars of Lecturi and the day screen (`TextSizeButtons`). Don't add
+  per-screen scales; the bottom bar clamps at 130 %.
 - **Rank names:** `praznic · cruce_rosie · cruce_albastra · simplu`. Say
   "cruce albastră", not "cruce neagră".
 - **Notes from the scraper:** junk (page JavaScript) is dropped and fixed-date

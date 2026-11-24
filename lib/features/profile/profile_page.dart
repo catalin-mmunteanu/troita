@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../../app/text_size.dart';
 import '../../app/theme.dart';
 import '../../app/troita_icons.dart';
 import '../settings/settings_page.dart';
@@ -9,6 +10,9 @@ import 'saved_names_page.dart';
 
 /// `profil` (2:430), minus the account header — there are no accounts yet, so a
 /// name and an avatar would be a lie.
+///
+/// The text size of the whole app is set here first, where people look for
+/// it, with rows large enough to read before they have found it.
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -27,6 +31,7 @@ class ProfilePage extends StatelessWidget {
             child: Text('Profil',
                 style: Theme.of(context).textTheme.headlineMedium),
           ),
+          const TextSizeCard(),
           _Row(
             icon: Icons.star_border,
             title: 'Bisericile mele',
@@ -85,10 +90,19 @@ class _Row extends StatelessWidget {
         ),
         decoration: TroitaTheme.cardDecoration(),
         child: ListTile(
-          leading: Icon(icon, color: TroitaColors.burgundy),
-          title: Text(title, style: Theme.of(context).textTheme.titleMedium),
-          subtitle:
-              Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          leading: Icon(icon, color: TroitaColors.burgundy, size: 28),
+          title: Text(title,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontSize: 18)),
+          subtitle: Text(subtitle,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(fontSize: 15, color: TroitaColors.muted)),
           trailing:
               const Icon(TroitaIcons.chevronRight, color: TroitaColors.muted),
           onTap: onTap,

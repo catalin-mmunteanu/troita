@@ -69,33 +69,38 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           if (_opened.contains(3)) const ProfilePage() else const SizedBox.shrink(),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (int i) => setState(() {
-          _tab = i;
-          _opened.add(i);
-        }),
-        destinations: const <NavigationDestination>[
-          NavigationDestination(
-            icon: Icon(TroitaIcons.calendar),
-            selectedIcon: Icon(TroitaIcons.calendarFilled),
-            label: 'Calendar',
-          ),
-          NavigationDestination(
-            icon: Icon(TroitaIcons.fasting),
-            label: 'Posturi',
-          ),
-          NavigationDestination(
-            icon: Icon(TroitaIcons.book),
-            selectedIcon: Icon(Icons.menu_book),
-            label: 'Lecturi',
-          ),
-          NavigationDestination(
-            icon: Icon(TroitaIcons.profile),
-            selectedIcon: Icon(TroitaIcons.profileFilled),
-            label: 'Profil',
-          ),
-        ],
+      // The tab labels stop growing at 130 %: past that they wrap or clip,
+      // and the icons already say which tab is which.
+      bottomNavigationBar: MediaQuery.withClampedTextScaling(
+        maxScaleFactor: 1.3,
+        child: NavigationBar(
+          selectedIndex: _tab,
+          onDestinationSelected: (int i) => setState(() {
+            _tab = i;
+            _opened.add(i);
+          }),
+          destinations: const <NavigationDestination>[
+            NavigationDestination(
+              icon: Icon(TroitaIcons.calendar),
+              selectedIcon: Icon(TroitaIcons.calendarFilled),
+              label: 'Calendar',
+            ),
+            NavigationDestination(
+              icon: Icon(TroitaIcons.fasting),
+              label: 'Posturi',
+            ),
+            NavigationDestination(
+              icon: Icon(TroitaIcons.book),
+              selectedIcon: Icon(Icons.menu_book),
+              label: 'Lecturi',
+            ),
+            NavigationDestination(
+              icon: Icon(TroitaIcons.profile),
+              selectedIcon: Icon(TroitaIcons.profileFilled),
+              label: 'Profil',
+            ),
+          ],
+        ),
       ),
     );
   }

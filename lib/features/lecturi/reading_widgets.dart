@@ -18,7 +18,7 @@ class ReadingsCard extends StatelessWidget {
     super.key,
     required this.lectura,
     required this.biblia,
-    required this.scale,
+    this.scale = 1.0,
     this.gospelFirst = false,
   });
 
@@ -100,7 +100,7 @@ class ReadingsCard extends StatelessWidget {
 
 /// The sinaxar of a day in full: icons, ornament, sections.
 class SinaxarText extends StatelessWidget {
-  const SinaxarText({super.key, required this.sinaxar, required this.scale});
+  const SinaxarText({super.key, required this.sinaxar, this.scale = 1.0});
 
   final Sinaxar sinaxar;
   final double scale;

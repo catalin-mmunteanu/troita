@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
 import '../../app/site_links.dart';
+import '../../app/text_size.dart';
 import '../../app/theme.dart';
 import '../../core/models/saved_name.dart';
 import '../../core/notifications/notification_prefs.dart';
@@ -82,6 +83,9 @@ class _SettingsPageState extends State<SettingsPage> {
             final bool ok = await state.requestNotificationPermission();
             if (mounted) setState(() => _permitted = ok);
           }),
+
+          const _Header('Text'),
+          const TextSizeCard(),
 
           const _Header('Notificări'),
           Padding(
