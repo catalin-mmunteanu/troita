@@ -7,6 +7,7 @@ import '../../app/app_scope.dart';
 import '../../app/app_state.dart';
 import '../../app/text_size.dart';
 import '../../app/theme.dart';
+import '../../app/troita_mark.dart';
 import '../../core/models/church.dart';
 import '../../core/models/name_days.dart';
 import '../../core/models/saved_name.dart';
@@ -155,7 +156,16 @@ class WelcomeStep extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const SizedBox(height: 8),
-        const Icon(Icons.add, size: 56, color: TroitaColors.burgundy),
+        // The app icon itself, so the first screen and the launcher match.
+        Container(
+          width: 76,
+          height: 76,
+          decoration: BoxDecoration(
+            color: TroitaMark.burgundy,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const TroitaMark.still(size: 76),
+        ),
         const SizedBox(height: 12),
         const _Heading(
           'Bun venit în Troița',
@@ -216,10 +226,24 @@ class NotificationsStepState extends State<NotificationsStep> {
     super.didChangeDependencies();
     if (_ready) return;
     final NotificationPrefs prefs = AppScope.of(context).notificationPrefs;
-    _preset = prefs.preset;
-    _gospel = prefs.level(NotifKind.gospel) != NotifLevel.off;
+    if (isUntouched(prefs)) {
+      // Nothing chosen yet: start from the recommendation.
+      _preset = NotifPreset.all;
+      _gospel = true;
+    } else {
+      _preset = prefs.preset;
+      _gospel = prefs.level(NotifKind.gospel) != NotifLevel.off;
+    }
     _ready = true;
   }
+
+  /// A new install: no row has been set, the main switch is on.
+  static bool isUntouched(NotificationPrefs prefs) =>
+      prefs.enabled && prefs.levels.isEmpty;
+
+  /// The recommended settings: everything, with the Gospel.
+  static NotificationPrefs recommended(NotificationPrefs prefs) =>
+      prefs.applyPreset(NotifPreset.all, gospel: true);
 
   /// Saves the choice and, unless it is "Fără notificări", asks the phone
   /// for the permission. Returns whether it was granted; null when not asked.
@@ -241,19 +265,19 @@ class NotificationsStepState extends State<NotificationsStep> {
                 'nicăieri.',
           ),
           _ChoiceCard(
+            selected: _preset == NotifPreset.all,
+            title: 'Tot',
+            badge: 'Recomandat',
+            text: 'În fiecare zi sfântul zilei, plus dezlegările, ajunurile, '
+                'Moșii, zilele de nume și hramul bisericii dumneavoastră.',
+            onTap: () => setState(() => _preset = NotifPreset.all),
+          ),
+          _ChoiceCard(
             selected: _preset == NotifPreset.important,
             title: 'Doar ce este important',
-            badge: 'Recomandat',
             text: 'Sărbătorile mari, începutul posturilor, hramul bisericii '
                 'dumneavoastră și zilele de nume ale celor dragi.',
             onTap: () => setState(() => _preset = NotifPreset.important),
-          ),
-          _ChoiceCard(
-            selected: _preset == NotifPreset.all,
-            title: 'Tot',
-            text: 'În fiecare zi sfântul zilei, plus dezlegările, ajunurile, '
-                'Moșii și zilele libere.',
-            onTap: () => setState(() => _preset = NotifPreset.all),
           ),
           _ChoiceCard(
             selected: _preset == NotifPreset.none,
@@ -273,9 +297,8 @@ class NotificationsStepState extends State<NotificationsStep> {
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               title: const Text('Evanghelia zilei, dimineața',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-              subtitle: Text(
-                'La ora ${AppScope.of(context).notificationPrefs.gospelTimeLabel}, '
-                'cu primul verset.',
+              subtitle: const Text(
+                'Primul verset al Evangheliei, în fiecare dimineață.',
                 style: _small,
               ),
             ),

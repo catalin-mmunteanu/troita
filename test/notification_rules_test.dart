@@ -7,6 +7,7 @@ import 'package:troita/core/models/name_days.dart';
 import 'package:troita/core/models/saved_name.dart';
 import 'package:troita/core/notifications/notification_planner.dart';
 import 'package:troita/core/notifications/notification_prefs.dart';
+import 'package:troita/features/onboarding/onboarding_steps.dart';
 
 NotificationPrefs _store(Map<String, Object> values) =>
     NotificationPrefs.fromStore(
@@ -92,6 +93,15 @@ void main() {
       expect(none.level(NotifKind.gospel), NotifLevel.all); // kept
       expect(none.preset, NotifPreset.none);
       expect(p.preset, NotifPreset.important);
+    });
+
+    test('a new install is recommended everything, with the Gospel', () {
+      const NotificationPrefs fresh = NotificationPrefs();
+      expect(NotificationsStepState.isUntouched(fresh), isTrue);
+      final NotificationPrefs r = NotificationsStepState.recommended(fresh);
+      expect(r.preset, NotifPreset.all);
+      expect(r.level(NotifKind.gospel), NotifLevel.all);
+      expect(NotificationsStepState.isUntouched(r), isFalse);
     });
 
     test('every level of every kind but Oprit says what it means', () {

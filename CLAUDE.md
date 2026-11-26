@@ -108,8 +108,17 @@ the site needs (or check troita-web).
   own screen (`notifications_page.dart`) with a main switch
   (`NotificationPrefs.enabled`, keeps the levels) and the shared pieces in
   `settings_widgets.dart`.
+- **Splash.** `lib/app/troita_mark.dart`: `TroitaMark` (the launcher
+  icon's troiță on its 108 grid) and `TroitaSplash` ("Troița se ridică",
+  2.4 s, only on the first start: `splash_seen`; later starts show it
+  still while the data opens). Android's launch screen
+  (`launch_background.xml`, `values-v31/styles.xml`) is the same burgundy
+  and icon, so the hand-over doesn't jump. Only the word "Troița", no
+  other text (owner's choice).
 - **Onboarding.** `lib/features/onboarding/`: welcome + text size,
-  notifications (three `NotifPreset` cards; the permission asked on
+  notifications (three `NotifPreset` cards, "Tot" + Evanghelia recommended
+  and preselected on a new install, also what skipping applies; no hour
+  shown; the permission asked on
   leaving that step, never for "Fără notificări"), names, Biserica mea
   (`AppState.parishId`, also a favourite), jurnal + widget hint, summary.
   Every choice saved at once; the step is kept in `onboarding_step` so an

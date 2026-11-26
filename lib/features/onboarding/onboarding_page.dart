@@ -86,7 +86,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
     setState(() => _busy = true);
     final AppState state = AppScope.of(context);
     if (skipped && !widget.rerun) {
-      // The defaults include the great feasts: ask once, as before.
+      // Skipping takes the recommendation, as the first card would have.
+      if (NotificationsStepState.isUntouched(state.notificationPrefs)) {
+        await state.setNotificationPrefs(
+            NotificationsStepState.recommended(state.notificationPrefs));
+      }
       await state.requestNotificationPermission();
     }
     final SharedPreferences p = await SharedPreferences.getInstance();
