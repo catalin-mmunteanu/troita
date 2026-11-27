@@ -80,11 +80,16 @@ class LocalChurchRepository implements ChurchRepository {
     // time and holds name, hram and address together, which is why "Curtici"
     // finds the churches in that village and "Parascheva" finds the ones
     // dedicated to her.
+    // Each word on its own, so "nicolae iasi" finds Sf. Nicolae in Iași:
+    // name and address are in the same column but not next to each other.
+    final List<String> words =
+        folded.split(' ').where((String w) => w.isNotEmpty).toList();
     final List<Map<String, Object?>> rows = await _db.query(
       'churches',
       columns: _cols.split(', '),
-      where: 'deleted = 0 AND search_fold LIKE ?',
-      whereArgs: <Object?>['%$folded%'],
+      where: 'deleted = 0 AND '
+          '${List<String>.filled(words.length, 'search_fold LIKE ?').join(' AND ')}',
+      whereArgs: <Object?>[for (final String w in words) '%$w%'],
       orderBy: 'priority DESC, name ASC',
       limit: limit,
     );

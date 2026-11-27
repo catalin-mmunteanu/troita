@@ -7,6 +7,7 @@ import 'package:troita/core/models/name_days.dart';
 import 'package:troita/core/models/saved_name.dart';
 import 'package:troita/core/notifications/notification_planner.dart';
 import 'package:troita/core/notifications/notification_prefs.dart';
+import 'package:troita/features/onboarding/onboarding_steps.dart';
 
 NotificationPrefs _store(Map<String, Object> values) =>
     NotificationPrefs.fromStore(
@@ -69,6 +70,38 @@ void main() {
       expect(p.copyWith(enabled: true).on(NotifKind.gospel), isTrue);
       // Defaults: saint, names, fasts, hram.
       expect(const NotificationPrefs().activeCount, 4);
+    });
+
+    test('onboarding presets', () {
+      const NotificationPrefs p = NotificationPrefs();
+      final NotificationPrefs all =
+          p.applyPreset(NotifPreset.all, gospel: false);
+      expect(all.level(NotifKind.mosi), NotifLevel.all);
+      expect(all.level(NotifKind.gospel), NotifLevel.off);
+      expect(all.preset, NotifPreset.all);
+
+      final NotificationPrefs important =
+          all.applyPreset(NotifPreset.important, gospel: true);
+      expect(important.level(NotifKind.mosi), NotifLevel.off);
+      expect(important.level(NotifKind.saint), NotifLevel.important);
+      expect(important.level(NotifKind.gospel), NotifLevel.all);
+      expect(important.preset, NotifPreset.important);
+
+      final NotificationPrefs none =
+          important.applyPreset(NotifPreset.none, gospel: true);
+      expect(none.enabled, isFalse);
+      expect(none.level(NotifKind.gospel), NotifLevel.all); // kept
+      expect(none.preset, NotifPreset.none);
+      expect(p.preset, NotifPreset.important);
+    });
+
+    test('a new install is recommended everything, with the Gospel', () {
+      const NotificationPrefs fresh = NotificationPrefs();
+      expect(NotificationsStepState.isUntouched(fresh), isTrue);
+      final NotificationPrefs r = NotificationsStepState.recommended(fresh);
+      expect(r.preset, NotifPreset.all);
+      expect(r.level(NotifKind.gospel), NotifLevel.all);
+      expect(NotificationsStepState.isUntouched(r), isFalse);
     });
 
     test('every level of every kind but Oprit says what it means', () {

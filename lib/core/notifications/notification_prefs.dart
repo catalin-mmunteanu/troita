@@ -95,6 +95,18 @@ enum NotifKind {
       };
 }
 
+/// The three choices of the onboarding, one card each.
+enum NotifPreset {
+  /// The defaults: great feasts, fasts, hram, name days.
+  important,
+
+  /// Every kind on Toate.
+  all,
+
+  /// The main switch off.
+  none,
+}
+
 /// Notification settings, on the device.
 ///
 /// `shared_preferences` rather than the method channel: a handful of values
@@ -149,6 +161,33 @@ class NotificationPrefs {
   NotifLevel? get common {
     final Set<NotifLevel> used = NotifKind.values.map(level).toSet();
     return used.length == 1 ? used.first : null;
+  }
+
+  /// Which onboarding card these settings match best.
+  NotifPreset get preset {
+    if (!enabled) return NotifPreset.none;
+    final bool allOn = NotifKind.values
+        .where((NotifKind k) => k != NotifKind.gospel && k != NotifKind.jurnal)
+        .every((NotifKind k) => level(k) == NotifLevel.all);
+    return allOn ? NotifPreset.all : NotifPreset.important;
+  }
+
+  /// The settings of an onboarding card. [gospel] is its own switch on the
+  /// same screen; "Fără notificări" keeps the rows, so choosing again later
+  /// starts from them.
+  NotificationPrefs applyPreset(NotifPreset p, {required bool gospel}) {
+    final NotifLevel g = gospel ? NotifLevel.all : NotifLevel.off;
+    return switch (p) {
+      NotifPreset.none => copyWith(enabled: false),
+      NotifPreset.important => copyWith(enabled: true, levels: <NotifKind, NotifLevel>{
+          for (final NotifKind k in NotifKind.values) k: k.defaultLevel,
+          NotifKind.gospel: g,
+        }),
+      NotifPreset.all => copyWith(enabled: true, levels: <NotifKind, NotifLevel>{
+          for (final NotifKind k in NotifKind.values) k: NotifLevel.all,
+          NotifKind.gospel: g,
+        }),
+    };
   }
 
   NotificationPrefs withLevel(NotifKind kind, NotifLevel value) =>

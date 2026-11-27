@@ -49,10 +49,7 @@ class _SavedNamesPageState extends State<SavedNamesPage> {
   Future<void> _add() async {
     final NameDays? nameDays = _nameDays;
     if (nameDays == null) return;
-    final SavedName? picked = await showDialog<SavedName>(
-      context: context,
-      builder: (_) => _AddNameDialog(names: nameDays.allNames),
-    );
+    final SavedName? picked = await showAddNameDialog(context, nameDays);
     if (picked != null && mounted) {
       await AppScope.of(context).addSavedName(picked);
     }
@@ -115,6 +112,14 @@ class _SavedNamesPageState extends State<SavedNamesPage> {
     return '${DateFormat('d MMMM yyyy', 'ro').format(d)} · $saint';
   }
 }
+
+/// Asks for a name from the list and an optional label. Shared with the
+/// onboarding.
+Future<SavedName?> showAddNameDialog(BuildContext context, NameDays nameDays) =>
+    showDialog<SavedName>(
+      context: context,
+      builder: (_) => _AddNameDialog(names: nameDays.allNames),
+    );
 
 /// A name from the list, typed with or without diacritics, and a label.
 class _AddNameDialog extends StatefulWidget {

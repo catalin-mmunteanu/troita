@@ -44,4 +44,11 @@ void main() {
       expect(n.contains(RegExp('[şţŞŢ]')), isFalse, reason: n);
     }
   });
+
+  test('nextDay: this year, today, or next year', () {
+    expect(nd.nextDay('Andrei', DateTime(2026, 11, 24)), DateTime(2026, 11, 30));
+    expect(nd.nextDay('Andrei', DateTime(2026, 11, 30)), DateTime(2026, 11, 30));
+    expect(nd.nextDay('Andrei', DateTime(2026, 12, 1)), DateTime(2027, 11, 30));
+    expect(nd.nextDay('Nimeni-Altcineva', DateTime(2026, 1, 1)), isNull);
+  });
 }

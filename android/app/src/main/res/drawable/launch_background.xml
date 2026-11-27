@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- The icon's burgundy with its troiță in the middle: the first thing on
+     screen, and the same picture Flutter's splash (TroitaSplash) starts
+     from, so nothing jumps when it takes over. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@android:color/white" />
+    <item android:drawable="@color/ic_launcher_background" />
+    <item
+        android:width="216dp"
+        android:height="216dp"
+        android:gravity="center"
+        android:drawable="@drawable/ic_launcher_foreground" />
 </layer-list>

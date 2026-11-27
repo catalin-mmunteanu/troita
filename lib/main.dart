@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app_scope.dart';
 import 'app/app_state.dart';
 import 'app/theme.dart';
+import 'app/troita_mark.dart';
 import 'core/models/lecturi.dart' show ReadingTab;
 import 'features/calendar/day_detail_page.dart';
 import 'features/church_detail/church_detail_page.dart';
@@ -17,17 +19,28 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ro');
 
+  // The animated splash plays once, on the first start after installing;
+  // later starts show the still mark while the data opens. Read before the
+  // first frame so the right one is drawn from the start.
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final bool firstRun = !(prefs.getBool(_kSplashSeen) ?? false);
+
   final AppState state = AppState();
   // Fire and forget: the UI renders a splash until `ready` flips.
   unawaited(state.initialize());
 
-  runApp(TroitaApp(state: state));
+  runApp(TroitaApp(state: state, firstRun: firstRun));
 }
 
+const String _kSplashSeen = 'splash_seen';
+
 class TroitaApp extends StatelessWidget {
-  const TroitaApp({required this.state, super.key});
+  const TroitaApp({required this.state, this.firstRun = false, super.key});
 
   final AppState state;
+
+  /// The first start after installing: play "Troița se ridică".
+  final bool firstRun;
 
   @override
   Widget build(BuildContext context) {
@@ -49,14 +62,16 @@ class TroitaApp extends StatelessWidget {
             child: child ?? const SizedBox.shrink(),
           );
         },
-        home: const _Root(),
+        home: _Root(firstRun: firstRun),
       ),
     );
   }
 }
 
 class _Root extends StatefulWidget {
-  const _Root();
+  const _Root({required this.firstRun});
+
+  final bool firstRun;
 
   @override
   State<_Root> createState() => _RootState();
@@ -64,6 +79,15 @@ class _Root extends StatefulWidget {
 
 class _RootState extends State<_Root> {
   bool _routing = false;
+
+  /// Whether the first-run animation has finished (or never had to run).
+  late bool _splashDone = !widget.firstRun;
+
+  Future<void> _onSplashDone() async {
+    if (mounted) setState(() => _splashDone = true);
+    final SharedPreferences p = await SharedPreferences.getInstance();
+    await p.setBool(_kSplashSeen, true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,19 +130,26 @@ class _RootState extends State<_Root> {
       });
     }
 
-    if (!state.ready) {
+    if (state.error != null) {
       return Scaffold(
         body: Center(
-          child: state.error == null
-              ? const CircularProgressIndicator()
-              : Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: Text(
-                    'Nu am putut porni aplicația.\n\n${state.error}',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Text(
+              'Nu am putut porni aplicația.\n\n${state.error}',
+              textAlign: TextAlign.center,
+            ),
+          ),
         ),
+      );
+    }
+
+    // The same burgundy and troiță as Android's launch screen, so the
+    // hand-over from it is seamless; animated only on the first start.
+    if (!state.ready || !_splashDone) {
+      return TroitaSplash(
+        animate: widget.firstRun,
+        onDone: widget.firstRun ? _onSplashDone : null,
       );
     }
 

@@ -144,6 +144,7 @@ class AppState extends ChangeNotifier {
       _marks = await ChurchMarksRepository.open();
       final SharedPreferences sp = await SharedPreferences.getInstance();
       journalEnabled = sp.getBool(_kJournal) ?? false;
+      parishId = sp.getString(_kParish);
       // Lecturi used to keep a size of its own; it seeds the shared one.
       textScale = TextSize.clamp(
           sp.getDouble(_kTextScale) ?? sp.getDouble('reading_scale') ?? 1.0);
@@ -337,6 +338,23 @@ class AppState extends ChangeNotifier {
     // Hram reminders are scheduled for favourites, so the window changes too.
     unawaited(rescheduleNotifications());
     return mark;
+  }
+
+  /// "Biserica mea": the one church the user calls theirs, chosen at the
+  /// onboarding or later. It is a favourite too, so its hram is announced.
+  String? parishId;
+  static const String _kParish = 'parish_id';
+
+  Future<void> setParish(String? churchId) async {
+    parishId = churchId;
+    final SharedPreferences p = await SharedPreferences.getInstance();
+    if (churchId == null) {
+      await p.remove(_kParish);
+      notifyListeners();
+      return;
+    }
+    await p.setString(_kParish, churchId);
+    await setFavourite(churchId, true);
   }
 
   Future<ChurchMark> setVisited(String churchId, bool on) async {
